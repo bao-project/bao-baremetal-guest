@@ -15,6 +15,7 @@
  */
 
 #include "gicv2.h"
+#include <irq.h>
 
 volatile gicd_t* gicd = (void*)0xF9010000;
 volatile gicc_t* gicc = (void*)0xF9020000;
@@ -152,13 +153,6 @@ bool gicd_is_active(uint64_t int_id){
     return ((1U << off) & gicd->ISACTIVER[reg_ind]) != 0;
 }
 
-
-irq_handler_t handlers[GIC_MAX_INTERUPTS];
-
-void gic_set_handler(uint64_t id, irq_handler_t handler){
-    handlers[id] = handler;
-}
-
 void gic_handle(){
 
     uint64_t ack = gicc->IAR;
@@ -167,8 +161,7 @@ void gic_handle(){
 
     if(id >= 1022) return;
 
-    if(handlers[id] != NULL)
-        handlers[id](id);
+    irq_handle(id);
 
     if(id >= 32 && id <= 35)
         return; 

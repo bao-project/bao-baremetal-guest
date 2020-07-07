@@ -396,14 +396,15 @@
 
 #ifndef __ASSEMBLER__
 
-#define MRS(var, reg) asm volatile("mrs %0, "#reg"\n\r": "=r"(var))
-#define MSR(reg, var) asm volatile("msr "#reg", %0\n\r" :: "r"(var))
+#define STR(str) #str
 
-static inline uint64_t get_cpuid(){
-    uint64_t cpuid;
-    MRS(cpuid, MPIDR_EL1);
-    return cpuid & MPIDR_CPU_MASK;
-}
+#define MRS(reg) ({\
+    uint64_t _temp;\
+    asm volatile("mrs %0, " STR(reg) "\n\r" : "=r"(_temp));\
+    _temp;\
+})
+
+#define MSR(reg, var) asm volatile("msr " STR(reg)  ", %0\n\r" ::"r"(var))
 
 #endif  /* |__ASSEMBLER__ */
 

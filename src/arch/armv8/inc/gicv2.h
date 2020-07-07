@@ -142,8 +142,4 @@ void gicd_send_sgi(uint64_t cpu_target, uint64_t sgi_num);
 bool gicd_is_pending(uint64_t int_id);
 bool gicd_is_active(uint64_t int_id);
 
-typedef void (*irq_handler_t)(uint64_t id);
-void gic_set_handler(uint64_t id, irq_handler_t handler);
-
-
 #endif /* __GICV2_H__ */

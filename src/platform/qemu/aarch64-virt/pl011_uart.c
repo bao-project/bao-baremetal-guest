@@ -68,23 +68,12 @@ void pl011_uart_init(volatile Pl011_Uart * ptr_uart/*, uint32_t baud_rate*/) {
 	/* First, disable everything */
 	ptr_uart->control = 0x0;
 
-	/* Disable FIFOs */
-	lcrh_reg = ptr_uart->line_control;
-	lcrh_reg &= ~UART_LCR_FEN;
-	ptr_uart->line_control = lcrh_reg;
-
 	/* Default baudrate = 115200 */
 	uint32_t baud_rate = UART_BAUD_RATE;
 	pl011_uart_set_baud_rate(ptr_uart, baud_rate);
 
-	/* Set the UART to be 8 bits, 1 stop bit and no parity, FIFOs enable*/
-	ptr_uart->line_control = (UART_LCR_WLEN_8 | UART_LCR_FEN);
-
-	/* Enable the UART, enable TX and enable loop back*/
-	ptr_uart->control = (UART_CR_UARTEN | UART_CR_TXE | UART_CR_LBE);
-
-	/* Set the receive interrupt FIFO level to 1/2 full */
-	ptr_uart->isr_fifo_level_sel = UART_IFLS_RXIFLSEL_1_2;
+	/* Set the UART to be 8 bits, 1 stop bit and no parity, FIFOs disable*/
+	ptr_uart->line_control = UART_LCR_WLEN_8;
 
 	ptr_uart->data = 0x0;
 	while(ptr_uart->flag & UART_FR_BUSY);
@@ -93,10 +82,10 @@ void pl011_uart_init(volatile Pl011_Uart * ptr_uart/*, uint32_t baud_rate*/) {
 	ptr_uart->control = (UART_CR_UARTEN | UART_CR_RXE | UART_CR_TXE);
 
 	/* Clear interrupts */
-	ptr_uart->isr_clear = (UART_ICR_OEIC | UART_ICR_BEIC | UART_ICR_PEIC | UART_ICR_FEIC);
+	ptr_uart->isr_clear = 0xffff; 
 
-	/* Enable receive and receive timeout interrupts */
-	ptr_uart->isr_mask = (UART_MIS_RXMIS | UART_MIS_RTMIS);
+	/* Enable receive interrupts */
+	ptr_uart->isr_mask = UART_MIS_RXMIS;
 
 }
 
@@ -137,8 +126,8 @@ Pl011_Uart *uart  = (void*) 0xFF010000;
 
 void uart_init(void)
 {
-    pl011_uart_init(uart);
-    pl011_uart_enable(uart);
+    //pl011_uart_init(uart);
+    //pl011_uart_enable(uart);
 
     return;
 }
@@ -157,6 +146,7 @@ void uart_enable_rxirq(){
 
 }
 
-void uart_clear_irqs(){
-
+void uart_clear_rxirq(){
+    volatile char c = uart->data;
+    uart->isr_clear = 0xffff;
 }

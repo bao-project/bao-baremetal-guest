@@ -168,7 +168,7 @@ void uart_enable_rxirq(){
     xil_uart_enable_irq(uart, UART_ISR_EN_RTRIG);
 }
 
-void uart_clear_irqs(){
+void uart_clear_rxirq(){
     xil_uart_clear_rxbuf(uart);
     xil_uart_clear_irq(uart, 0xFFFFFFFF);
 }
