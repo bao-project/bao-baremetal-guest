@@ -1,7 +1,7 @@
 
 #include <stdint.h>
 #include <psci.h>
-#include <gicv2.h>
+#include <gic.h>
 
 void _start();
 

@@ -14,7 +14,7 @@
  *
  */
 
-#include "gicv2.h"
+#include "gic.h"
 #include <irq.h>
 
 volatile gicd_t* gicd = (void*)0xF9010000;
