@@ -1,4 +1,8 @@
-/** * Bao, a Lightweight Static Partitioning Hypervisor * * Copyright (c) Bao Project (www.bao-project.org), 2019- *
+/** 
+ * Bao, a Lightweight Static Partitioning Hypervisor 
+ *
+ * Copyright (c) Bao Project (www.bao-project.org), 2019-
+ *
  * Authors:
  *      Jose Martins <jose.martins@bao-project.org>
  *      Sandro Pinto <sandro.pinto@bao-project.org>
