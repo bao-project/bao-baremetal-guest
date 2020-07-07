@@ -1,12 +1,17 @@
 
+
+#include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/errno.h>
 
+#include <spinlock.h>
 #include <uart.h>
-#include <sysregs.h>
-#include <psci.h>
-#include <gicv2.h>
+#include <cpu.h>
+#include <fences.h>
+#include <wfi.h>
 
 int _read(int file, char *ptr, int len)
 {
@@ -61,7 +66,6 @@ void* _sbrk(int increment)
 {
     extern char _heap_base;
     static char* heap_end = &_heap_base;
-
     char* current_heap_end = heap_end;
     heap_end += increment;
     return current_heap_end;
@@ -69,8 +73,10 @@ void* _sbrk(int increment)
 
 void _exit(int return_value)
 {
-    asm ("dsb sy");
-    while (1) asm ("wfi" ::: "memory");
+    fence_ord();
+    while (1) {
+        wfi();
+    }
 }
 
 int _getpid(void)
@@ -84,22 +90,27 @@ int _kill(int pid, int sig)
     return -1;
 }
 
-void _init(){
+static void tls_init(){
 
-    void _start();
-    void main();
+    register void* tp = get_tp();
+    extern uint8_t _tdata_start, _tdata_end;
+    extern uint8_t _tbss_start, _tbss_end;
+    
+    size_t tdata_size = &_tdata_end - &_tdata_start;
+    memcpy(tp, &_tdata_start, tdata_size);
+    size_t tbss_size = &_tbss_end - &_tbss_start;
+    memset(tp + tdata_size, 0, tbss_size);
+}
 
-    if(get_cpuid() == 0){
-        uart_init();
-        gic_init();
-        for(int i = 1; i < 4; i++){
-            psci_cpu_on(i, (uintptr_t) _start, 0);
-        }
-    }
+extern void arch_init();
+extern int main();
 
-    gic_cpu_init();
-    asm volatile("msr DAIFClr, %0\n" :: "I"(0x2));  
+void _init(uint64_t cpuid){
 
-    main();
+    tls_init();
+    uart_init();
+    arch_init(cpuid);
+    int ret = main();
+    _exit(ret);
 }
 

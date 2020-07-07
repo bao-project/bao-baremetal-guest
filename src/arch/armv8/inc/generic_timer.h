@@ -27,15 +27,13 @@ void gt_enable()
 
 void gt_next(uint64_t us)
 {
-    uint64_t current = 0;
-    MRS(current, CNTPCT_EL0);
+    uint64_t current = MRS(CNTPCT_EL0);
     MSR(CNTV_CVAL_EL0, current + (us * 100));
 }
 
 inline static uint64_t gt_read_us()
 {
-    uint64_t time = 0;
-    MRS(time, CNTVCT_EL0);
+    uint64_t time = MRS(CNTVCT_EL0);
     return time * 100; // assumes plat_freq = 100MHz
 }
 

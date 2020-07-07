@@ -21,6 +21,6 @@ void uart_init(void);
 void uart_putc(char c);
 char uart_getchar(void);
 void uart_enable_rxirq();
-void uart_clear_irqs();
+void uart_clear_rxirq();
 
 #endif

@@ -14,6 +14,14 @@
  *
  */
 
+#include <plat.h>
+
+MEMORY {
+    RAM (rwx)    : ORIGIN = PLAT_MEM_BASE, LENGTH = PLAT_MEM_SIZE    
+}
+
+ENTRY(_start)
+
 SECTIONS {
 
     .start : {
@@ -28,13 +36,23 @@ SECTIONS {
         *(.rodata*)
     }
 
+    PROVIDE(_tls_start = .);    
+    .tdata : {
+        PROVIDE(_tdata_start = .);
+        *(.tdata)
+        PROVIDE(_tdata_end = .);
+    }
+    .tbss (NOLOAD) :  {	
+        PROVIDE(_tbss_start = .);
+        *(.tbss)
+        PROVIDE(_tbss_end = .);
+    }
+    PROVIDE(_tls_end = .);
+
     .data : {
         *(.data .data.*)
+        PROVIDE(__global_pointer$ = . + 0x800);
         *(.sdata .sdata.* .sdata2.*)
-    }
-
-    .page_tables : {
-        *(.page_tables)
     }
 
     .bss (NOLOAD) :  {	
@@ -44,7 +62,10 @@ SECTIONS {
         __bss_end = .;
     }
 
-    _stack_base = .;
-    . += 0x4000 * 4;
-    _heap_base = .;
+    . = ALIGN(16);
+    PROVIDE(_tls_dyn = .);
+    PROVIDE(_stack_base = .);
+    . = . + 128K; /* 1M for per-hart storage (tls+stack) */
+    PROVIDE(end = . );
+    PROVIDE(_heap_base = .);
 }

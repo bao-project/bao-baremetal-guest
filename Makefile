@@ -16,47 +16,60 @@
 
 
 NAME := bao_bare-metal_guest
-
-CROSS_COMPILE ?= aarch64-elf-
-CC:=$(CROSS_COMPILE)gcc
-AS:=$(CROSS_COMPILE)as
-LD:=$(CROSS_COMPILE)ld
-OBJCOPY:=$(CROSS_COMPILE)objcopy
-OBJDUMP:=$(CROSS_COMPILE)objdump
-
-OPT_LEVEL = 3
-DEBUG_LEVEL = 0
+OPT_LEVEL = 0
+DEBUG_LEVEL = 3
 
 ifneq ($(MAKECMDGOALS), clean)
-ifeq ($(PLAT),)
+ifeq ($(PLATFORM),)
 $(error Undefined platform)
 endif
 endif
 
 SRC_DIR:=./src
-BUILD_DIR:=build/$(PLAT)
+BUILD_DIR:=build/$(PLATFORM)
 TARGET:=$(BUILD_DIR)/$(NAME)
-PLAT_DIR:=$(SRC_DIR)/platform/$(PLAT)
-SRC_DIRS:=$(SRC_DIR) $(PLAT_DIR)
+PLATFORM_DIR:=$(SRC_DIR)/platform/$(PLATFORM)
+SRC_DIRS:=$(SRC_DIR) $(PLATFORM_DIR)
 INC_DIRS:=$(addsuffix /inc, $(SRC_DIRS))
 
-ifeq ($(wildcard $(PLAT_DIR)),)
-$(error unsupported platform $(PLAT))
+ifeq ($(wildcard $(PLATFORM_DIR)),)
+$(error unsupported platform $(PLATFORM))
 endif
 
-LINKER_SCRIPT:=linker.ld
-C_SRC = $(foreach src_dir, $(SRC_DIRS), $(wildcard $(src_dir)/*.c))
-ASM_SRC = $(foreach src_dir, $(SRC_DIRS), $(wildcard $(src_dir)/*.S))
+-include $(SRC_DIR)/sources.mk
+C_SRC+=$(addprefix $(SRC_DIR)/, $(src_c_srcs))
+
+-include $(PLATFORM_DIR)/plat.mk
+-include $(PLATFORM_DIR)/sources.mk
+C_SRC+=$(addprefix $(PLATFORM_DIR)/, $(plat_c_srcs))
+ASM_SRC+=$(addprefix $(PLATFORM_DIR)/, $(plat_s_srcs))
+ARCH_DIR:= $(SRC_DIR)/arch/$(ARCH)
+SRC_DIRS+= $(ARCH_DIR)
+INC_DIRS+= $(ARCH_DIR)/inc
+-include $(ARCH_DIR)/arch.mk
+-include $(ARCH_DIR)/sources.mk
+C_SRC+=$(addprefix $(ARCH_DIR)/, $(arch_c_srcs))
+ASM_SRC+=$(addprefix $(ARCH_DIR)/, $(arch_s_srcs))
+
+LD_FILE:= $(SRC_DIR)/linker.ld
+GEN_LD_FILE:= $(BUILD_DIR)/linker.ld
+#C_SRC = $(foreach src_dir, $(SRC_DIRS), $(wildcard $(src_dir)/*.c))
+#ASM_SRC = $(foreach src_dir, $(SRC_DIRS), $(wildcard $(src_dir)/*.S))
 OBJS = $(C_SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o) $(ASM_SRC:$(SRC_DIR)/%.S=$(BUILD_DIR)/%.o)
-DEPS = $(OBJS:%=%.d)
+DEPS = $(OBJS:%=%.d) $(GEN_LD_FILE).d
 DIRS:=$(sort $(dir $(OBJS) $(DEPS)))
 
-GENERIC_FLAGS = -march=armv8-a -O$(OPT_LEVEL) -g$(DEBUG_LEVEL)
-ASFLAGS = $(GENERIC_FLAGS)
-CFLAGS = $(GENERIC_FLAGS)
-CPPFLAGS =	$(addprefix -I, $(INC_DIRS)) -MD -MF $@.d
-LDFLAGS = $(GENERIC_FLAGS) -nostartfiles -ffreestanding -static
+CC=$(CROSS_COMPILE)gcc
+AS=$(CROSS_COMPILE)as
+LD=$(CROSS_COMPILE)ld
+OBJCOPY=$(CROSS_COMPILE)objcopy
+OBJDUMP=$(CROSS_COMPILE)objdump
 
+GENERIC_FLAGS = $(ARCH_GENERIC_FLAGS) -O$(OPT_LEVEL) -g$(DEBUG_LEVEL) -static
+ASFLAGS = $(GENERIC_FLAGS) $(ARCH_ASFLAGS) 
+CFLAGS = $(GENERIC_FLAGS) $(ARCH_CFLAGS) 
+CPPFLAGS =	$(ARCH_CPPFLAGS) $(addprefix -I, $(INC_DIRS)) -MD -MF $@.d
+LDFLAGS = $(GENERIC_FLAGS) $(ARCH_LDFLAGS) -nostartfiles 
 all: $(TARGET).bin
 
 ifneq ($(MAKECMDGOALS), clean)
@@ -66,8 +79,8 @@ endif
 $(TARGET).bin: $(TARGET).elf
 	$(OBJCOPY) -O binary $< $@
 
-$(TARGET).elf: $(OBJS) $(LD_FILE)
-	$(CC) $(LDFLAGS) -T$(LINKER_SCRIPT) $(OBJS) -o $@
+$(TARGET).elf: $(OBJS) $(GEN_LD_FILE)
+	$(CC) $(LDFLAGS) -T$(GEN_LD_FILE) $(OBJS) -o $@
 	$(OBJDUMP) -S $@ > $(TARGET).asm
 	$(OBJDUMP) -x -d --wide $@ > $(TARGET).lst
 
@@ -81,6 +94,9 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.S
 	$(CC) $(ASFLAGS) $(CPPFLAGS) -c $< -o $@
+
+$(GEN_LD_FILE): $(LD_FILE)
+	$(CC) $(CPPFLAGS) -E -x assembler-with-cpp $< | grep "^[^#;]" > $@
 
 .SECONDEXPANSION:
 
