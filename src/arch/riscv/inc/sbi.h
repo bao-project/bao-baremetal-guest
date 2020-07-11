@@ -71,4 +71,9 @@ struct sbiret sbi_remote_hfence_vvma(const unsigned long hart_mask,
                                      unsigned long start_addr,
                                      unsigned long size);
 
+struct sbiret sbi_hart_start(unsigned long hartid, unsigned long start_addr,
+                             unsigned long priv);
+struct sbiret sbi_hart_stop();
+struct sbiret sbi_hart_status(unsigned long hartid);
+
 #endif /* __SBI_H__ */

@@ -152,11 +152,12 @@ char uart_getchar(void)
     return uart8250_getc();
 }
 
-
 void uart_enable_rxirq()
 {
+    uart8250_enable_rx_int();
 }
 
 void uart_clear_rxirq()
 {
+    uart8250_interrupt_handler(); 
 }

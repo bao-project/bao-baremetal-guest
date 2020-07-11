@@ -22,6 +22,9 @@
 #include <stdbool.h>
 #include <bit.h>
 
+#define GICV2 (2)
+#define GICV3 (3)
+
 #define GIC_MAX_INTERUPTS 1024
 #define GIC_MAX_SGIS 16
 #define GIC_MAX_PPIS 16

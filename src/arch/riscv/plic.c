@@ -40,15 +40,10 @@ static int plic_hartidpriv_to_context(int hartid, int mode){
     return (hartid*2) + (mode == PRIV_M ? 0 : 1);
 }
 
-//static spinlock_t plic_lock = SPINLOCK_INITVAL;
-
 void plic_init(){
     int cntxt = plic_hartidpriv_to_context(hart_id, PRIV_S);
     plic_hart = (void*) PLIC_HART_BASE + (cntxt*sizeof(plic_hart_t));
-    //plic_hart->threshold = 0;
-    //spin_lock(&plic_lock);
-    //printf("hartd%d: plic_hart at 0x%lx\n", hart_id, plic_hart);
-    //spin_unlock(&plic_lock);
+    plic_hart->threshold = 0;
 }
 
 void plic_enable_interrupt(int hid, int int_id, bool en){
@@ -58,7 +53,7 @@ void plic_enable_interrupt(int hid, int int_id, bool en){
     
     int cntxt = plic_hartidpriv_to_context(hid, PRIV_S);
     if(cntxt < 0) return;
-    //printf("hartd%d: enable interrupt\n", hart_id, plic_hart);
+
     if(en){
         plic_global->enbl[cntxt][reg_ind] |= mask;
     } else {
@@ -76,8 +71,6 @@ int plic_get_prio(int int_id){
 }
 
 void plic_handle(){
-
-    printf("%s\n", __func__);
 
     uint32_t id = plic_hart->claim;
 
