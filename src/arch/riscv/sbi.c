@@ -34,6 +34,11 @@
 #define SBI_REMOTE_HFENCE_VVMA_FID (5)
 #define SBI_REMOTE_HFENCE_VVMA_ASID_FID (6)
 
+#define SBI_EXTID_HSM (0x48534D)
+#define SBI_HART_START_FID  (0)
+#define SBI_HART_STOP_FID   (1)
+#define SBI_HART_STATUS_FID   (2)
+
 static inline struct sbiret sbi_ecall(long eid, long fid, long a0, long a1,
                                       long a2, long a3, long a4, long a5)
 {
@@ -158,3 +163,23 @@ struct sbiret sbi_remote_hfence_vvma(const unsigned long hart_mask,
     return sbi_ecall(SBI_EXTID_RFNC, SBI_REMOTE_HFENCE_VVMA_FID, hart_mask,
                      hart_mask_base, start_addr, size, 0, 0);
 }
+
+struct sbiret sbi_hart_start(unsigned long hartid, unsigned long start_addr,
+                             unsigned long priv)
+{
+    return sbi_ecall(SBI_EXTID_HSM, SBI_HART_START_FID, hartid,
+                     start_addr, priv, 0, 0, 0);    
+}
+
+struct sbiret sbi_hart_stop()
+{
+    return sbi_ecall(SBI_EXTID_HSM, SBI_HART_STOP_FID, 0,
+                     0, 0, 0, 0, 0);   
+}
+
+struct sbiret sbi_hart_status(unsigned long hartid)
+{
+    return sbi_ecall(SBI_EXTID_HSM, SBI_HART_STATUS_FID, hartid,
+                     0, 0, 0, 0, 0);   
+}
+

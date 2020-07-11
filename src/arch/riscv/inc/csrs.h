@@ -107,11 +107,11 @@
 #define SATP_MODE_48    (9ULL << SATP_MODE_OFF)
 #define SATP_ASID_MSK   BIT_MASK(SATP_ASID_OFF,SATP_ASID_LEN)
 
-#define SSTATUS_UIE_BIT     (1ULL << 0)
-#define SSTATUS_SIE_BIT     (1ULL << 1)
-#define SSTATUS_UPIE_BIT    (1ULL << 4)
-#define SSTATUS_SPIE_BIT    (1ULL << 5)
-#define SSTATUS_SPP_BIT     (1ULL << 8)
+#define SSTATUS_UIE     (1ULL << 0)
+#define SSTATUS_SIE     (1ULL << 1)
+#define SSTATUS_UPIE    (1ULL << 4)
+#define SSTATUS_SPIE    (1ULL << 5)
+#define SSTATUS_SPP     (1ULL << 8)
 
 #define SIE_USIE    (1ULL << 0)
 #define SIE_SSIE    (1ULL << 1)
