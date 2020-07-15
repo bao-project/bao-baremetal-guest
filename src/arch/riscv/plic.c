@@ -74,7 +74,8 @@ void plic_handle(){
 
     uint32_t id = plic_hart->claim;
 
-    irq_handle(id);
-
-    plic_hart->complete = id;
+    if(id > 0) {
+        irq_handle(id);
+        plic_hart->complete = id;
+    }
 }
