@@ -14,7 +14,7 @@ static bool is_external(uint64_t cause) {
     }
 }
 
-__attribute__((interrupt("supervisor")))
+__attribute__((interrupt("supervisor"), aligned(4)))
 void exception_handler(){
     
     uint64_t scause = CSRR(scause);
