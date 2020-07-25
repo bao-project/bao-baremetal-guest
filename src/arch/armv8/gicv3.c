@@ -414,10 +414,7 @@ void gicr_set_enable(uint64_t int_id, bool en, uint32_t gicr_id)
 static bool irq_in_gicd(uint64_t int_id)
 {
     if (int_id > 32 && int_id < 1025) return true;
-
-    if (int_id < 32 && !(gicd->CTLR & GICD_CTLR_ARE_NS_BIT)) return true;
-
-    return false;
+    else return false;
 }
 
 void gic_send_sgi(uint64_t cpu_target, uint64_t sgi_num)
