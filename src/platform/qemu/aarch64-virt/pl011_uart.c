@@ -126,8 +126,8 @@ Pl011_Uart *uart  = (void*) 0xFF010000;
 
 void uart_init(void)
 {
-    //pl011_uart_init(uart);
-    //pl011_uart_enable(uart);
+    pl011_uart_init(uart);
+    pl011_uart_enable(uart);
 
     return;
 }
@@ -147,6 +147,8 @@ void uart_enable_rxirq(){
 }
 
 void uart_clear_rxirq(){
-    volatile char c = uart->data;
+    while(!(uart->flag & UART_FR_RXFE)) {
+        volatile char c = uart->data;
+    }
     uart->isr_clear = 0xffff;
 }
