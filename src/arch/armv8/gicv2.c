@@ -16,6 +16,7 @@
 
 #include "gic.h"
 #include <irq.h>
+#include <cpu.h>
 
 volatile gicd_t* gicd = (void*)0xF9010000;
 volatile gicc_t* gicc = (void*)0xF9020000;
@@ -25,7 +26,7 @@ static size_t gic_num_int(){
         GICD_TYPER_ITLINENUM_OFF) +1)*32;
 }
 
-void gic_cpu_init(){
+void gicc_init(){
 
      for(int i =0; i < GIC_NUM_INT_REGS(GIC_CPU_PRIV); i++){
         /**
@@ -55,7 +56,7 @@ void gic_cpu_init(){
     
 }
 
-void gic_init(){
+void gicd_init(){
 
     size_t int_num = gic_num_int();
 
@@ -88,6 +89,13 @@ void gic_init(){
     gicd->CTLR |= GICD_CTLR_EN_BIT;
 }
 
+void gic_init() {
+    if(get_cpuid() == 0) {
+        gicd_init();
+    }
+    gicc_init();
+}
+
 void gic_set_enable(uint64_t int_id, bool en){
     
     uint64_t reg_ind = int_id/(sizeof(uint32_t)*8);
@@ -108,6 +116,15 @@ void gic_set_trgt(uint64_t int_id, uint8_t trgt)
 
     gicd->ITARGETSR[reg_ind] =
         (gicd->ITARGETSR[reg_ind] & ~mask) | ((trgt << off) & mask);
+}
+
+uint8_t gic_get_trgt(uint64_t int_id)
+{
+    uint64_t reg_ind = (int_id * GIC_TARGET_BITS) / (sizeof(uint32_t) * 8);
+    uint64_t off = (int_id * GIC_TARGET_BITS) % (sizeof(uint32_t) * 8);
+    uint32_t mask = ((1U << GIC_TARGET_BITS) - 1) << off;
+
+    return (gicd->ITARGETSR[reg_ind] & mask) >> off;
 }
 
 void gic_send_sgi(uint64_t cpu_target, uint64_t sgi_num){
@@ -160,9 +177,6 @@ void gic_handle(){
     if(id >= 1022) return;
 
     irq_handle(id);
-
-    if(id >= 32 && id <= 35)
-        return; 
         
     gicc->EOIR = ack;
     

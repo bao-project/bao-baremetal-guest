@@ -299,6 +299,7 @@ void gic_set_state(uint64_t int_id, enum int_state state);
 void gic_set_trgt(uint64_t int_id, uint8_t trgt);
 void gic_set_route(uint64_t int_id, uint64_t trgt);
 uint64_t gic_get_prio(uint64_t int_id);
+uint8_t gic_get_trgt(uint64_t int_id);
 enum int_state gic_get_state(uint64_t int_id);
 
 void gicd_set_enable(uint64_t int_id, bool en);
