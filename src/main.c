@@ -34,8 +34,8 @@ void uart_rx_handler(){
 }
 
 void ipi_handler(){
-   printf("cpu%d: %s\n", get_cpuid(), __func__);
-   
+    printf("cpu%d: %s\n", get_cpuid(), __func__);
+    irq_send_ipi(1ull << (get_cpuid() + 1));
 }
 
 void timer_handler(){
@@ -53,16 +53,16 @@ void main(void){
         printf("Bao bare-metal test guest\n");
         spin_unlock(&print_lock);
 
-        uart_enable_rxirq();
         irq_set_handler(UART_IRQ_ID, uart_rx_handler);
-        
         irq_set_handler(TIMER_IRQ_ID, timer_handler);
-        irq_enable(TIMER_IRQ_ID);
+        irq_set_handler(IPI_IRQ_ID, ipi_handler);
+
+	uart_enable_rxirq();
+
         timer_enable();
         timer_set(TIMER_INTERVAL);
+        irq_enable(TIMER_IRQ_ID);
 
-        irq_set_handler(IPI_IRQ_ID, ipi_handler);
-        
         master_done = true;
     }
 
