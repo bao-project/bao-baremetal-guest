@@ -36,7 +36,7 @@ SECTIONS {
         *(.rodata*)
     }
 
-    PROVIDE(_tls_start = .);    
+    PROVIDE(_tls_start = ALIGN(16));    
     .tdata : {
         PROVIDE(_tdata_start = .);
         *(.tdata)
@@ -47,7 +47,7 @@ SECTIONS {
         *(.tbss)
         PROVIDE(_tbss_end = .);
     }
-    PROVIDE(_tls_end = .);
+    PROVIDE(_tls_end = ALIGN(16));
 
     .data : {
         *(.data .data.*)
