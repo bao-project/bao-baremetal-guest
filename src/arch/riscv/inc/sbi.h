@@ -76,4 +76,6 @@ struct sbiret sbi_hart_start(unsigned long hartid, unsigned long start_addr,
 struct sbiret sbi_hart_stop();
 struct sbiret sbi_hart_status(unsigned long hartid);
 
+void sbi_shutdown(void);
+
 #endif /* __SBI_H__ */
