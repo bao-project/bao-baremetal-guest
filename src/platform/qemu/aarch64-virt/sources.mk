@@ -1,2 +1,2 @@
-plat_c_srcs:= pl011_uart.c
+plat_c_srcs:=virt.c
 plat_s_srcs:=

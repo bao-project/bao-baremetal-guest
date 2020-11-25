@@ -9,7 +9,7 @@
 
 // #include <sbi/riscv_io.h>
 // #include <sbi_utils/serial/uart8250.h>
-#include <uart8250.h>
+#include <8250_uart.h>
 
 #define readb(addr)  (*((volatile uint8_t*)addr))
 #define writeb(val, addr)  (*(volatile uint8_t*)(addr) = val)
@@ -135,29 +135,4 @@ int uart8250_init(unsigned long base, u32 in_freq, u32 baudrate, u32 reg_shift,
 	set_reg(UART_SCR_OFFSET, 0x00);
 
 	return 0;
-}
-
-void uart_init(){
-    uart8250_init(VIRT_UART16550_ADDR, VIRT_UART_SHIFTREG_ADDR,
-			     VIRT_UART_BAUDRATE, 0, 1);
-}
-
-void uart_putc(char c)
-{
-    uart8250_putc(c);
-}
-
-char uart_getchar(void)
-{
-    return uart8250_getc();
-}
-
-void uart_enable_rxirq()
-{
-    uart8250_enable_rx_int();
-}
-
-void uart_clear_rxirq()
-{
-    uart8250_interrupt_handler(); 
 }

@@ -1,2 +1,2 @@
-plat_c_srcs:= zynq_uart.c
+plat_c_srcs:= zcu.c
 plat_s_srcs:=
