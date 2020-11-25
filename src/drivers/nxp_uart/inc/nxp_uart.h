@@ -43,4 +43,10 @@ struct lpuart {
 #define LPUART_STAT_TDRE_BIT (1U << 23)
 #define LPUART_STAT_OR_BIT (1U << 19)
 
+void nxp_uart_init(volatile struct lpuart *uart);
+void nxp_uart_putc(volatile struct lpuart *uart, char c);
+char nxp_uart_getchar(volatile struct lpuart *uart);
+void nxp_uart_enable_rxirq(volatile struct lpuart *uart);
+void nxp_uart_clear_rxirq(volatile struct lpuart *uart);
+
 #endif /* __UART_NXP_H */

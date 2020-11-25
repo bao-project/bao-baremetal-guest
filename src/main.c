@@ -57,7 +57,7 @@ void main(void){
         irq_set_handler(TIMER_IRQ_ID, timer_handler);
         irq_set_handler(IPI_IRQ_ID, ipi_handler);
 
-	uart_enable_rxirq();
+	    uart_enable_rxirq();
 
         timer_enable();
         timer_set(TIMER_INTERVAL);

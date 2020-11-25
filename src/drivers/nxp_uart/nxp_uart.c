@@ -15,9 +15,7 @@
 
 #include <nxp_uart.h>
 
-static volatile struct lpuart *uart = (void*)0xff000000;
-
-void uart_init(){
+void nxp_uart_init(volatile struct lpuart *uart){
    
     //reset
     uart->global &= ~LPUART_GLOBAL_RST_BIT; 
@@ -29,20 +27,20 @@ void uart_init(){
     uart->ctrl = LPUART_CTRL_TE_BIT | LPUART_CTRL_RE_BIT; 
 }
 
-void uart_putc(char c){
+void nxp_uart_putc(volatile struct lpuart *uart, char c){
     while(!(uart->stat & LPUART_STAT_TDRE_BIT));
     uart->data = c;
 }
 
-char uart_getchar(void){
+char nxp_uart_getchar(volatile struct lpuart *uart){
     return uart->data;
 }
 
-void uart_enable_rxirq(){
+void nxp_uart_enable_rxirq(volatile struct lpuart *uart){
     uart->ctrl |= LPUART_CTRL_RIE_BIT;
 }
 
-void uart_clear_rxirq(){
-    (void) uart_getchar();
+void nxp_uart_clear_rxirq(volatile struct lpuart *uart){
+    (void) nxp_uart_getchar(uart);
     uart->stat |= LPUART_STAT_OR_BIT;
 }
