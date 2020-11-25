@@ -16,7 +16,7 @@
 
 
 NAME := bao_bare-metal_guest
-OPT_LEVEL = 0
+OPT_LEVEL = 2
 DEBUG_LEVEL = 3
 
 ifneq ($(MAKECMDGOALS), clean)
