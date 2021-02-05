@@ -8,12 +8,15 @@
 
 void irq_enable(unsigned id) {
    gic_set_enable(id, true); 
-   gic_set_prio(id, 0);
    if(GIC_VERSION == GICV2) {
        gic_set_trgt(id, gic_get_trgt(id) | (1 << get_cpuid()));
    } else {
        gic_set_route(id, get_cpuid());
    }
+}
+
+void irq_set_prio(unsigned id, unsigned prio){
+    gic_set_prio(id, (uint8_t) prio);
 }
 
 void irq_send_ipi(uint64_t target_cpu_mask) {
