@@ -15,7 +15,7 @@
 #
 
 
-NAME := bao_bare-metal_guest
+NAME := baremetal
 OPT_LEVEL = 2
 DEBUG_LEVEL = 3
 
