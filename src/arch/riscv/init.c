@@ -9,6 +9,7 @@
 
 extern void _start();
 
+__attribute__((weak))
 void arch_init(){
 #ifndef SINGLE_CORE
     uint64_t hart_id = get_cpuid();

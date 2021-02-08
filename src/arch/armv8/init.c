@@ -8,6 +8,7 @@
 
 void _start();
 
+__attribute__((weak))
 void arch_init(){
     uint64_t cpuid = get_cpuid();
     gic_init();
