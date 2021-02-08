@@ -96,6 +96,7 @@ extern int main();
 static bool init_done = false;
 static spinlock_t init_lock = SPINLOCK_INITVAL;
 
+__attribute__((weak))
 void _init(){
 
     spin_lock(&init_lock);
