@@ -36,19 +36,6 @@ SECTIONS {
         *(.rodata*)
     }
 
-    PROVIDE(_tls_start = ALIGN(16));    
-    .tdata : {
-        PROVIDE(_tdata_start = .);
-        *(.tdata)
-        PROVIDE(_tdata_end = .);
-    }
-    .tbss (NOLOAD) :  {	
-        PROVIDE(_tbss_start = .);
-        *(.tbss)
-        PROVIDE(_tbss_end = .);
-    }
-    PROVIDE(_tls_end = ALIGN(16));
-
     .data : {
         *(.data .data.*)
         PROVIDE(__global_pointer$ = . + 0x800);
@@ -63,9 +50,7 @@ SECTIONS {
     }
 
     . = ALIGN(16);
-    PROVIDE(_tls_dyn = .);
     PROVIDE(_stack_base = .);
-    . = . + 128K; /* 1M for per-hart storage (tls+stack) */
-    PROVIDE(end = . );
+    . = . + 2M; /* 2M of total stack size */
     PROVIDE(_heap_base = .);
 }

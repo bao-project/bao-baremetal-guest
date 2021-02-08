@@ -90,35 +90,22 @@ int _kill(int pid, int sig)
     return -1;
 }
 
-static void tls_init(){
-
-    register void* tp = get_tp();
-    extern uint8_t _tdata_start, _tdata_end;
-    extern uint8_t _tbss_start, _tbss_end;
-    
-    size_t tdata_size = &_tdata_end - &_tdata_start;
-    memcpy(tp, &_tdata_start, tdata_size);
-    size_t tbss_size = &_tbss_end - &_tbss_start;
-    memset(tp + tdata_size, 0, tbss_size);
-}
-
 extern void arch_init();
 extern int main();
 
 static bool init_done = false;
 static spinlock_t init_lock = SPINLOCK_INITVAL;
 
-void _init(uint64_t cpuid){
+void _init(){
 
     spin_lock(&init_lock);
     if(!init_done) {
         init_done = true;
-        tls_init();
         uart_init();
     }
     spin_unlock(&init_lock);
     
-    arch_init(cpuid);
+    arch_init();
 
     int ret = main();
     _exit(ret);
