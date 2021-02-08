@@ -78,9 +78,11 @@ wait_flag:
 	msr SPSEL, x3	
 
     adr x1, _stack_base
-    add x1, x1, #STACK_SIZE
     ldr x2, =STACK_SIZE
+    add x1, x1, x2
+#ifndef SINGLE_CORE
     madd x1, x0, x2, x1
+#endif
     mov sp, x1
    
     //TODO: other c runtime init (ctors, etc...)
