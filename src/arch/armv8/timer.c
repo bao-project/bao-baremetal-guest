@@ -3,12 +3,6 @@
 
 uint64_t TIMER_FREQ;
 
-void timer_enable()
-{
-    TIMER_FREQ = MRS(CNTFRQ_EL0);
-    MSR(CNTV_CTL_EL0, 1);
-}
-
 void timer_set(uint64_t n)
 {
     uint64_t current = MRS(CNTPCT_EL0);
