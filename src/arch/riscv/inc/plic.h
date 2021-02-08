@@ -52,7 +52,7 @@ typedef struct {
 } plic_hart_t;
 
 extern volatile plic_global_t * plic_global;
-extern volatile __thread plic_hart_t *plic_hart;
+extern volatile plic_hart_t *plic_hart;
 
 void plic_init();
 void plic_handle();

@@ -16,6 +16,7 @@
 #include <plic.h>
 #include <irq.h>
 #include <spinlock.h>
+#include <cpu.h>
 
 #include <stdio.h>
 
@@ -23,9 +24,8 @@
 #define PRIV_S  (1)
 #define PRIV_M  (3)
 
-extern __thread int hart_id;
 volatile plic_global_t * plic_global = (void*) PLIC_BASE;
-__thread volatile plic_hart_t *plic_hart;
+volatile plic_hart_t *plic_hart = (void*) PLIC_HART_BASE;
 
 void plic_probe(){
     uint32_t *ptr =  (void*) plic_global->enbl;
@@ -41,9 +41,8 @@ static int plic_hartidpriv_to_context(int hartid, int mode){
 }
 
 void plic_init(){
-    int cntxt = plic_hartidpriv_to_context(hart_id, PRIV_S);
-    plic_hart = (void*) PLIC_HART_BASE + (cntxt*sizeof(plic_hart_t));
-    plic_hart->threshold = 0;
+    int cntxt = plic_hartidpriv_to_context(get_cpuid(), PRIV_S);
+    plic_hart[cntxt].threshold = 0;
 }
 
 void plic_enable_interrupt(int hid, int int_id, bool en){
@@ -72,10 +71,11 @@ int plic_get_prio(int int_id){
 
 void plic_handle(){
 
-    uint32_t id = plic_hart->claim;
+    int cntxt = plic_hartidpriv_to_context(get_cpuid(), PRIV_S);
+    uint32_t id = plic_hart[cntxt].claim;
 
     if(id > 0) {
         irq_handle(id);
-        plic_hart->complete = id;
+        plic_hart[cntxt].complete = id;
     }
 }
