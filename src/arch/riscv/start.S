@@ -65,8 +65,10 @@ skip:
     la      t0, _stack_base
     li      t1, STACK_SIZE
     add     t0, t0, t1
+#ifndef SINGLE_CORE
     mul     t1, t1, tp
     add     t0, t0, t1
+#endif
     mv      sp, t0
 
     //TODO: other c runtime init (ctors, etc...)
