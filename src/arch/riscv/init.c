@@ -17,7 +17,6 @@ void arch_init(){
         if(i == hart_id) continue;
         ret = sbi_hart_start(i, (unsigned long) &_start, 0);
     } while(i++, ret.error == SBI_SUCCESS);
-    pt_init();
     plic_init();   
     CSRS(sie, SIE_SEIE);
     CSRS(sstatus, SSTATUS_SIE);
