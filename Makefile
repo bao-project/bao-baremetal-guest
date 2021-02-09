@@ -28,9 +28,10 @@ endif
 SRC_DIR:=./src
 BUILD_DIR:=build/$(PLATFORM)
 TARGET:=$(BUILD_DIR)/$(NAME)
+CORE_DIR:=$(SRC_DIR)/core
 PLATFORM_DIR:=$(SRC_DIR)/platform/$(PLATFORM)
 DRIVERS_DIR:=$(SRC_DIR)/drivers
-SRC_DIRS:=$(SRC_DIR) $(PLATFORM_DIR)
+SRC_DIRS:=$(SRC_DIR) $(CORE_DIR) $(PLATFORM_DIR)
 INC_DIRS:=$(addsuffix /inc, $(SRC_DIRS))
 
 ifeq ($(wildcard $(PLATFORM_DIR)),)
@@ -39,6 +40,9 @@ endif
 
 -include $(SRC_DIR)/sources.mk
 C_SRC+=$(addprefix $(SRC_DIR)/, $(src_c_srcs))
+
+-include $(CORE_DIR)/sources.mk
+C_SRC+=$(addprefix $(CORE_DIR)/, $(core_c_srcs))
 
 -include $(PLATFORM_DIR)/plat.mk
 -include $(PLATFORM_DIR)/sources.mk

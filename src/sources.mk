@@ -1,1 +1,1 @@
-src_c_srcs:= main.c retarget.c irq.c
+src_c_srcs:= main.c
