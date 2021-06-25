@@ -15,8 +15,8 @@
 #
 
 
-NAME := bao_bare-metal_guest
-OPT_LEVEL = 0
+NAME := baremetal
+OPT_LEVEL = 2
 DEBUG_LEVEL = 3
 
 ifneq ($(MAKECMDGOALS), clean)
@@ -28,8 +28,10 @@ endif
 SRC_DIR:=./src
 BUILD_DIR:=build/$(PLATFORM)
 TARGET:=$(BUILD_DIR)/$(NAME)
+CORE_DIR:=$(SRC_DIR)/core
 PLATFORM_DIR:=$(SRC_DIR)/platform/$(PLATFORM)
-SRC_DIRS:=$(SRC_DIR) $(PLATFORM_DIR)
+DRIVERS_DIR:=$(SRC_DIR)/drivers
+SRC_DIRS:=$(SRC_DIR) $(CORE_DIR) $(PLATFORM_DIR)
 INC_DIRS:=$(addsuffix /inc, $(SRC_DIRS))
 
 ifeq ($(wildcard $(PLATFORM_DIR)),)
@@ -39,10 +41,20 @@ endif
 -include $(SRC_DIR)/sources.mk
 C_SRC+=$(addprefix $(SRC_DIR)/, $(src_c_srcs))
 
+-include $(CORE_DIR)/sources.mk
+C_SRC+=$(addprefix $(CORE_DIR)/, $(core_c_srcs))
+
 -include $(PLATFORM_DIR)/plat.mk
 -include $(PLATFORM_DIR)/sources.mk
 C_SRC+=$(addprefix $(PLATFORM_DIR)/, $(plat_c_srcs))
 ASM_SRC+=$(addprefix $(PLATFORM_DIR)/, $(plat_s_srcs))
+
+SRC_DIRS+= $(foreach driver, $(drivers), $(DRIVERS_DIR)/$(driver))
+INC_DIRS+= $(foreach driver, $(drivers), $(DRIVERS_DIR)/$(driver)/inc)
+-include $(foreach driver, $(drivers), $(DRIVERS_DIR)/$(driver)/sources.mk)
+C_SRC+=$(addprefix $(DRIVERS_DIR)/, $(driver_c_srcs))
+ASM_SRC+=$(addprefix $(DRIVERS_DIR)/, $(driver_s_srcs))
+
 ARCH_DIR:= $(SRC_DIR)/arch/$(ARCH)
 SRC_DIRS+= $(ARCH_DIR)
 INC_DIRS+= $(ARCH_DIR)/inc
@@ -69,7 +81,10 @@ GENERIC_FLAGS = $(ARCH_GENERIC_FLAGS) -O$(OPT_LEVEL) -g$(DEBUG_LEVEL) -static
 ASFLAGS = $(GENERIC_FLAGS) $(ARCH_ASFLAGS) 
 CFLAGS = $(GENERIC_FLAGS) $(ARCH_CFLAGS) 
 CPPFLAGS =	$(ARCH_CPPFLAGS) $(addprefix -I, $(INC_DIRS)) -MD -MF $@.d
-LDFLAGS = $(GENERIC_FLAGS) $(ARCH_LDFLAGS) -nostartfiles 
+ifneq ($(SINGLE_CORE),)
+CPPFLAGS+=-DSINGLE_CORE=y
+endif
+LDFLAGS = $(GENERIC_FLAGS) $(ARCH_LDFLAGS) -nostartfiles
 all: $(TARGET).bin
 
 ifneq ($(MAKECMDGOALS), clean)

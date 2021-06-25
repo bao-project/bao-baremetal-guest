@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <cpu.h>
+#include <wfi.h>
 #include <spinlock.h>
 #include <plat.h>
 #include <irq.h>
@@ -34,8 +35,8 @@ void uart_rx_handler(){
 }
 
 void ipi_handler(){
-   printf("cpu%d: %s\n", get_cpuid(), __func__);
-   
+    printf("cpu%d: %s\n", get_cpuid(), __func__);
+    irq_send_ipi(1ull << (get_cpuid() + 1));
 }
 
 void timer_handler(){
@@ -52,21 +53,29 @@ void main(void){
         spin_lock(&print_lock);
         printf("Bao bare-metal test guest\n");
         spin_unlock(&print_lock);
+
+        irq_set_handler(UART_IRQ_ID, uart_rx_handler);
+        irq_set_handler(TIMER_IRQ_ID, timer_handler);
+        irq_set_handler(IPI_IRQ_ID, ipi_handler);
+
+        uart_enable_rxirq();
+
+        timer_set(TIMER_INTERVAL);
+        irq_enable(TIMER_IRQ_ID);
+        irq_set_prio(TIMER_IRQ_ID, IRQ_MAX_PRIO);
+
         master_done = true;
     }
+
+    irq_enable(UART_IRQ_ID);
+    irq_set_prio(UART_IRQ_ID, IRQ_MAX_PRIO);
+    irq_enable(IPI_IRQ_ID);
+    irq_set_prio(IPI_IRQ_ID, IRQ_MAX_PRIO);
 
     while(!master_done);
     spin_lock(&print_lock);
     printf("cpu %d up\n", get_cpuid());
     spin_unlock(&print_lock);
 
-    int cpuid = get_cpuid();
-    int count = 0;
-    while(1){
-        spin_lock(&print_lock);
-        printf("cpu%d %d\n", cpuid, count++);
-        spin_unlock(&print_lock);
-        for(volatile int i = 0; i < 199999999; i++);
-    }
-
+    while(1) wfi();
 }

@@ -3,22 +3,13 @@
 .section .start, "ax"
 .global _start
 _start:
-    /* Expecting hart id in a0 */
+    /**
+     * Expecting hart id in a0.
+     * Save hart id in thread pointer. We assume the compiler does not use tp.
+     */
+    mv      tp, a0 
 .option push
 .option norelax   
-    /* Initialize stack pointer and thread pointer*/
-
-    la      t0, _tls_start
-    la      t1, _tls_end
-    sub     t0, t1, t0
-    li      t1, STACK_SIZE  
-    add     t0, t0, t1      //t0 = tls_size + stack_size
-
-    mul     t1, t0, a0      //t1 = hart offset (hartid*t0)
-    la      tp, _tls_dyn
-    add     tp, tp, t1
-    add     sp, tp, t0
-
     /* Initialize global_pointer */
 	la gp, __global_pointer$
 .option pop
@@ -70,12 +61,17 @@ skip:
     lw      t1, 0(t0)
     beqz    t1, 1b
 
-    //mv  s0, a0
-	///* Call global constructors */
-	//la a0, __libc_fini_array
-	//call atexit
-	//call __libc_init_array
-    //mv a0, s0
+    /* Initialize stack pointer*/
+    la      t0, _stack_base
+    li      t1, STACK_SIZE
+    add     t0, t0, t1
+#ifndef SINGLE_CORE
+    mul     t1, t1, tp
+    add     t0, t0, t1
+#endif
+    mv      sp, t0
+
+    //TODO: other c runtime init (ctors, etc...)
     
     /* Jump to main */
     call _init
