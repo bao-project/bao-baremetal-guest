@@ -24,6 +24,29 @@ _start:
     mrs x0, MPIDR_EL1
     and x0, x0, MPIDR_CPU_MASK
 
+    /**
+     * Check current exception level. If in:
+     *     - el0 or el3, stop
+     *     - el1, proceed
+     *     - el2, jump to el1
+     */
+    mrs x1, currentEL
+    lsr x1, x1, 2
+    cmp x1, 0
+    b.eq .
+    cmp x1, 3
+    b.eq .
+    cmp x1, 1
+    b.eq _enter_el1
+    mov x1, SPSR_EL1t | SPSR_F | SPSR_I | SPSR_A | SPSR_D
+    msr spsr_el2, x1
+    mov x1, HCR_RW_BIT
+    msr hcr_el2, x1
+    adr x1, _enter_el1
+    msr elr_el2, x1
+    eret
+
+_enter_el1:
     adr x1, _exception_vector
     msr	VBAR_EL1, x1
 
