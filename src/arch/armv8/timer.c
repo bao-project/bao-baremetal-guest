@@ -5,7 +5,7 @@ uint64_t TIMER_FREQ;
 
 void timer_set(uint64_t n)
 {
-    uint64_t current = MRS(CNTPCT_EL0);
+    uint64_t current = MRS(CNTVCT_EL0);
     MSR(CNTV_CVAL_EL0, current + n);
 }
 
