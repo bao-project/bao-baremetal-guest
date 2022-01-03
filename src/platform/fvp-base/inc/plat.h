@@ -4,6 +4,6 @@
 #define PLAT_MEM_BASE 0x0
 #define PLAT_MEM_SIZE 0x8000000
 
-#define UART_IRQ_ID 33
+#define UART_IRQ_ID 37
 
 #endif
