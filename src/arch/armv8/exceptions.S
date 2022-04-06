@@ -30,7 +30,7 @@
     stp x14, x15, [sp, #(8*14)]
     stp x16, x17, [sp, #(8*16)]
     stp x18, x19, [sp, #(8*18)]
-    stp x29, x30, [sp, #(8*28)]
+    stp x29, x30, [sp, #(8*20)]
 .endm
 
 .macro RESTORE_REGS
@@ -44,7 +44,7 @@
     ldp x14, x15, [sp, #(8*14)]
     ldp x16, x17, [sp, #(8*16)]
     ldp x18, x19, [sp, #(8*18)]
-    ldp x29, x30, [sp, #(8*28)]
+    ldp x29, x30, [sp, #(8*20)]
 
     add sp, sp, #(22 * 8)
 .endm
