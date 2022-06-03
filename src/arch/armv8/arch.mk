@@ -1,7 +1,15 @@
-CROSS_COMPILE ?=aarch64-none-elf-
+ARM_PROFILE?=armv8-a
 
-ARCH_GENERIC_FLAGS = -march=armv8-a -DGIC_VERSION=$(GIC_VERSION) #-mtls-dialect=trad
+ARCH_GENERIC_FLAGS =-DGIC_VERSION=$(GIC_VERSION) -march=$(ARM_PROFILE)
 ARCH_ASFLAGS = 
-ARCH_CFLAGS = 
+ARCH_CFLAGS = -mgeneral-regs-only
 ARCH_CPPFLAGS =	
 ARCH_LDFLAGS = 
+
+ARCH_SUB?=aarch64
+ARCH_SUB_DIR:=$(ARCH_DIR)/$(ARCH_SUB)
+include $(ARCH_SUB_DIR)/arch_sub.mk
+SRC_DIRS+=$(ARCH_SUB_DIR)
+INC_DIRS+=$(ARCH_SUB_DIR)/inc
+
+include $(ARCH_SUB_DIR)/sources.mk
