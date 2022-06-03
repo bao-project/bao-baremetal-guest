@@ -10,7 +10,7 @@ void _start();
 
 __attribute__((weak))
 void arch_init(){
-    uint64_t cpuid = get_cpuid();
+    unsigned long cpuid = get_cpuid();
     gic_init();
     TIMER_FREQ = MRS(CNTFRQ_EL0);
     MSR(CNTV_CTL_EL0, 1);

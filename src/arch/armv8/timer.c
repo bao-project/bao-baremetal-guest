@@ -1,7 +1,7 @@
 #include <timer.h>
 #include <sysregs.h>
 
-uint64_t TIMER_FREQ;
+unsigned long TIMER_FREQ;
 
 void timer_set(uint64_t n)
 {

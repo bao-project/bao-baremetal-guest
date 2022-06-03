@@ -4,7 +4,7 @@
 #include <plic.h>
 #include <irq.h>
 
-static bool is_external(uint64_t cause) {
+static bool is_external(unsigned long cause) {
     switch(cause) {
         case SCAUSE_CODE_SEI:
         case SCAUSE_CODE_UEI:
@@ -17,11 +17,12 @@ static bool is_external(uint64_t cause) {
 __attribute__((interrupt("supervisor"), aligned(4)))
 void exception_handler(){
     
-    uint64_t scause = CSRR(scause);
+    unsigned long scause = CSRR(scause);
     if(is_external(scause)) {
         plic_handle();
-    } else { 
-       uint64_t id = (scause & ~(1ull << 63)) + 1024;
+    } else {
+       size_t msb = sizeof(unsigned long) * 8 - 1;
+       unsigned long id = (scause & ~(1ull << msb)) + 1024;
        irq_handle(id);
        if(id == IPI_IRQ_ID) {
            CSRC(sip, SIP_SSIE);

@@ -154,7 +154,7 @@
 
 #define CSRR(csr)                                     \
     ({                                                \
-        uint64_t _temp;                               \
+        unsigned long _temp;                          \
         asm volatile("csrr  %0, " CSR_STR(csr) "\n\r" \
                      : "=r"(_temp)::"memory");        \
         _temp;                                        \

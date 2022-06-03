@@ -16,12 +16,12 @@
 
 #include <psci.h>
 
-int smc_call(uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3)
+int smc_call(unsigned long x0, unsigned long x1, unsigned long x2, unsigned long x3)
 {
-	register uint64_t r0 asm("r0") = x0;
-	register uint64_t r1 asm("r1") = x1;
-	register uint64_t r2 asm("r2") = x2;
-	register uint64_t r3 asm("r3") = x3;
+	register unsigned long r0 asm("r0") = x0;
+	register unsigned long r1 asm("r1") = x1;
+	register unsigned long r2 asm("r2") = x2;
+	register unsigned long r3 asm("r3") = x3;
 
     asm volatile(
        		"smc	#0\n"
@@ -36,32 +36,32 @@ int smc_call(uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3)
     SMC PSCI interface 
 --------------------------------- */
 
-uint64_t psci_version(void)
+int32_t psci_version(void)
 {
     return smc_call(PSCI_VERSION, 0, 0, 0);
 }
 
 
-uint64_t psci_cpu_suspend(uint64_t power_state, uintptr_t entrypoint, 
-                    uint64_t context_id)
+int32_t psci_cpu_suspend(uint32_t power_state, uintptr_t entrypoint, 
+                    unsigned long context_id)
 {
     return smc_call(PSCI_CPU_SUSPEND_AARCH64, power_state, entrypoint, 
                                                                     context_id);
 }
 
-uint64_t psci_cpu_off(void)
+int32_t psci_cpu_off(void)
 {
     return smc_call(PSCI_CPU_OFF, 0, 0, 0);
 }
 
-uint64_t psci_cpu_on(uint64_t target_cpu, uintptr_t entrypoint, 
-                    uint64_t context_id)
+int32_t psci_cpu_on(unsigned long target_cpu, uintptr_t entrypoint, 
+                    unsigned long context_id)
 {
     return smc_call(PSCI_CPU_ON_AARCH64, target_cpu, entrypoint, context_id);
 }
 
-uint64_t psci_affinity_info(uint64_t target_affinity, 
-                            uint64_t lowest_affinity_level)
+int32_t psci_affinity_info(unsigned long target_affinity, 
+                            uint32_t lowest_affinity_level)
 {
     return smc_call(PSCI_AFFINITY_INFO_AARCH64, target_affinity, 
                     lowest_affinity_level, 0);

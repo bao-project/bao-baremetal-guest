@@ -96,10 +96,10 @@ void gic_init() {
     gicc_init();
 }
 
-void gic_set_enable(uint64_t int_id, bool en){
+void gic_set_enable(unsigned long int_id, bool en){
     
-    uint64_t reg_ind = int_id/(sizeof(uint32_t)*8);
-    uint64_t bit = (1UL << int_id%(sizeof(uint32_t)*8));
+    unsigned long reg_ind = int_id/(sizeof(uint32_t)*8);
+    unsigned long bit = (1UL << int_id%(sizeof(uint32_t)*8));
 
     if(en)
         gicd->ISENABLER[reg_ind] = bit;
@@ -108,50 +108,50 @@ void gic_set_enable(uint64_t int_id, bool en){
 
 }
 
-void gic_set_trgt(uint64_t int_id, uint8_t trgt)
+void gic_set_trgt(unsigned long int_id, uint8_t trgt)
 {
-    uint64_t reg_ind = (int_id * GIC_TARGET_BITS) / (sizeof(uint32_t) * 8);
-    uint64_t off = (int_id * GIC_TARGET_BITS) % (sizeof(uint32_t) * 8);
+    unsigned long reg_ind = (int_id * GIC_TARGET_BITS) / (sizeof(uint32_t) * 8);
+    unsigned long off = (int_id * GIC_TARGET_BITS) % (sizeof(uint32_t) * 8);
     uint32_t mask = ((1U << GIC_TARGET_BITS) - 1) << off;
 
     gicd->ITARGETSR[reg_ind] =
         (gicd->ITARGETSR[reg_ind] & ~mask) | ((trgt << off) & mask);
 }
 
-uint8_t gic_get_trgt(uint64_t int_id)
+uint8_t gic_get_trgt(unsigned long int_id)
 {
-    uint64_t reg_ind = (int_id * GIC_TARGET_BITS) / (sizeof(uint32_t) * 8);
-    uint64_t off = (int_id * GIC_TARGET_BITS) % (sizeof(uint32_t) * 8);
+    unsigned long reg_ind = (int_id * GIC_TARGET_BITS) / (sizeof(uint32_t) * 8);
+    unsigned long off = (int_id * GIC_TARGET_BITS) % (sizeof(uint32_t) * 8);
     uint32_t mask = ((1U << GIC_TARGET_BITS) - 1) << off;
 
     return (gicd->ITARGETSR[reg_ind] & mask) >> off;
 }
 
-void gic_send_sgi(uint64_t cpu_target, uint64_t sgi_num){
+void gic_send_sgi(unsigned long cpu_target, unsigned long sgi_num){
     gicd->SGIR   = (1UL << (GICD_SGIR_CPUTRGLST_OFF + cpu_target))
         | (sgi_num & GICD_SGIR_SGIINTID_MSK);
 }
 
-void gic_set_prio(uint64_t int_id, uint8_t prio){
-    uint64_t reg_ind = (int_id*GIC_PRIO_BITS)/(sizeof(uint32_t)*8);
-    uint64_t off = (int_id*GIC_PRIO_BITS)%((sizeof(uint32_t)*8));
-    uint64_t mask = ((1 << GIC_PRIO_BITS)-1) << off;
+void gic_set_prio(unsigned long int_id, uint8_t prio){
+    unsigned long reg_ind = (int_id*GIC_PRIO_BITS)/(sizeof(uint32_t)*8);
+    unsigned long off = (int_id*GIC_PRIO_BITS)%((sizeof(uint32_t)*8));
+    unsigned long mask = ((1 << GIC_PRIO_BITS)-1) << off;
 
     gicd->IPRIORITYR[reg_ind] = (gicd->IPRIORITYR[reg_ind] & ~mask) | 
         ((prio << off) & mask);
 }
 
-bool gic_is_pending(uint64_t int_id){
+bool gic_is_pending(unsigned long int_id){
 
-    uint64_t reg_ind = int_id/(sizeof(uint32_t)*8);
-    uint64_t off = int_id%(sizeof(uint32_t)*8);
+    unsigned long reg_ind = int_id/(sizeof(uint32_t)*8);
+    unsigned long off = int_id%(sizeof(uint32_t)*8);
 
     return ((1U << off) & gicd->ISPENDR[reg_ind]) != 0;
 }
 
-void gic_set_pending(uint64_t int_id, bool pending){
-    uint64_t reg_ind = int_id / (sizeof(uint32_t) * 8);
-    uint64_t mask = 1U << int_id % (sizeof(uint32_t) * 8);
+void gic_set_pending(unsigned long int_id, bool pending){
+    unsigned long reg_ind = int_id / (sizeof(uint32_t) * 8);
+    unsigned long mask = 1U << int_id % (sizeof(uint32_t) * 8);
 
     if (pending) {
         gicd->ISPENDR[reg_ind] = mask;
@@ -160,19 +160,19 @@ void gic_set_pending(uint64_t int_id, bool pending){
     }   
 }
 
-bool gic_is_active(uint64_t int_id){
+bool gic_is_active(unsigned long int_id){
 
-    uint64_t reg_ind = int_id/(sizeof(uint32_t)*8);
-    uint64_t off = int_id%(sizeof(uint32_t)*8);
+    unsigned long reg_ind = int_id/(sizeof(uint32_t)*8);
+    unsigned long off = int_id%(sizeof(uint32_t)*8);
 
     return ((1U << off) & gicd->ISACTIVER[reg_ind]) != 0;
 }
 
 void gic_handle(){
 
-    uint64_t ack = gicc->IAR;
-    uint64_t id = ack & GICC_IAR_ID_MSK;
-    uint64_t src = (ack & GICC_IAR_CPU_MSK) >> GICC_IAR_CPU_OFF;
+    unsigned long ack = gicc->IAR;
+    unsigned long id = ack & GICC_IAR_ID_MSK;
+    unsigned long src = (ack & GICC_IAR_CPU_MSK) >> GICC_IAR_CPU_OFF;
 
     if(id >= 1022) return;
 

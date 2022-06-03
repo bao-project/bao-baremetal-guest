@@ -18,6 +18,6 @@ void irq_set_prio(unsigned id, unsigned prio) {
     plic_set_prio(id, prio);
 }
 
-void irq_send_ipi(uint64_t target_cpu_mask) {
+void irq_send_ipi(unsigned long target_cpu_mask) {
     sbi_send_ipi(target_cpu_mask, 0);
 }

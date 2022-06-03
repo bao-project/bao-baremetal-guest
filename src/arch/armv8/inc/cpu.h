@@ -5,8 +5,8 @@
 #include <stdbool.h>
 #include <sysregs.h>
 
-static inline uint64_t get_cpuid(){
-    uint64_t cpuid = MRS(MPIDR_EL1);
+static inline unsigned long get_cpuid(){
+    unsigned long cpuid = MRS(MPIDR_EL1);
     return cpuid & MPIDR_CPU_MASK;
 }
 

@@ -6,8 +6,8 @@
 
 extern int primary_hart;
 
-static inline uint64_t get_cpuid(){
-    register uint64_t hartid asm("tp");
+static inline unsigned long get_cpuid(){
+    register unsigned long hartid asm("tp");
     return hartid;
 }
 

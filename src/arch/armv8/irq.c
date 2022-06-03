@@ -19,7 +19,7 @@ void irq_set_prio(unsigned id, unsigned prio){
     gic_set_prio(id, (uint8_t) prio);
 }
 
-void irq_send_ipi(uint64_t target_cpu_mask) {
+void irq_send_ipi(unsigned long target_cpu_mask) {
     for(int i = 0; i < sizeof(target_cpu_mask)*8; i++) {
         if(target_cpu_mask & (1ull << i)) {
             gic_send_sgi(i, IPI_IRQ_ID);

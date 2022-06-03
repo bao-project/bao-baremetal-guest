@@ -40,7 +40,7 @@
 #define PTE_PAGE (PTE_RWX)
 #define PTE_SUPERPAGE (PTE_PAGE)
 
-typedef uint64_t pte_t;
+typedef unsigned long pte_t;
 
 void pt_init();
 

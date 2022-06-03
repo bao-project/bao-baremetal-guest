@@ -28,7 +28,7 @@ static spinlock_t gicd_lock;
 static spinlock_t gicr_lock;
 
 
-inline uint64_t gic_num_irqs()
+inline unsigned long gic_num_irqs()
 {
     uint32_t itlinenumber =
         bit_extract(gicd->TYPER, GICD_TYPER_ITLN_OFF, GICD_TYPER_ITLN_LEN);
@@ -146,8 +146,8 @@ void gic_init()
 
 void gic_handle()
 {
-    uint64_t ack = MRS(ICC_IAR1_EL1);
-    uint64_t id = ack & ((1UL << 24) -1);
+    unsigned long ack = MRS(ICC_IAR1_EL1);
+    unsigned long id = ack & ((1UL << 24) -1);
 
     if (id >= 1022) return;
 
@@ -157,14 +157,14 @@ void gic_handle()
     //MSR(ICC_DIR_EL1, ack);
 }
 
-uint64_t gicd_get_prio(uint64_t int_id)
+unsigned long gicd_get_prio(unsigned long int_id)
 {
-    uint64_t reg_ind = GIC_PRIO_REG(int_id);
-    uint64_t off = GIC_PRIO_OFF(int_id);
+    unsigned long reg_ind = GIC_PRIO_REG(int_id);
+    unsigned long off = GIC_PRIO_OFF(int_id);
 
     spin_lock(&gicd_lock);
 
-    uint64_t prio =
+    unsigned long prio =
         gicd->IPRIORITYR[reg_ind] >> off & BIT_MASK(off, GIC_PRIO_BITS);
 
     spin_unlock(&gicd_lock);
@@ -172,24 +172,24 @@ uint64_t gicd_get_prio(uint64_t int_id)
     return prio;
 }
 
-void gicd_set_icfgr(uint64_t int_id, uint8_t cfg)
+void gicd_set_icfgr(unsigned long int_id, uint8_t cfg)
 {
     spin_lock(&gicd_lock);
 
-    uint64_t reg_ind = (int_id * GIC_CONFIG_BITS) / (sizeof(uint32_t) * 8);
-    uint64_t off = (int_id * GIC_CONFIG_BITS) % (sizeof(uint32_t) * 8);
-    uint64_t mask = ((1U << GIC_CONFIG_BITS) - 1) << off;
+    unsigned long reg_ind = (int_id * GIC_CONFIG_BITS) / (sizeof(uint32_t) * 8);
+    unsigned long off = (int_id * GIC_CONFIG_BITS) % (sizeof(uint32_t) * 8);
+    unsigned long mask = ((1U << GIC_CONFIG_BITS) - 1) << off;
 
     gicd->ICFGR[reg_ind] = (gicd->ICFGR[reg_ind] & ~mask) | ((cfg << off) & mask);
 
     spin_unlock(&gicd_lock);
 }
 
-void gicd_set_prio(uint64_t int_id, uint8_t prio)
+void gicd_set_prio(unsigned long int_id, uint8_t prio)
 {
-    uint64_t reg_ind = GIC_PRIO_REG(int_id);
-    uint64_t off = GIC_PRIO_OFF(int_id);
-    uint64_t mask = BIT_MASK(off, GIC_PRIO_BITS);
+    unsigned long reg_ind = GIC_PRIO_REG(int_id);
+    unsigned long off = GIC_PRIO_OFF(int_id);
+    unsigned long mask = BIT_MASK(off, GIC_PRIO_BITS);
 
     spin_lock(&gicd_lock);
 
@@ -199,10 +199,10 @@ void gicd_set_prio(uint64_t int_id, uint8_t prio)
     spin_unlock(&gicd_lock);
 }
 
-enum int_state gicd_get_state(uint64_t int_id)
+enum int_state gicd_get_state(unsigned long int_id)
 {
-    uint64_t reg_ind = GIC_INT_REG(int_id);
-    uint64_t mask = GIC_INT_MASK(int_id);
+    unsigned long reg_ind = GIC_INT_REG(int_id);
+    unsigned long mask = GIC_INT_MASK(int_id);
 
     spin_lock(&gicd_lock);
 
@@ -214,13 +214,13 @@ enum int_state gicd_get_state(uint64_t int_id)
     return pend | act;
 }
 
-static void gicd_set_pend(uint64_t int_id, bool pend)
+static void gicd_set_pend(unsigned long int_id, bool pend)
 {
     spin_lock(&gicd_lock);
 
     if (gic_is_sgi(int_id)) {
-        uint64_t reg_ind = GICD_SGI_REG(int_id);
-        uint64_t off = GICD_SGI_OFF(int_id);
+        unsigned long reg_ind = GICD_SGI_REG(int_id);
+        unsigned long off = GICD_SGI_OFF(int_id);
 
         if (pend) {
             gicd->SPENDSGIR[reg_ind] = (1U) << (off + get_cpuid());
@@ -228,7 +228,7 @@ static void gicd_set_pend(uint64_t int_id, bool pend)
             gicd->CPENDSGIR[reg_ind] = BIT_MASK(off, 8);
         }
     } else {
-        uint64_t reg_ind = GIC_INT_REG(int_id);
+        unsigned long reg_ind = GIC_INT_REG(int_id);
 
         if (pend) {
             gicd->ISPENDR[reg_ind] = GIC_INT_MASK(int_id);
@@ -240,9 +240,9 @@ static void gicd_set_pend(uint64_t int_id, bool pend)
     spin_unlock(&gicd_lock);
 }
 
-void gicd_set_act(uint64_t int_id, bool act)
+void gicd_set_act(unsigned long int_id, bool act)
 {
-    uint64_t reg_ind = GIC_INT_REG(int_id);
+    unsigned long reg_ind = GIC_INT_REG(int_id);
 
     spin_lock(&gicd_lock);
 
@@ -255,16 +255,16 @@ void gicd_set_act(uint64_t int_id, bool act)
     spin_unlock(&gicd_lock);
 }
 
-void gicd_set_state(uint64_t int_id, enum int_state state)
+void gicd_set_state(unsigned long int_id, enum int_state state)
 {
     gicd_set_act(int_id, state & ACT);
     gicd_set_pend(int_id, state & PEND);
 }
 
-void gicd_set_trgt(uint64_t int_id, uint8_t trgt)
+void gicd_set_trgt(unsigned long int_id, uint8_t trgt)
 {
-    uint64_t reg_ind = GIC_TARGET_REG(int_id);
-    uint64_t off = GIC_TARGET_OFF(int_id);
+    unsigned long reg_ind = GIC_TARGET_REG(int_id);
+    unsigned long off = GIC_TARGET_OFF(int_id);
     uint32_t mask = BIT_MASK(off, GIC_TARGET_BITS);
 
     spin_lock(&gicd_lock);
@@ -275,18 +275,18 @@ void gicd_set_trgt(uint64_t int_id, uint8_t trgt)
     spin_unlock(&gicd_lock);
 }
 
-void gicd_set_route(uint64_t int_id, uint64_t trgt)
+void gicd_set_route(unsigned long int_id, unsigned long trgt)
 {
     if (gic_is_priv(int_id)) return;
 
     gicd->IROUTER[int_id] = trgt;
 }
 
-void gicd_set_enable(uint64_t int_id, bool en)
+void gicd_set_enable(unsigned long int_id, bool en)
 {
-    uint64_t bit = GIC_INT_MASK(int_id);
+    unsigned long bit = GIC_INT_MASK(int_id);
 
-    uint64_t reg_ind = GIC_INT_REG(int_id);
+    unsigned long reg_ind = GIC_INT_REG(int_id);
     spin_lock(&gicd_lock);
     if (en)
         gicd->ISENABLER[reg_ind] = bit;
@@ -295,11 +295,11 @@ void gicd_set_enable(uint64_t int_id, bool en)
     spin_unlock(&gicd_lock);
 }
 
-void gicr_set_prio(uint64_t int_id, uint8_t prio, uint32_t gicr_id)
+void gicr_set_prio(unsigned long int_id, uint8_t prio, uint32_t gicr_id)
 {
-    uint64_t reg_ind = GIC_PRIO_REG(int_id);
-    uint64_t off = GIC_PRIO_OFF(int_id);
-    uint64_t mask = BIT_MASK(off, GIC_PRIO_BITS);
+    unsigned long reg_ind = GIC_PRIO_REG(int_id);
+    unsigned long off = GIC_PRIO_OFF(int_id);
+    unsigned long mask = BIT_MASK(off, GIC_PRIO_BITS);
 
     spin_lock(&gicr_lock);
 
@@ -309,14 +309,14 @@ void gicr_set_prio(uint64_t int_id, uint8_t prio, uint32_t gicr_id)
     spin_unlock(&gicr_lock);
 }
 
-uint64_t gicr_get_prio(uint64_t int_id, uint32_t gicr_id)
+unsigned long gicr_get_prio(unsigned long int_id, uint32_t gicr_id)
 {
-    uint64_t reg_ind = GIC_PRIO_REG(int_id);
-    uint64_t off = GIC_PRIO_OFF(int_id);
+    unsigned long reg_ind = GIC_PRIO_REG(int_id);
+    unsigned long off = GIC_PRIO_OFF(int_id);
 
     spin_lock(&gicr_lock);
 
-    uint64_t prio =
+    unsigned long prio =
         gicr[gicr_id].IPRIORITYR[reg_ind] >> off & BIT_MASK(off, GIC_PRIO_BITS);
 
     spin_unlock(&gicr_lock);
@@ -324,13 +324,13 @@ uint64_t gicr_get_prio(uint64_t int_id, uint32_t gicr_id)
     return prio;
 }
 
-void gicr_set_icfgr(uint64_t int_id, uint8_t cfg, uint32_t gicr_id)
+void gicr_set_icfgr(unsigned long int_id, uint8_t cfg, uint32_t gicr_id)
 {
     spin_lock(&gicr_lock);
 
-    uint64_t reg_ind = (int_id * GIC_CONFIG_BITS) / (sizeof(uint32_t) * 8);
-    uint64_t off = (int_id * GIC_CONFIG_BITS) % (sizeof(uint32_t) * 8);
-    uint64_t mask = ((1U << GIC_CONFIG_BITS) - 1) << off;
+    unsigned long reg_ind = (int_id * GIC_CONFIG_BITS) / (sizeof(uint32_t) * 8);
+    unsigned long off = (int_id * GIC_CONFIG_BITS) % (sizeof(uint32_t) * 8);
+    unsigned long mask = ((1U << GIC_CONFIG_BITS) - 1) << off;
 
     if (reg_ind == 0) {
         gicr[gicr_id].ICFGR0 =
@@ -343,9 +343,9 @@ void gicr_set_icfgr(uint64_t int_id, uint8_t cfg, uint32_t gicr_id)
     spin_unlock(&gicr_lock);
 }
 
-enum int_state gicr_get_state(uint64_t int_id, uint32_t gicr_id)
+enum int_state gicr_get_state(unsigned long int_id, uint32_t gicr_id)
 {
-    uint64_t mask = GIC_INT_MASK(int_id);
+    unsigned long mask = GIC_INT_MASK(int_id);
 
     spin_lock(&gicr_lock);
 
@@ -357,7 +357,7 @@ enum int_state gicr_get_state(uint64_t int_id, uint32_t gicr_id)
     return pend | act;
 }
 
-static void gicr_set_pend(uint64_t int_id, bool pend, uint32_t gicr_id)
+static void gicr_set_pend(unsigned long int_id, bool pend, uint32_t gicr_id)
 {
     spin_lock(&gicr_lock);
     if (pend) {
@@ -368,7 +368,7 @@ static void gicr_set_pend(uint64_t int_id, bool pend, uint32_t gicr_id)
     spin_unlock(&gicr_lock);
 }
 
-void gicr_set_act(uint64_t int_id, bool act, uint32_t gicr_id)
+void gicr_set_act(unsigned long int_id, bool act, uint32_t gicr_id)
 {
     spin_lock(&gicr_lock);
 
@@ -381,27 +381,27 @@ void gicr_set_act(uint64_t int_id, bool act, uint32_t gicr_id)
     spin_unlock(&gicr_lock);
 }
 
-void gicr_set_state(uint64_t int_id, enum int_state state, uint32_t gicr_id)
+void gicr_set_state(unsigned long int_id, enum int_state state, uint32_t gicr_id)
 {
     gicr_set_act(int_id, state & ACT, gicr_id);
     gicr_set_pend(int_id, state & PEND, gicr_id);
 }
 
-void gicr_set_trgt(uint64_t int_id, uint8_t trgt, uint32_t gicr_id)
+void gicr_set_trgt(unsigned long int_id, uint8_t trgt, uint32_t gicr_id)
 {
     spin_lock(&gicr_lock);
 
     spin_unlock(&gicr_lock);
 }
 
-void gicr_set_route(uint64_t int_id, uint8_t trgt, uint32_t gicr_id)
+void gicr_set_route(unsigned long int_id, uint8_t trgt, uint32_t gicr_id)
 {
     gicr_set_trgt(int_id, trgt, gicr_id);
 }
 
-void gicr_set_enable(uint64_t int_id, bool en, uint32_t gicr_id)
+void gicr_set_enable(unsigned long int_id, bool en, uint32_t gicr_id)
 {
-    uint64_t bit = GIC_INT_MASK(int_id);
+    unsigned long bit = GIC_INT_MASK(int_id);
 
     spin_lock(&gicr_lock);
     if (en)
@@ -411,21 +411,21 @@ void gicr_set_enable(uint64_t int_id, bool en, uint32_t gicr_id)
     spin_unlock(&gicr_lock);
 }
 
-static bool irq_in_gicd(uint64_t int_id)
+static bool irq_in_gicd(unsigned long int_id)
 {
     if (int_id > 32 && int_id < 1025) return true;
     else return false;
 }
 
-void gic_send_sgi(uint64_t cpu_target, uint64_t sgi_num)
+void gic_send_sgi(unsigned long cpu_target, unsigned long sgi_num)
 {
     if (sgi_num >= GIC_MAX_SGIS) return;
     
-    uint64_t sgi = (1UL << (cpu_target & 0xffull)) | (sgi_num << 24);
+    unsigned long sgi = (1UL << (cpu_target & 0xffull)) | (sgi_num << 24);
     MSR(ICC_SGI1R_EL1, sgi); 
 }
 
-void gic_set_prio(uint64_t int_id, uint8_t prio)
+void gic_set_prio(unsigned long int_id, uint8_t prio)
 {
     if (irq_in_gicd(int_id)) {
         return gicd_set_prio(int_id, prio);
@@ -434,7 +434,7 @@ void gic_set_prio(uint64_t int_id, uint8_t prio)
     }
 }
 
-uint64_t gic_get_prio(uint64_t int_id)
+unsigned long gic_get_prio(unsigned long int_id)
 {
     if (irq_in_gicd(int_id)) {
         return gicd_get_prio(int_id);
@@ -443,7 +443,7 @@ uint64_t gic_get_prio(uint64_t int_id)
     }
 }
 
-void gic_set_icfgr(uint64_t int_id, uint8_t cfg)
+void gic_set_icfgr(unsigned long int_id, uint8_t cfg)
 {
     if (irq_in_gicd(int_id)) {
         return gicd_set_icfgr(int_id, cfg);
@@ -452,7 +452,7 @@ void gic_set_icfgr(uint64_t int_id, uint8_t cfg)
     }
 }
 
-enum int_state gic_get_state(uint64_t int_id)
+enum int_state gic_get_state(unsigned long int_id)
 {
     if (irq_in_gicd(int_id)) {
         return gicd_get_state(int_id);
@@ -461,7 +461,7 @@ enum int_state gic_get_state(uint64_t int_id)
     }
 }
 
-static void gic_set_pend(uint64_t int_id, bool pend)
+static void gic_set_pend(unsigned long int_id, bool pend)
 {
     if (irq_in_gicd(int_id)) {
         return gicd_set_pend(int_id, pend);
@@ -470,7 +470,7 @@ static void gic_set_pend(uint64_t int_id, bool pend)
     }
 }
 
-void gic_set_act(uint64_t int_id, bool act)
+void gic_set_act(unsigned long int_id, bool act)
 {
     if (irq_in_gicd(int_id)) {
         return gicd_set_act(int_id, act);
@@ -479,7 +479,7 @@ void gic_set_act(uint64_t int_id, bool act)
     }
 }
 
-void gic_set_state(uint64_t int_id, enum int_state state)
+void gic_set_state(unsigned long int_id, enum int_state state)
 {
     if (irq_in_gicd(int_id)) {
         return gicd_set_state(int_id, state);
@@ -488,7 +488,7 @@ void gic_set_state(uint64_t int_id, enum int_state state)
     }
 }
 
-void gic_set_trgt(uint64_t int_id, uint8_t trgt)
+void gic_set_trgt(unsigned long int_id, uint8_t trgt)
 {
     if (irq_in_gicd(int_id)) {
         return gicd_set_trgt(int_id, trgt);
@@ -497,12 +497,12 @@ void gic_set_trgt(uint64_t int_id, uint8_t trgt)
     }
 }
 
-void gic_set_route(uint64_t int_id, uint64_t trgt)
+void gic_set_route(unsigned long int_id, unsigned long trgt)
 {
     return gicd_set_route(int_id, trgt);
 }
 
-void gic_set_enable(uint64_t int_id, bool en)
+void gic_set_enable(unsigned long int_id, bool en)
 {
     if (irq_in_gicd(int_id)) {
         return gicd_set_enable(int_id, en);
