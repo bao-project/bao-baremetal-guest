@@ -6,7 +6,7 @@
 #include <sysregs.h>
 
 static inline unsigned long get_cpuid(){
-    unsigned long cpuid = MRS(MPIDR_EL1);
+    unsigned long cpuid = sysreg_mpidr_el1_read();
     return cpuid & MPIDR_CPU_MASK;
 }
 

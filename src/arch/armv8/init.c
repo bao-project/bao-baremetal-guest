@@ -12,8 +12,8 @@ __attribute__((weak))
 void arch_init(){
     unsigned long cpuid = get_cpuid();
     gic_init();
-    TIMER_FREQ = MRS(CNTFRQ_EL0);
-    MSR(CNTV_CTL_EL0, 1);
+    TIMER_FREQ = sysreg_cntfrq_el0_read();
+    sysreg_cntv_ctl_el0_write(1);
 #ifndef SINGLE_CORE
     if(cpuid == 0){
         size_t i = 0;
