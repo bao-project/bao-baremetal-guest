@@ -22,28 +22,28 @@
 
 #ifndef __ASSEMBLER__
 
-static inline uint64_t bit_get(uint64_t word, uint64_t off)
+static inline unsigned long bit_get(unsigned long word, unsigned long off)
 {
     return word & (1UL << off);
 }
 
-static inline uint64_t bit_set(uint64_t word, uint64_t off)
+static inline unsigned long bit_set(unsigned long word, unsigned long off)
 {
     return word |= (1UL << off);
 }
 
-static inline uint64_t bit_clear(uint64_t word, uint64_t off)
+static inline unsigned long bit_clear(unsigned long word, unsigned long off)
 {
     return word &= ~(1UL << off);
 }
 
-static inline uint64_t bit_extract(uint64_t word, uint64_t off, uint64_t len)
+static inline unsigned long bit_extract(unsigned long word, unsigned long off, unsigned long len)
 {
     return (word >> off) & BIT_MASK(0, len);
 }
 
-static inline uint64_t bit_insert(uint64_t word, uint64_t val, uint64_t off,
-                                  uint64_t len)
+static inline unsigned long bit_insert(unsigned long word, unsigned long val, unsigned long off,
+                                  unsigned long len)
 {
     return (~BIT_MASK(off, len) & word) | ((BIT_MASK(0, len) & val) << off);
 }

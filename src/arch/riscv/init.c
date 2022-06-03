@@ -12,7 +12,7 @@ extern void _start();
 __attribute__((weak))
 void arch_init(){
 #ifndef SINGLE_CORE
-    uint64_t hart_id = get_cpuid();
+    unsigned long hart_id = get_cpuid();
     struct sbiret ret = (struct sbiret){ .error = SBI_SUCCESS };
     size_t i = 0;    
     do {

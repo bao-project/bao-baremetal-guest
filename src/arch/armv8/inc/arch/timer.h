@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-extern uint64_t TIMER_FREQ;
+extern unsigned long TIMER_FREQ;
 
 #endif

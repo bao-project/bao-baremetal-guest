@@ -54,19 +54,19 @@
 /* psci wake up from off entry point */
 void _psci_wake_up();
 
-uint64_t psci_version(void);
+int32_t psci_version(void);
 
-uint64_t psci_cpu_suspend(uint64_t power_state,
+int32_t psci_cpu_suspend(uint32_t power_state,
 		     uintptr_t entrypoint,
-		     uint64_t context_id);
+		     unsigned long context_id);
 
-uint64_t psci_cpu_off(void);
+int32_t psci_cpu_off(void);
 
-uint64_t psci_cpu_on(uint64_t target_cpu,
+int32_t psci_cpu_on(unsigned long target_cpu,
 		uintptr_t entrypoint,
-		uint64_t context_id);
+		unsigned long context_id);
 
-uint64_t psci_affinity_info(uint64_t target_affinity,
-		       uint64_t lowest_affinity_level);
+int32_t psci_affinity_info(unsigned long target_affinity,
+		       uint32_t lowest_affinity_level);
 
 #endif /* __PSCI_H__ */
