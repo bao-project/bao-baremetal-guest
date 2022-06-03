@@ -39,9 +39,9 @@ inline unsigned long gic_num_irqs()
 static inline void gicc_init()
 {
     /* Enable system register interface i*/
-    MSR(ICC_PMR_EL1, -1);
-    MSR(ICC_CTLR_EL1, GICC_CTLR_EN_BIT);
-    MSR(ICC_IGRPEN1_EL1, ICC_IGRPEN_EL1_ENB_BIT);
+    sysreg_icc_pmr_el1_write(-1);
+    sysreg_icc_ctlr_el1_write(GICC_CTLR_EN_BIT);
+    sysreg_icc_igrpen1_el1_write(ICC_IGRPEN_EL1_ENB_BIT);
 }
 
 static inline void gicr_init()
@@ -57,20 +57,20 @@ static inline void gicr_init()
 
 //void gicc_save_state(gicc_state_t *state)
 //{
-//    state->CTLR = MRS(ICC_CTLR_EL1);
-//    state->PMR = MRS(ICC_PMR_EL1);
-//    //state->IAR = MRS(ICC_IAR1_EL1);
-//    state->BPR = MRS(ICC_BPR1_EL1);
-//    //state->EOIR = MRS(ICC_EOIR1_EL1);
-//    state->RPR = MRS(ICC_RPR_EL1);
-//    state->HPPIR = MRS(ICC_HPPIR1_EL1);
+//    state->CTLR = sysreg_icc_ctlr_el1_read();
+//    state->PMR = sysreg_icc_pmr_el1_read();
+//    //state->IAR = sysreg_icc_iar1_el1_read();
+//    state->BPR = sysreg_icc_bpr1_el1_read();
+//    //state->EOIR = sysreg_icc_eoir1_el1_read();
+//    state->RPR = sysreg_icc_rpr_el1_read();
+//    state->HPPIR = sysreg_icc_hppir1_el1_read();
 //    state->priv_ISENABLER = gicr[get_cpuid()].ISENABLER0;
 //
 //    for (int i = 0; i < GIC_NUM_PRIO_REGS(GIC_CPU_PRIV); i++) {
 //        state->priv_IPRIORITYR[i] = gicr[get_cpuid()].IPRIORITYR[i];
 //    }
 //
-//    state->HCR = MRS(ICH_HCR_EL2);
+//    state->HCR = sysreg_ich_hcr_el2_read();
 //    for (int i = 0; i < gich_num_lrs(); i++) {
 //        state->LR[i] = gich_read_lr(i);
 //    }
@@ -78,20 +78,20 @@ static inline void gicr_init()
 //
 //void gicc_restore_state(gicc_state_t *state)
 //{
-//    MSR(ICC_CTLR_EL1, state->CTLR);
-//    MSR(ICC_PMR_EL1, state->PMR);
-//    MSR(ICC_BPR1_EL1, state->BPR);
-//    //MSR(ICC_EOIR1_EL1, state->EOIR);
-//    //MSR(ICC_IAR1_EL1, state->IAR);
-//    MSR(ICC_RPR_EL1, state->RPR);
-//    MSR(ICC_HPPIR1_EL1, state->HPPIR);
+//    sysreg_icc_ctlr_el1_write(state->CTLR);
+//    sysreg_icc_pmr_el1_write(state->PMR);
+//    sysreg_icc_bpr1_el1_write(state->BPR);
+//    //sysreg_icc_eoir1_el1_write(state->EOIR);
+//    //sysreg_icc_iar1_el1_write(state->IAR);
+//    sysreg_icc_rpr_el1_write(state->RPR);
+//    sysreg_icc_hppir1_el1_write(state->HPPIR);
 //    gicr[get_cpuid()].ISENABLER0 = state->priv_ISENABLER;
 //
 //    for (int i = 0; i < GIC_NUM_PRIO_REGS(GIC_CPU_PRIV); i++) {
 //        gicr[get_cpuid()].IPRIORITYR[i] = state->priv_IPRIORITYR[i];
 //    }
 //
-//    MSR(ICH_HCR_EL2, state->HCR);
+//    sysreg_ich_hcr_el2_write(state->HCR);
 //    for (int i = 0; i < gich_num_lrs(); i++) {
 //        gich_write_lr(i, state->LR[i]);
 //    }
@@ -146,15 +146,15 @@ void gic_init()
 
 void gic_handle()
 {
-    unsigned long ack = MRS(ICC_IAR1_EL1);
+    unsigned long ack = sysreg_icc_iar1_el1_read();
     unsigned long id = ack & ((1UL << 24) -1);
 
     if (id >= 1022) return;
 
     irq_handle(id);
 
-    MSR(ICC_EOIR1_EL1, ack);
-    //MSR(ICC_DIR_EL1, ack);
+    sysreg_icc_eoir1_el1_write(ack);
+    //sysreg_icc_dir_el1_write(ack);
 }
 
 unsigned long gicd_get_prio(unsigned long int_id)
@@ -422,7 +422,7 @@ void gic_send_sgi(unsigned long cpu_target, unsigned long sgi_num)
     if (sgi_num >= GIC_MAX_SGIS) return;
     
     unsigned long sgi = (1UL << (cpu_target & 0xffull)) | (sgi_num << 24);
-    MSR(ICC_SGI1R_EL1, sgi); 
+    sysreg_icc_sgi1r_el1_write(sgi); 
 }
 
 void gic_set_prio(unsigned long int_id, uint8_t prio)
