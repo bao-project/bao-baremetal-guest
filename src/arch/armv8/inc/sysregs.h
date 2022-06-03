@@ -16,6 +16,8 @@
 #ifndef __ARCH_SYSREGS_H__
 #define __ARCH_SYSREGS_H__
 
+#include <arch/subarch/sysregs.h>
+
 /* ID_AA64MMFR0_EL1, AArch64 Memory Model Feature Register 0 */
 #define ID_AA64MMFR0_PAR_OFF 0
 #define ID_AA64MMFR0_PAR_LEN 4
@@ -462,19 +464,5 @@
 #define ICC_SRE_SRE_BIT  (0x1)
 
 #define ICC_IGRPEN_EL1_ENB_BIT (0x1)
-
-#ifndef __ASSEMBLER__
-
-#define STR(str) #str
-
-#define MRS(reg) ({\
-    uint64_t _temp;\
-    asm volatile("mrs %0, " STR(reg) "\n\r" : "=r"(_temp));\
-    _temp;\
-})
-
-#define MSR(reg, var) asm volatile("msr " STR(reg)  ", %0\n\r" ::"r"(var))
-
-#endif /* |__ASSEMBLER__ */
 
 #endif /* __ARCH_SYSREGS_H__ */
