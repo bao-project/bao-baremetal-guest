@@ -17,9 +17,12 @@
 #include "gic.h"
 #include <irq.h>
 #include <cpu.h>
+#include <spinlock.h>
 
 volatile gicd_t* gicd = (void*)0xF9010000;
 volatile gicc_t* gicc = (void*)0xF9020000;
+
+spinlock_t gicd_lock = SPINLOCK_INITVAL;
 
 static size_t gic_num_int(){
     return ((gicd->TYPER & BIT_MASK(GICD_TYPER_ITLINENUM_OFF, GICD_TYPER_ITLINENUM_LEN) >>
@@ -101,11 +104,14 @@ void gic_set_enable(unsigned long int_id, bool en){
     unsigned long reg_ind = int_id/(sizeof(uint32_t)*8);
     unsigned long bit = (1UL << int_id%(sizeof(uint32_t)*8));
 
+    spin_lock(&gicd_lock);
+
     if(en)
         gicd->ISENABLER[reg_ind] = bit;
     else
         gicd->ICENABLER[reg_ind] = bit;
 
+    spin_unlock(&gicd_lock);
 }
 
 void gic_set_trgt(unsigned long int_id, uint8_t trgt)
@@ -114,8 +120,12 @@ void gic_set_trgt(unsigned long int_id, uint8_t trgt)
     unsigned long off = (int_id * GIC_TARGET_BITS) % (sizeof(uint32_t) * 8);
     uint32_t mask = ((1U << GIC_TARGET_BITS) - 1) << off;
 
+    spin_lock(&gicd_lock);
+
     gicd->ITARGETSR[reg_ind] =
         (gicd->ITARGETSR[reg_ind] & ~mask) | ((trgt << off) & mask);
+
+    spin_unlock(&gicd_lock);
 }
 
 uint8_t gic_get_trgt(unsigned long int_id)
@@ -137,8 +147,12 @@ void gic_set_prio(unsigned long int_id, uint8_t prio){
     unsigned long off = (int_id*GIC_PRIO_BITS)%((sizeof(uint32_t)*8));
     unsigned long mask = ((1 << GIC_PRIO_BITS)-1) << off;
 
+    spin_lock(&gicd_lock);
+
     gicd->IPRIORITYR[reg_ind] = (gicd->IPRIORITYR[reg_ind] & ~mask) | 
         ((prio << off) & mask);
+
+    spin_unlock(&gicd_lock);
 }
 
 bool gic_is_pending(unsigned long int_id){
@@ -153,11 +167,15 @@ void gic_set_pending(unsigned long int_id, bool pending){
     unsigned long reg_ind = int_id / (sizeof(uint32_t) * 8);
     unsigned long mask = 1U << int_id % (sizeof(uint32_t) * 8);
 
+    spin_lock(&gicd_lock);
+
     if (pending) {
         gicd->ISPENDR[reg_ind] = mask;
     } else {
         gicd->ICPENDR[reg_ind] = mask;
     }   
+
+    spin_unlock(&gicd_lock);
 }
 
 bool gic_is_active(unsigned long int_id){
