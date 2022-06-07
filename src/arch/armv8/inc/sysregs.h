@@ -259,6 +259,7 @@
 #define SCTLR_I (1 << 12)
 #define SCTLR_WXN (1 << 19)
 #define SCTLR_EE (1 << 25)
+#define SCTLR_BR (1 << 17)
 
 /* CLIDR - Cache Level ID Register */
 
@@ -485,5 +486,28 @@
 #define ICC_SRE_SRE_BIT  (0x1)
 
 #define ICC_IGRPEN_EL1_ENB_BIT (0x1)
+
+/* MPU registers */
+
+#define MPUIR_REGION_MSK    (0xFFUL)
+#define MPUIR_REGION(MPUIR) ((MPUIR) & MPUIR_REGION_MSK)
+
+#define PRBAR_XN            (1UL << 0)
+#define PRBAR_AP_RW_EL1     (0UL << 1)
+#define PRBAR_AP_RW_ALL     (1UL << 1)
+#define PRBAR_AP_RO_EL1     (2UL << 1)
+#define PRBAR_AP_RO_ALL     (3UL << 1)
+#define PRBAR_SH_NS         (0 << 3)
+#define PRBAR_SH_OS         (2UL << 3)
+#define PRBAR_SH_IS         (3UL << 3)
+#define PRBAR_BASE_MSK      (~0x3FUL)
+#define PRBAR_BASE(BASE)    ((BASE) & PRBAR_BASE_MSK)
+
+#define PRLAR_EN            (0x1UL)
+#define PRLAR_ATTR_OFF      (1)
+#define PRLAR_ATTR_MSK      (0x3UL << PRLAR_ATTR_OFF)
+#define PRLAR_ATTR(N)       (((N) << PRLAR_ATTR_OFF) & PRLAR_ATTR_MSK)
+#define PRLAR_LIMIT_MSK     (~0x3FUL)
+#define PRLAR_LIMIT(BASE)   ((BASE) & PRLAR_LIMIT_MSK)
 
 #endif /* __ARCH_SYSREGS_H__ */
