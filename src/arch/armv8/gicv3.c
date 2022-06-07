@@ -24,8 +24,8 @@
 volatile gicd_t* gicd = (void*)0xF9010000;
 volatile gicr_t* gicr = (void*)0xF9020000;
 
-static spinlock_t gicd_lock;
-static spinlock_t gicr_lock;
+spinlock_t gicd_lock = SPINLOCK_INITVAL;
+spinlock_t gicr_lock = SPINLOCK_INITVAL;
 
 
 inline unsigned long gic_num_irqs()
