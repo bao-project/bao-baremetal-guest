@@ -57,6 +57,27 @@
 #define SPSR_IL (1 << 20)
 #define SPSR_SS (1 << 21)
 
+#define CPSR_M_MSK  (0x0f)
+#define CPSR_M_USR  (0x00)
+#define CPSR_M_FIQ  (0x01)
+#define CPSR_M_IRQ  (0x02)
+#define CPSR_M_SVC  (0x03)
+#define CPSR_M_MON  (0x06)
+#define CPSR_M_ABT  (0x07)
+#define CPSR_M_HYP  (0x0a)
+#define CPSR_M_UND  (0x0b)
+#define CPSR_M_SYS  (0x0f)
+
+#define MODE_USR    (CPSR_M_USR | 0x10)
+#define MODE_FIQ    (CPSR_M_FIQ | 0x10)
+#define MODE_IRQ    (CPSR_M_IRQ | 0x10)
+#define MODE_SVC    (CPSR_M_SVC | 0x10)
+#define MODE_MON    (CPSR_M_MON | 0x10)
+#define MODE_ABT    (CPSR_M_ABT | 0x10)
+#define MODE_HYP    (CPSR_M_HYP | 0x10)
+#define MODE_UND    (CPSR_M_UND | 0x10)
+#define MODE_SYS    (CPSR_M_SYS | 0x10)
+
 /* SCR - Secure Configuration Register */
 
 #define SCR_NS (1 << 0)
