@@ -14,7 +14,8 @@ void arch_init(){
     gic_init();
     TIMER_FREQ = sysreg_cntfrq_el0_read();
     sysreg_cntv_ctl_el0_write(1);
-#ifndef SINGLE_CORE
+
+#if !(defined(SINGLE_CORE)) && !(defined(MPU))
     if(cpuid == 0){
         size_t i = 0;
         int ret;
