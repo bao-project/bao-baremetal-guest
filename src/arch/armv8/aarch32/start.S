@@ -3,6 +3,7 @@
 #include <plat.h>
 
 #define STACK_SIZE  0x4000
+#define GICV3 (3)
 
 .section .start, "ax"
 .global _start
@@ -15,6 +16,12 @@ _start:
     cps #MODE_SYS
     b entry_el1
 1:
+#if GIC_VERSION == GICV3
+    mrc p15, 4, r0, c12, c9, 5 // icc_hsre
+    orr r0, r0, #(1 << 3)
+    mcr p15, 4, r0, c12, c9, 5 // icc_hsre
+#endif
+
     mrs r0, cpsr
     mov r1, #MODE_SYS
     bfi r0, r1, #0, #5

@@ -46,6 +46,11 @@ static inline void gicc_init()
 
 static inline void gicr_init()
 {
+    gicd->CTLR |= (1ull << 6);
+    gicr[get_cpuid()].WAKER &= ~GICR_ProcessorSleep_BIT;
+    while(gicr[get_cpuid()].WAKER & GICR_ChildrenASleep_BIT) { }
+
+    gicr[get_cpuid()].IGROUPR0 = -1;
     gicr[get_cpuid()].ICENABLER0 = -1;
     gicr[get_cpuid()].ICPENDR0 = -1;
     gicr[get_cpuid()].ICACTIVER0 = -1;
@@ -110,6 +115,7 @@ void gicd_init()
 
     /* Bring distributor to known state */
     for (int i = GIC_NUM_PRIVINT_REGS; i < GIC_NUM_INT_REGS(int_num); i++) {
+        gicd->IGROUPR[i] = -1;
         /**
          * Make sure all interrupts are not enabled, non pending,
          * non active.
