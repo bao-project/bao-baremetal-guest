@@ -40,9 +40,23 @@ entry_el1:
 
     // TODO: invalidate caches, bp, etc...
 
-    // TODO: setup basic MPU
+#ifdef MPU
+    ldr r4, =MAIR_EL1_DFLT
+    mcr p15, 0, r4, c10, c2, 0 // mair
 
-    ldr r1, =(SCTLR_RES1 | SCTLR_C | SCTLR_I) // TODO: enable MPU
+    // Set MPU region for cacheability and shareability
+    mov r4, #0
+    mcr p15, 0, r4, c6, c2, 1  // prselr
+    mov r4, #(PRBAR_BASE(0) | PRBAR_SH_IS | PRBAR_AP_RW_ALL)
+    mcr p15, 0, r4, c6, c3, 0  // prbar
+    mov r4, #(PRLAR_LIMIT(0x7fffffffUL) | PRLAR_ATTR(1) | PRLAR_EN)
+    mcr p15, 0, r4, c6, c3, 1  // prlar
+#endif
+
+    dsb
+    isb
+
+    ldr r1, =(SCTLR_RES1 | SCTLR_C | SCTLR_I | SCTLR_BR | SCTLR_M)
     mcr p15, 0, r1, c1, c0, 0 // sctlr
 
 	dsb	nsh
