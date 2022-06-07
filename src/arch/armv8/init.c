@@ -24,5 +24,5 @@ void arch_init(){
         } while(i++, ret == PSCI_E_SUCCESS);
     }
 #endif
-    asm volatile("MSR   DAIFClr, #2\n\t");
+    arm_unmask_irq();
 }
