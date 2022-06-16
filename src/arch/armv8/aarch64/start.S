@@ -17,6 +17,7 @@
 #include "sysregs.h"
 
 #define STACK_SIZE  0x4000
+#define GICV3 (3)
 
 .section .start, "ax"
 .global _start
@@ -38,6 +39,14 @@ _start:
     b.eq .
     cmp x1, 1
     b.eq _enter_el1
+    mrs x1, mpidr_el1
+    msr vmpidr_el2, x1
+#if GIC_VERSION == GICV3
+    mov x1, 0x9
+    msr icc_sre_el2, x1
+#endif
+    adr x1, _exception_vector
+    msr	VBAR_EL2, x1
     mov x1, SPSR_EL1t | SPSR_F | SPSR_I | SPSR_A | SPSR_D
     msr spsr_el2, x1
     mov x1, HCR_RW_BIT
