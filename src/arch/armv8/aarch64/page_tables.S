@@ -15,25 +15,39 @@
  */
 
 #include <page_tables.h>
+#include <plat.h>
 
 .section .page_tables, "aw"
 .balign PAGE_SIZE
 
-l1_page_table:
-
-    //0x00000000 - 0x7FFFFFFF   RAM
+l2_page_tables:
     .set ADDR, 0
-    .rept   2
-    .8byte (PTE_SUPERPAGE | PTE_MEM_FLAGS) + ADDR
-    .set ADDR, ADDR + L1_BLOCK_SIZE
-    .endr
 
-     //0x80000000 - 0xFFFFFFFF  DEVICES
-    .rept   2
+    .set COUNT, PLAT_MEM_BASE/L2_BLOCK_SIZE
+    .rept   COUNT
     .8byte (PTE_SUPERPAGE | PTE_DEV_FLAGS) + ADDR
-    .set ADDR, ADDR + L1_BLOCK_SIZE
+    .set ADDR, ADDR + L2_BLOCK_SIZE
     .endr
 
+    .set COUNT, PLAT_MEM_SIZE/L2_BLOCK_SIZE
+    .rept   COUNT
+    .8byte (PTE_SUPERPAGE | PTE_MEM_FLAGS) + ADDR
+    .set ADDR, ADDR + L2_BLOCK_SIZE
+    .endr
+
+    .set COUNT, (0x100000000 - ADDR)/L2_BLOCK_SIZE
+    .rept   COUNT
+    .8byte (PTE_SUPERPAGE | PTE_DEV_FLAGS) + ADDR
+    .set ADDR, ADDR + L2_BLOCK_SIZE
+    .endr
+
+    .balign PAGE_SIZE
+
+l1_page_table:
+    .8byte (PTE_TABLE) + l2_page_tables + PAGE_SIZE*0
+    .8byte (PTE_TABLE) + l2_page_tables + PAGE_SIZE*1
+    .8byte (PTE_TABLE) + l2_page_tables + PAGE_SIZE*2
+    .8byte (PTE_TABLE) + l2_page_tables + PAGE_SIZE*3    
     .balign PAGE_SIZE
 
 .global root_page_table
