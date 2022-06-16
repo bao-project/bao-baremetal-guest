@@ -5,6 +5,10 @@
 #define STACK_SIZE  0x4000
 #define GICV3 (3)
 
+#define GENERIC_TIMER_CNTCTL_CNTCR_EN   (0x1)
+#define GENERIC_TIMER_CNTCTL_CNTCR_OFFSET  (0x0)
+#define GENERIC_TIMER_CNTCTL_CNTDIF0_OFFSET  (0x20)
+
 .section .start, "ax"
 .global _start
 _start:
@@ -18,8 +22,17 @@ _start:
 1:
 #if GIC_VERSION == GICV3
     mrc p15, 4, r0, c12, c9, 5 // icc_hsre
-    orr r0, r0, #(1 << 3)
+    orr r0, r0, #0x9
     mcr p15, 4, r0, c12, c9, 5 // icc_hsre
+#endif
+
+#if defined(MPU)
+    ldr r0, =PLAT_GENERIC_TIMER_CNTCTL_BASE
+    ldr r1, [r0, #GENERIC_TIMER_CNTCTL_CNTCR_OFFSET]
+    orr r1, r1, #GENERIC_TIMER_CNTCTL_CNTCR_EN
+    str r1, [r0, #GENERIC_TIMER_CNTCTL_CNTCR_OFFSET]
+    ldr r1, [r0, #GENERIC_TIMER_CNTCTL_CNTDIF0_OFFSET]
+    mcr p15, 0, r1, c14, c0, 0 // cntfrq
 #endif
 
     mrs r0, cpsr
