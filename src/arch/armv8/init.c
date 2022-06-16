@@ -18,7 +18,7 @@ void arch_init(){
 #if !(defined(SINGLE_CORE)) && !(defined(MPU))
     if(cpuid == 0){
         size_t i = 0;
-        int ret;
+        int ret = PSCI_E_SUCCESS;
         do {
             if(i == cpuid) continue;
             ret = psci_cpu_on(i, (uintptr_t) _start, 0);
