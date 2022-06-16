@@ -113,6 +113,7 @@ static inline void gicr_init()
 void gic_cpu_init()
 {
     sysreg_icc_sre_el1_write(sysreg_icc_sre_el1_read() | ICC_SRE_SRE_BIT);
+    ISB();
     gicr_init();
     gicc_init();
 }
