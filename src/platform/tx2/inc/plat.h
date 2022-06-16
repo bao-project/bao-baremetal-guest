@@ -1,8 +1,11 @@
 #ifndef PLAT_H
 #define PLAT_H
 
-#define PLAT_MEM_BASE 0x0
-#define PLAT_MEM_SIZE 0x1000000
+#define PLAT_MEM_BASE 0xa0000000
+#define PLAT_MEM_SIZE 0x8000000
+
+#define PLAT_GICD_BASE_ADDR (0x03881000)
+#define PLAT_GICC_BASE_ADDR (0x03882000)
 
 #define UART_IRQ_ID (144)
 
