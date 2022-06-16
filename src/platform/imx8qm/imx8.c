@@ -1,7 +1,7 @@
 #include <uart.h>
 #include <nxp_uart.h>
 
-volatile struct lpuart * const uart = (void*)0xff000000;
+volatile struct lpuart * const uart = (void*)0x5a060000;
 
 void uart_init(){
    nxp_uart_init(uart);
