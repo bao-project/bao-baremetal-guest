@@ -295,7 +295,17 @@ void gicd_set_route(unsigned long int_id, unsigned long trgt)
 {
     if (gic_is_priv(int_id)) return;
 
-    gicd->IROUTER[int_id] = trgt;
+    /**
+     * In aarch32 the compiler might issue a single strd access. However, this
+     * instruction is complex to emulate since it does not generate a valid
+     * syndrome register. Bao has no support for its emulation. Therefore 
+     * we perform the 64-bit access explicitly as two 32-bit stores.
+     */
+
+    uint64_t _trgt = trgt;
+    volatile uint32_t *irouter = (uint32_t*) &gicd->IROUTER[int_id];
+    irouter[0] = _trgt;
+    irouter[1] = (_trgt >> 32);
 }
 
 void gicd_set_enable(unsigned long int_id, bool en)
