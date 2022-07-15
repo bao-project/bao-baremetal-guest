@@ -1,11 +1,9 @@
-#include <stdint.h>
+#include <core.h>
 #include <cpu.h>
 #include <page_tables.h>
 #include <plic.h>
 #include <sbi.h>
 #include <csrs.h>
-
-#include <stdio.h>
 
 extern void _start();
 

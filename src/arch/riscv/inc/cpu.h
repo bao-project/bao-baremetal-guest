@@ -1,8 +1,7 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <core.h>
 
 extern int primary_hart;
 

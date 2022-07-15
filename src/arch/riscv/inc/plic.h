@@ -16,8 +16,7 @@
 #ifndef __PLIC_H__
 #define __PLIC_H__
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <core.h>
 #include <csrs.h>
 
 #define PLIC_BASE   (0xc000000)

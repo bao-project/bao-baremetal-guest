@@ -1,7 +1,7 @@
 #ifndef IRQ_H
 #define IRQ_H
 
-#include <stdint.h>
+#include <core.h>
 #include <arch/irq.h>
 
 typedef void (*irq_handler_t)(unsigned id);

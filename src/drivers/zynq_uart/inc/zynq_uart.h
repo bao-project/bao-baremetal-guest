@@ -17,8 +17,7 @@
 #ifndef __UART_ZYNQ_H
 #define __UART_ZYNQ_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <core.h>
 
 /** UART Interrupts ID*/
 

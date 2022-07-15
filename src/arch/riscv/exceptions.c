@@ -1,5 +1,4 @@
-#include <stdint.h>
-#include <stdio.h>
+#include <core.h>
 #include <csrs.h>
 #include <plic.h>
 #include <irq.h>

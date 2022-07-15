@@ -17,7 +17,7 @@
 #ifndef __SPINLOCK__
 #define __SPINLOCK__
 
-#include <stdint.h>
+#include <core.h>
 
 typedef volatile uint32_t spinlock_t;
 

@@ -16,7 +16,7 @@
 #ifndef __BIT_H__
 #define __BIT_H__
 
-#include <stdint.h>
+#include <core.h>
 
 #define BIT_MASK(OFF, LEN) (((1UL << (OFF + LEN)) - 1) & ~((1UL << (OFF)) - 1))
 

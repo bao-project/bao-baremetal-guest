@@ -1,7 +1,7 @@
 #ifndef __SBI_H__
 #define __SBI_H__
 
-#include <stdint.h>
+#include <core.h>
 
 /**
  * From https://github.com/riscv/riscv-sbi-doc

@@ -17,7 +17,7 @@
 #ifndef __PSCI_H__
 #define __PSCI_H__
 
-#include <stdint.h>
+#include <core.h>
 
 #define PSCI_VERSION				(0x84000000)
 #define PSCI_CPU_SUSPEND_AARCH32	(0x84000001)
