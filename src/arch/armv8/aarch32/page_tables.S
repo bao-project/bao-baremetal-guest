@@ -1,0 +1,44 @@
+/** 
+ * Bao, a Lightweight Static Partitioning Hypervisor 
+ *
+ * Copyright (c) Bao Project (www.bao-project.org), 2019-
+ *
+ * Authors:
+ *      Jose Martins <jose.martins@bao-project.org>
+ *      Sandro Pinto <sandro.pinto@bao-project.org>
+ *
+ * Bao is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License version 2 as published by the Free
+ * Software Foundation, with a special exception exempting guest code from such
+ * license. See the COPYING file in the top-level directory for details. 
+ *
+ */
+
+#include <page_tables.h>
+#include <plat.h>
+
+.section .page_tables, "aw"
+
+.balign (16 * 0x400)
+.global page_table
+page_table:
+    .set ADDR, 0
+
+    .set COUNT, PLAT_MEM_BASE/L1_BLOCK_SIZE
+    .rept   COUNT
+    .4byte (PTE_SUPERPAGE | PTE_DEV_FLAGS) + ADDR
+    .set ADDR, ADDR + L1_BLOCK_SIZE
+    .endr
+
+    .set COUNT, PLAT_MEM_SIZE/L1_BLOCK_SIZE
+    .rept   COUNT
+    .4byte (PTE_SUPERPAGE | PTE_MEM_FLAGS) + ADDR
+    .set ADDR, ADDR + L1_BLOCK_SIZE
+    .endr
+
+    .set COUNT, (0x100000000 - ADDR)/L1_BLOCK_SIZE
+    .rept   COUNT
+    .4byte (PTE_SUPERPAGE | PTE_DEV_FLAGS) + ADDR
+    .set ADDR, ADDR + L1_BLOCK_SIZE
+    .endr
+    

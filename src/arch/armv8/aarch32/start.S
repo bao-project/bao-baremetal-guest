@@ -60,9 +60,10 @@ entry_el1:
 
     // TODO: invalidate caches, bp, etc...
 
-#ifdef MPU
     ldr r4, =MAIR_EL1_DFLT
     mcr p15, 0, r4, c10, c2, 0 // mair
+
+#ifdef MPU
 
     // Set MPU region for cacheability and shareability
     mov r4, #0
@@ -71,13 +72,36 @@ entry_el1:
     mcr p15, 0, r4, c6, c3, 0  // prbar
     mov r4, #(PRLAR_LIMIT(0x7fffffffUL) | PRLAR_ATTR(1) | PRLAR_EN)
     mcr p15, 0, r4, c6, c3, 1  // prlar
-#endif
 
     dsb
     isb
 
     ldr r1, =(SCTLR_RES1 | SCTLR_C | SCTLR_I | SCTLR_BR | SCTLR_M)
     mcr p15, 0, r1, c1, c0, 0 // sctlr
+
+#else 
+
+    ldr r1, =0x55555555
+    mcr p15, 0, r1, c3, c0, 0 // dacr
+
+    mov r1, #0
+    mcr p15, 0, r1, c2, c0, 2 // ttbcr
+    
+    ldr r1, =page_table
+    ldr r2, =(TTBR_IRGN1 | TTBR_RGN_0 | TTBR_S | TTBR_NOS)
+    orr r1, r1, r2
+    mcr p15, 0, r1, c2, c0, 0 // ttbr0
+
+    dsb
+    isb
+
+    ldr r1, =(SCTLR_AFE | SCTLR_C | SCTLR_I | SCTLR_M)
+    mcr p15, 0, r1, c1, c0, 0 // sctlr
+
+    dsb
+    isb
+
+#endif
 
 	dsb	nsh
 	isb
