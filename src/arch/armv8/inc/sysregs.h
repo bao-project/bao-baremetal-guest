@@ -180,6 +180,16 @@
 #define VTCR_TBI (1 << 20)
 
 /**
+ * Aarch32 TTBR configuration bits
+ */
+
+#define TTBR_IRGN1  (1 << 0)
+#define TTBR_S      (1 << 1)
+#define TTBR_RGN_0  (1 << 3)
+#define TTBR_NOS    (1 << 5)
+
+
+/**
  * Default stage-2 translation control
  * ...
  */
@@ -260,6 +270,7 @@
 #define SCTLR_WXN (1 << 19)
 #define SCTLR_EE (1 << 25)
 #define SCTLR_BR (1 << 17)
+#define SCTLR_AFE (1 << 29)
 
 /* CLIDR - Cache Level ID Register */
 
