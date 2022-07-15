@@ -14,18 +14,11 @@
  *
  */
 
+#include <core.h>
 #include <plat.h>
 
-#ifndef PLAT_MEM_BASE
-#define PLAT_MEM_BASE (0x0)
-#endif
-
-#ifndef PLAT_MEM_SIZE
-#define PLAT_MEM_SIZE (0x8000000)
-#endif
-
 MEMORY {
-    RAM (rwx)    : ORIGIN = PLAT_MEM_BASE, LENGTH = PLAT_MEM_SIZE    
+    RAM (rwx)    : ORIGIN = MEM_BASE, LENGTH = MEM_SIZE    
 }
 
 ENTRY(_start)

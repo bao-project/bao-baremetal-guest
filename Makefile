@@ -78,15 +78,21 @@ OBJCOPY=$(CROSS_COMPILE)objcopy
 OBJDUMP=$(CROSS_COMPILE)objdump
 
 GENERIC_FLAGS = $(ARCH_GENERIC_FLAGS) -O$(OPT_LEVEL) -g$(DEBUG_LEVEL) -static
+CPPFLAGS = $(ARCH_CPPFLAGS) $(addprefix -I, $(INC_DIRS)) -MD -MF $@.d
 ifneq ($(MPU),)
-GENERIC_FLAGS+=-DMPU
+CPPFLAGS+=-DMPU
 endif
-ASFLAGS = $(GENERIC_FLAGS) $(ARCH_ASFLAGS) 
-CFLAGS = $(GENERIC_FLAGS) $(ARCH_CFLAGS) 
-CPPFLAGS =	$(ARCH_CPPFLAGS) $(addprefix -I, $(INC_DIRS)) -MD -MF $@.d
+ifneq ($(MEM_BASE),)
+CPPFLAGS+=-DMEM_BASE=$(MEM_BASE)
+endif
+ifneq ($(MEM_SIZE),)
+CPPFLAGS+=-DMEM_SIZE=$(MEM_SIZE)
+endif
 ifneq ($(SINGLE_CORE),)
 CPPFLAGS+=-DSINGLE_CORE=y
 endif
+ASFLAGS = $(GENERIC_FLAGS) $(CPPFLAGS) $(ARCH_ASFLAGS) 
+CFLAGS = $(GENERIC_FLAGS) $(CPPFLAGS) $(ARCH_CFLAGS) 
 LDFLAGS = $(GENERIC_FLAGS) $(ARCH_LDFLAGS) -nostartfiles
 all: $(TARGET).bin
 
@@ -108,10 +114,10 @@ $(BUILD_DIR):
 $(OBJS): | $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.S
-	$(CC) $(ASFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CC) $(ASFLAGS) -c $< -o $@
 
 $(GEN_LD_FILE): $(LD_FILE)
 	$(CC) $(CPPFLAGS) -E -x assembler-with-cpp $< | grep "^[^#;]" > $@

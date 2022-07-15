@@ -14,6 +14,7 @@
  *
  */
 
+#include <core.h>
 #include <page_tables.h>
 #include <plat.h>
 
@@ -23,13 +24,13 @@
 l2_page_tables:
     .set ADDR, 0
 
-    .set COUNT, PLAT_MEM_BASE/L2_BLOCK_SIZE
+    .set COUNT, MEM_BASE/L2_BLOCK_SIZE
     .rept   COUNT
     .8byte (PTE_SUPERPAGE | PTE_DEV_FLAGS) + ADDR
     .set ADDR, ADDR + L2_BLOCK_SIZE
     .endr
 
-    .set COUNT, PLAT_MEM_SIZE/L2_BLOCK_SIZE
+    .set COUNT, MEM_SIZE/L2_BLOCK_SIZE
     .rept   COUNT
     .8byte (PTE_SUPERPAGE | PTE_MEM_FLAGS) + ADDR
     .set ADDR, ADDR + L2_BLOCK_SIZE
