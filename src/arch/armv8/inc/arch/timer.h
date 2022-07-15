@@ -1,7 +1,7 @@
 #ifndef ARCH_TIMER_H
 #define ARCH_TIMER_H
 
-#include <stdint.h>
+#include <core.h>
 
 extern unsigned long TIMER_FREQ;
 

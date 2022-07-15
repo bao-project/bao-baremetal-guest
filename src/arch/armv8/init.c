@@ -1,5 +1,5 @@
 
-#include <stdint.h>
+#include <core.h>
 #include <cpu.h>
 #include <psci.h>
 #include <gic.h>

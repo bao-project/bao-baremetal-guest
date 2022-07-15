@@ -10,8 +10,8 @@
 #ifndef __SERIAL_UART8250_H__
 #define __SERIAL_UART8250_H__
 
-//#include <sbi/sbi_types.h>
-#include <stdint.h>
+#include <core.h>
+
 typedef uint32_t u32;
 typedef uint16_t u16;
 

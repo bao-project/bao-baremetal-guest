@@ -17,9 +17,7 @@
 #ifndef __GIC_H__
 #define __GIC_H__
 
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
+#include <core.h>
 #include <bit.h>
 
 #define GICV2 (2)

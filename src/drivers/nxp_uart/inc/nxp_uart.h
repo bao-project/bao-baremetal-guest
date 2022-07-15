@@ -16,8 +16,7 @@
 #ifndef UART_NXP_H
 #define UART_NXP_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <core.h>
 #include <uart.h>
 
 struct lpuart {

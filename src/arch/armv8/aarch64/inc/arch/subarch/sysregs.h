@@ -21,7 +21,7 @@
 
 #ifndef __ASSEMBLER__
 
-#include <stdint.h>
+#include <core.h>
 
 #define SYSREG_GEN_ACCESSORS_NAME(reg, name) \
     static inline unsigned long sysreg_##reg##_read() {\

@@ -18,7 +18,7 @@
 #ifndef __PL011_UART_H_
 #define __PL011_UART_H_
 
-#include <stdint.h>
+#include <core.h>
 
 /* UART Base Address (PL011) */
 

@@ -14,9 +14,9 @@
  *
  */
 
+#include <core.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <cpu.h>
 #include <wfi.h>
 #include <spinlock.h>

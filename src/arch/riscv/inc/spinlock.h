@@ -16,7 +16,7 @@
 #ifndef __ARCH_SPINLOCK__
 #define __ARCH_SPINLOCK__
 
-#include <stdint.h>
+#include <core.h>
 
 typedef volatile uint32_t spinlock_t __attribute__((aligned(4)));
 
