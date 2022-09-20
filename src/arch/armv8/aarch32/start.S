@@ -73,6 +73,13 @@ entry_el1:
     mov r4, #(PRLAR_LIMIT(0x7fffffffUL) | PRLAR_ATTR(1) | PRLAR_EN)
     mcr p15, 0, r4, c6, c3, 1  // prlar
 
+    mov r4, #1
+    mcr p15, 0, r4, c6, c2, 1  // prselr
+    mov r4, #(PRBAR_BASE(0x80000000UL) | PRBAR_SH_IS | PRBAR_AP_RW_ALL)
+    mcr p15, 0, r4, c6, c3, 0  // prbar
+    mov r4, #(PRLAR_LIMIT(0xffffffffUL) | PRLAR_ATTR(2) | PRLAR_EN)
+    mcr p15, 0, r4, c6, c3, 1  // prlar
+
     dsb
     isb
 
