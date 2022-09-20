@@ -68,17 +68,12 @@ void pl011_uart_init(volatile Pl011_Uart * ptr_uart/*, uint32_t baud_rate*/) {
 	/* First, disable everything */
 	ptr_uart->control = 0x0;
 
-	/* Disable FIFOs */
-	lcrh_reg = ptr_uart->line_control;
-	lcrh_reg &= ~UART_LCR_FEN;
-	ptr_uart->line_control = lcrh_reg;
-
 	/* Default baudrate = 115200 */
 	uint32_t baud_rate = UART_BAUD_RATE;
 	pl011_uart_set_baud_rate(ptr_uart, baud_rate);
 
-	/* Set the UART to be 8 bits, 1 stop bit and no parity, FIFOs enable*/
-	ptr_uart->line_control = (UART_LCR_WLEN_8 | UART_LCR_FEN);
+	/* Set the UART to be 8 bits, 1 stop bit and no parity */
+	ptr_uart->line_control = (UART_LCR_WLEN_8);
 
 	/* Enable the UART, enable TX and enable loop back*/
 	ptr_uart->control = (UART_CR_UARTEN | UART_CR_TXE | UART_CR_LBE);
