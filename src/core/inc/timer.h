@@ -3,7 +3,7 @@
 
 #include <arch/timer.h>
 
-#define TIME_US(us) ((TIMER_FREQ)*(us)/(1000000ull))
+#define TIME_US(us) (((TIMER_FREQ)*(us))/(1000000ull))
 #define TIME_MS(ms) (TIME_US((ms)*1000ull))
 #define TIME_S(s)   (TIME_MS((s)*1000ull))
 
