@@ -503,21 +503,28 @@
 #define MPUIR_REGION_MSK    (0xFFUL)
 #define MPUIR_REGION(MPUIR) ((MPUIR) & MPUIR_REGION_MSK)
 
-#define PRBAR_XN            (1UL << 0)
-#define PRBAR_AP_RW_EL1     (0UL << 1)
-#define PRBAR_AP_RW_ALL     (1UL << 1)
-#define PRBAR_AP_RO_EL1     (2UL << 1)
-#define PRBAR_AP_RO_ALL     (3UL << 1)
-#define PRBAR_SH_NS         (0 << 3)
-#define PRBAR_SH_OS         (2UL << 3)
-#define PRBAR_SH_IS         (3UL << 3)
-#define PRBAR_BASE_MSK      (~0x3FUL)
+#ifdef AARCH64
+#define PRBAR_ADJUST_SHIFT    1
+#else
+#define PRBAR_ADJUST_SHIFT    0
+#endif
+
+#define PRBAR_XN            ((1UL << 0) << PRBAR_ADJUST_SHIFT)
+#define PRBAR_AP_RW_EL1     ((0 << 1) << PRBAR_ADJUST_SHIFT)
+#define PRBAR_AP_RW_ALL     ((1UL << 1) << PRBAR_ADJUST_SHIFT)
+#define PRBAR_AP_RO_EL1     ((2UL << 1) << PRBAR_ADJUST_SHIFT)
+#define PRBAR_AP_RO_ALL     ((3UL << 1) << PRBAR_ADJUST_SHIFT)
+#define PRBAR_SH_NS         ((0 << 3) << PRBAR_ADJUST_SHIFT)
+#define PRBAR_SH_OS         ((2UL << 3) << PRBAR_ADJUST_SHIFT)
+#define PRBAR_SH_IS         ((3UL << 3) << PRBAR_ADJUST_SHIFT)
+#define PRBAR_BASE_MSK      (~0x3FULL)
 #define PRBAR_BASE(BASE)    ((BASE) & PRBAR_BASE_MSK)
 
 #define PRLAR_EN            (0x1UL)
 #define PRLAR_ATTR_OFF      (1)
 #define PRLAR_ATTR_MSK      (0x3UL << PRLAR_ATTR_OFF)
 #define PRLAR_ATTR(N)       (((N) << PRLAR_ATTR_OFF) & PRLAR_ATTR_MSK)
+#define PRLAR_NS            (0x1UL << 4)
 #define PRLAR_LIMIT_MSK     (~0x3FUL)
 #define PRLAR_LIMIT(BASE)   ((BASE) & PRLAR_LIMIT_MSK)
 
