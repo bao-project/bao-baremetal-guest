@@ -15,7 +15,7 @@ void arch_init(){
     TIMER_FREQ = sysreg_cntfrq_el0_read();
     sysreg_cntv_ctl_el0_write(1);
 
-#if !(defined(SINGLE_CORE)) && !(defined(MPU))
+#if !(defined(SINGLE_CORE))
     if(cpuid == 0){
         size_t i = 0;
         int ret = PSCI_E_SUCCESS;
