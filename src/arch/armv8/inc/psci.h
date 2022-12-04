@@ -60,6 +60,9 @@
 #define PSCI_E_DISABLED			-8
 #define PSCI_E_INVALID_ADDRESS	-9
 
+#ifdef MPU
+#define PSCI_CONDUIT    hvc
+#endif
 
 /* psci wake up from off entry point */
 void _psci_wake_up();

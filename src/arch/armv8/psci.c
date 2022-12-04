@@ -15,6 +15,14 @@
  */
 
 #include <psci.h>
+#include <plat.h>
+
+#define STR(S)  #S
+#define XSTR(S) STR(S)
+
+#ifndef PSCI_CONDUIT
+#define PSCI_CONDUIT    smc
+#endif
 
 int smc_call(unsigned long x0, unsigned long x1, unsigned long x2, unsigned long x3)
 {
@@ -24,7 +32,7 @@ int smc_call(unsigned long x0, unsigned long x1, unsigned long x2, unsigned long
 	register unsigned long r3 asm("r3") = x3;
 
     asm volatile(
-       		"smc	#0\n"
+       		XSTR(PSCI_CONDUIT) " #0\n"
 			: "=r" (r0)
 			: "r" (r0), "r" (r1), "r" (r2)
 			: "r3");
