@@ -7,9 +7,9 @@ ARCH_CPPFLAGS =
 ARCH_LDFLAGS = 
 
 ARCH_SUB?=aarch64
-ARCH_SUB_DIR:=$(ARCH_DIR)/$(ARCH_SUB)
-include $(ARCH_SUB_DIR)/arch_sub.mk
-SRC_DIRS+=$(ARCH_SUB_DIR)
-INC_DIRS+=$(ARCH_SUB_DIR)/inc
+arch_sub_dir:=$(cur_dir)/$(ARCH_SUB)
+include $(arch_sub_dir)/arch_sub.mk
+SRC_DIRS+=$(arch_sub_dir)
+INC_DIRS+=$(arch_sub_dir)/inc
 
-include $(ARCH_SUB_DIR)/sources.mk
+include $(arch_sub_dir)/sources.mk
