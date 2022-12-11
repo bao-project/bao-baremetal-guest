@@ -3,7 +3,6 @@
 #include <plat.h>
 
 #define STACK_SIZE  0x4000
-#define GICV3 (3)
 
 #define GENERIC_TIMER_CNTCTL_CNTCR_EN   (0x1)
 #define GENERIC_TIMER_CNTCTL_CNTCR_OFFSET  (0x0)
@@ -48,8 +47,6 @@ _start:
 entry_el1:
     mrc p15, 0, r0, c0, c0, 5 // mpidr
     and r0, r0, #MPIDR_CPU_MASK
-
-    // TODO: check if we are at EL1/PL1 else jump to it
 
     ldr r1, =_exception_vector
     mcr	p15, 0, r1, c12, c0, 0 // vbar
