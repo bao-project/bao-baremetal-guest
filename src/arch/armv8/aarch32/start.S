@@ -140,12 +140,17 @@ wait_flag:
 
     ldr r1, =_stack_base
     ldr r2, =STACK_SIZE
-    add r1, r1, r2
+    add r3, r2, r2 // r3 = 2 * STACK_SIZE
 #ifndef SINGLE_CORE
-    mul r2, r2, r0
-    add r1, r1, r2
+    mul r4, r3, r0 // r4 = cpuid * (2*STACK_SIZE)
+    add r1, r1, r4
 #endif
-    mov sp, r1
+    add sp, r1, r2
+    cps #MODE_IRQ
+    isb
+    add sp, r1, r3
+    cps #MODE_SVC
+    isb
 
     // TODO: other c runtime init (eg ctors)
 
