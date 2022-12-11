@@ -54,9 +54,12 @@ entry_el1:
     ldr r1, =_exception_vector
     mcr	p15, 0, r1, c12, c0, 0 // vbar
 
-    // TODO: setup translation and page-tables
-
-    // TODO: enable floating point
+    // Enable floating point
+    mov r1, #(0xf << 20)
+    mcr p15, 0, r1, c1, c0, 2 // cpacr
+    isb
+    mov r1, #(0x1 << 30)
+    vmsr fpexc, r1
 
     // TODO: invalidate caches, bp, etc...
 
