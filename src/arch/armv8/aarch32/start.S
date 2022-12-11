@@ -17,7 +17,7 @@ _start:
     and r1, r0, #CPSR_M_MSK
     cmp r1, #CPSR_M_HYP
     beq 1f
-    cps #MODE_SYS
+    cps #MODE_SVC
     b entry_el1
 1:
 #if GIC_VERSION == GICV3
@@ -36,7 +36,7 @@ _start:
 #endif
 
     mrs r0, cpsr
-    mov r1, #MODE_SYS
+    mov r1, #MODE_SVC
     bfi r0, r1, #0, #5
     msr spsr_hyp, r0
     ldr r0, =entry_el1
