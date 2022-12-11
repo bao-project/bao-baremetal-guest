@@ -29,7 +29,9 @@
 #define icc_dir_el1     S3_0_C12_C11_1
 #define icc_sre_el1     S3_0_C12_C12_5
 #define icc_pmr_el1     S3_0_C4_C6_0
-#define icc_bpr1_el1    S3_0_C12_C8_3
+#define icc_bpr0_el1    S3_0_C12_C8_3
+#define icc_bpr1_el1    S3_0_C12_C12_3
+#define icc_rpr_el1     S3_0_C12_C11_3
 #define icc_ctlr_el1    S3_0_C12_C12_4
 #define icc_igrpen1_el1 S3_0_C12_C12_7
 #define icc_sgi1r_el1   S3_0_C12_C11_5
@@ -53,6 +55,7 @@
 SYSREG_GEN_ACCESSORS(esr_el1);
 SYSREG_GEN_ACCESSORS(elr_el1);
 SYSREG_GEN_ACCESSORS(far_el1);
+SYSREG_GEN_ACCESSORS(vbar_el1);
 SYSREG_GEN_ACCESSORS(clidr_el1);
 SYSREG_GEN_ACCESSORS(csselr_el1);
 SYSREG_GEN_ACCESSORS(ccsidr_el1);
@@ -73,6 +76,7 @@ SYSREG_GEN_ACCESSORS(cntfrq_el0);
 SYSREG_GEN_ACCESSORS(cntv_ctl_el0);
 SYSREG_GEN_ACCESSORS(cntvct_el0);
 SYSREG_GEN_ACCESSORS(cntv_cval_el0);
+SYSREG_GEN_ACCESSORS(cntv_tval_el0);
 SYSREG_GEN_ACCESSORS(mpuir_el1);
 SYSREG_GEN_ACCESSORS(prselr_el1);
 SYSREG_GEN_ACCESSORS(prbar_el1);
@@ -83,7 +87,9 @@ SYSREG_GEN_ACCESSORS(icc_eoir1_el1);
 SYSREG_GEN_ACCESSORS(icc_dir_el1);
 SYSREG_GEN_ACCESSORS(icc_sre_el1);
 SYSREG_GEN_ACCESSORS(icc_pmr_el1);
-SYSREG_GEN_ACCESSORS(icc_bpr_el1);
+SYSREG_GEN_ACCESSORS(icc_bpr0_el1);
+SYSREG_GEN_ACCESSORS(icc_bpr1_el1);
+SYSREG_GEN_ACCESSORS(icc_rpr_el1);
 SYSREG_GEN_ACCESSORS(icc_ctlr_el1);
 SYSREG_GEN_ACCESSORS(icc_igrpen1_el1);
 SYSREG_GEN_ACCESSORS(icc_sgi1r_el1);
