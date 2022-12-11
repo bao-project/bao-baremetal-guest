@@ -14,9 +14,7 @@ _exception_vector:
     b irq_handler
 
 irq_handler:
-    cps #MODE_SVC
     push {r0-r12, r14}
     bl gic_handle
     pop {r0-r12, r14}
-    cps #MODE_IRQ
     SUBS PC, lr, #4
