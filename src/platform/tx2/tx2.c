@@ -1,8 +1,9 @@
+#include <plat.h>
 #include <8250_uart.h>
 
 
 #define VIRT_UART16550_INTERRUPT	112
-#define VIRT_UART16550_ADDR		    0x03100000
+#define VIRT_UART16550_ADDR		    UART_ADDR
 #define VIRT_UART_BAUDRATE		    115200
 #define VIRT_UART_FREQ		        408000000
 

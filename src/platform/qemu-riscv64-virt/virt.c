@@ -1,9 +1,11 @@
+#include <plat.h>
 #include <8250_uart.h>
 
 
 #define VIRT_UART16550_INTERRUPT	10
 
-#define VIRT_UART16550_ADDR		0x10000000
+#define VIRT_UART16550_ADDR		UART_ADDR
+
 #define VIRT_UART_BAUDRATE		115200
 #define VIRT_UART_SHIFTREG_ADDR		1843200
 

@@ -1,6 +1,7 @@
+#include <plat.h>
 #include <pl011_uart.h>
 
-Pl011_Uart *uart  = (void*) 0x9C0A0000;
+Pl011_Uart *uart  = (void*) PLAT_UART_ADDR;
 
 void uart_init(void)
 {
