@@ -17,6 +17,7 @@
 #include <core.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h> 
 #include <cpu.h>
 #include <wfi.h>
 #include <spinlock.h>
@@ -29,9 +30,44 @@
 
 spinlock_t print_lock = SPINLOCK_INITVAL;
 
+#ifdef DEMO_IPC
+
+#define SHMEM_IRQ_ID (52)
+
+char* const baremetal_message = (char*)0x70000000;
+char* const zephyr_message    = (char*)0x70002000;
+const size_t shmem_channel_size = 0x2000;
+
+void shmem_update_msg(int irq_count) {
+    sprintf(baremetal_message, "Bao baremetal guest received %d uart interrupts!\n",
+        irq_count);
+}
+
+void shmem_handler() {
+    zephyr_message[shmem_channel_size-1] = '\0';
+    char* end = strchr(zephyr_message, '\n');
+    *end = '\0';
+    printf("message from zephyr: %s\n", zephyr_message);
+}
+
+void shmem_init() {
+    memset(baremetal_message, 0, shmem_channel_size);
+    memset(zephyr_message, 0, shmem_channel_size);
+    shmem_update_msg(0);
+    irq_set_handler(SHMEM_IRQ_ID, shmem_handler);
+    irq_set_prio(SHMEM_IRQ_ID, IRQ_MAX_PRIO);
+    irq_enable(SHMEM_IRQ_ID);
+}
+
+#endif
+
 void uart_rx_handler(){
-    printf("cpu%d: %s\n",get_cpuid(), __func__);
+    static int irq_count = 0;
+    printf("cpu%d: %s %d\n",get_cpuid(), __func__, ++irq_count);
     uart_clear_rxirq();
+#ifdef DEMO_IPC
+        shmem_update_msg(irq_count);
+#endif
 }
 
 void ipi_handler(){
@@ -63,6 +99,10 @@ void main(void){
         timer_set(TIMER_INTERVAL);
         irq_enable(TIMER_IRQ_ID);
         irq_set_prio(TIMER_IRQ_ID, IRQ_MAX_PRIO);
+
+#ifdef DEMO_IPC
+        shmem_init();
+#endif
 
         master_done = true;
     }
