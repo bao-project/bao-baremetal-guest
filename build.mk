@@ -15,6 +15,9 @@ DEBUG_LEVEL = 3
 
 GENERIC_FLAGS = $(ARCH_GENERIC_FLAGS) -O$(OPT_LEVEL) -g$(DEBUG_LEVEL) -static
 CPPFLAGS += $(ARCH_CPPFLAGS) $(addprefix -I, $(INC_DIRS)) -MD -MF $@.d
+ifneq ($(STD_ADDR_SPACE),)
+CPPFLAGS+=-DSTD_ADDR_SPACE
+endif
 ifneq ($(MPU),)
 CPPFLAGS+=-DMPU
 endif

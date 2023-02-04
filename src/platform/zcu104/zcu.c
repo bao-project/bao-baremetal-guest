@@ -1,6 +1,7 @@
+#include <plat.h>
 #include <zynq_uart.h>
 
-Xil_Uart *uart  = (void*) 0xFF000000;
+Xil_Uart *uart  = (void*) UART_ADDR;
 
 void uart_init(void)
 {

@@ -20,14 +20,6 @@
 #include <spinlock.h>
 #include <fences.h>
 #include <irq.h>
-#include <plat.h>
-
-#ifndef PLAT_GICD_BASE_ADDR
-#define PLAT_GICD_BASE_ADDR (0xF9010000)
-#endif
-#ifndef PLAT_GICR_BASE_ADDR
-#define PLAT_GICR_BASE_ADDR (0xF9020000)
-#endif
 
 volatile gicd_t* gicd = (void*)PLAT_GICD_BASE_ADDR;
 volatile gicr_t* gicr = (void*)PLAT_GICR_BASE_ADDR;

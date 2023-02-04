@@ -18,8 +18,19 @@
 
 #include <core.h>
 #include <csrs.h>
+#include <plat.h>
 
+
+#ifdef STD_ADDR_SPACE
+#undef PLAT_PLIC_BASE
+#endif
+
+#ifdef PLAT_PLIC_BASE
+#define PLIC_BASE   PLAT_PLIC_BASE
+#else
 #define PLIC_BASE   (0xc000000)
+#endif
+
 #define PLIC_HART_BASE   (PLIC_BASE+0x200000)
 
 #define PLIC_MAX_INTERRUPTS (1024)

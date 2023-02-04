@@ -7,6 +7,7 @@
 #define PLAT_GICD_BASE_ADDR (0x03881000)
 #define PLAT_GICC_BASE_ADDR (0x03882000)
 
+#define PLAT_UART_ADDR (0x03100000)
 #define UART_IRQ_ID (144)
 
 #endif

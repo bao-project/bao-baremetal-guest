@@ -19,6 +19,7 @@
 
 #include <core.h>
 #include <bit.h>
+#include <plat.h>
 
 #define GICV2 (2)
 #define GICV3 (3)
@@ -330,5 +331,25 @@ static inline bool gic_is_priv(unsigned long int_id)
 {
     return int_id < GIC_CPU_PRIV;
 }
+
+#ifdef STD_ADDR_SPACE
+#undef PLAT_GICD_BASE_ADDR
+#undef PLAT_GICC_BASE_ADDR
+#undef PLAT_GICR_BASE_ADDR
+#endif
+
+#ifndef PLAT_GICD_BASE_ADDR
+#define PLAT_GICD_BASE_ADDR (0xF9010000)
+#endif
+
+#ifndef PLAT_GICC_BASE_ADDR
+#define PLAT_GICC_BASE_ADDR (0xF9020000)
+#endif
+
+#ifndef PLAT_GICR_BASE_ADDR
+#define PLAT_GICR_BASE_ADDR (0xF9020000)
+#endif
+
+
 
 #endif /* __GIC_H__ */
