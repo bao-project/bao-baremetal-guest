@@ -43,10 +43,21 @@ void shmem_update_msg(int irq_count) {
         irq_count);
 }
 
+char* strnchr(const char* s, size_t n, char c) {
+    for (size_t i = 0; i < n; i++) {
+        if (s[i] == c) {
+            return (char*)s + i;
+        }
+    }
+    return NULL;
+}
+
 void shmem_handler() {
     zephyr_message[shmem_channel_size-1] = '\0';
     char* end = strchr(zephyr_message, '\n');
-    *end = '\0';
+    if (end != NULL) {
+        *end = '\0';
+    }
     printf("message from zephyr: %s\n", zephyr_message);
 }
 
