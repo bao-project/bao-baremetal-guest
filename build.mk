@@ -13,7 +13,8 @@ objdump=$(CROSS_COMPILE)objdump
 OPT_LEVEL = 2
 DEBUG_LEVEL = 3
 
-GENERIC_FLAGS = $(ARCH_GENERIC_FLAGS) -O$(OPT_LEVEL) -g$(DEBUG_LEVEL) -static
+debug_flags:= -g$(DEBUG_LEVEL) $(arch_debug_flags) $(platform_debug_flags)
+GENERIC_FLAGS = $(ARCH_GENERIC_FLAGS) -O$(OPT_LEVEL) $(debug_flags) -static
 CPPFLAGS += $(ARCH_CPPFLAGS) $(addprefix -I, $(INC_DIRS)) -MD -MF $@.d
 ifneq ($(STD_ADDR_SPACE),)
 CPPFLAGS+=-DSTD_ADDR_SPACE
