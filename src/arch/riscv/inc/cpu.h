@@ -2,6 +2,9 @@
 #define CPU_H
 
 #include <core.h>
+#include <util.h>
+
+#define CPU_HAS_EXTENSION(EXT) (DEFINED(EXT))
 
 extern int primary_hart;
 

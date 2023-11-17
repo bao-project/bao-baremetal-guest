@@ -1,6 +1,7 @@
 #ifndef TIMER_H_
 #define TIMER_H_
 
+#include <core.h>
 #include <arch/timer.h>
 
 #define TIME_US(us) (((TIMER_FREQ)*(us))/(1000000ull))

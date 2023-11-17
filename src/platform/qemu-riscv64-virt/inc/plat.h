@@ -9,4 +9,6 @@
 #define PLAT_UART_ADDR (0x10000000)
 #define UART_IRQ_ID (10)
 
+#define CPU_EXT_SSTC 1
+
 #endif
