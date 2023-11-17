@@ -150,6 +150,8 @@
 #define SCAUSE_CODE_LPF     (13)
 #define SCAUSE_CODE_SPF     (15)
 
+#define CSR_STIMECMP      0x14D
+
 #define CSR_STR(s) #s
 
 #define CSRR(csr)                                     \
