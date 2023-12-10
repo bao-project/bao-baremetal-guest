@@ -19,10 +19,6 @@
 #define RV64   (__riscv_xlen == 64)
 #define RV32   (__riscv_xlen == 32)
 
-#if(!(RV64))
-    #error "Unsupported __riscv_xlen #__riscv_xlen."
-#endif
-
 #if(RV64)
     #define LOAD    ld
     #define STORE   sd
@@ -31,18 +27,6 @@
     #define LOAD    lw
     #define STORE   sw
     #define REGLEN  (4)
-#endif
-
-#if(RV64)
-    #define BAO_VAS_BASE    (0xffffffc000000000)
-    #define BAO_CPU_BASE    (0xffffffc040000000)
-    #define BAO_VM_BASE     (0xffffffe000000000)
-    #define BAO_VAS_TOP     (0xfffffff000000000)
-#elif(RV32)
-    #define BAO_VAS_BASE    (0xc0000000)
-    #define BAO_CPU_BASE    (0x00000000)
-    #define BAO_VM_BASE     (0x00000000)
-    #define BAO_VAS_TOP     (0xffffffff)
 #endif
 
 #define REG_RA  (1)
@@ -151,6 +135,7 @@
 #define SCAUSE_CODE_SPF     (15)
 
 #define CSR_STIMECMP      0x14D
+#define CSR_STIMECMPH     0x15D
 
 #define STR(s)  #s
 #define XSTR(s)  STR(s)
@@ -194,7 +179,18 @@ CSRS_GEN_ACCESSORS(sstatus);
 CSRS_GEN_ACCESSORS(sie);
 CSRS_GEN_ACCESSORS(sip);
 CSRS_GEN_ACCESSORS(scause);
+
+#if (RV64)
+CSRS_GEN_ACCESSORS(time);
 CSRS_GEN_ACCESSORS_NAMED(stimecmp, CSR_STIMECMP);
+#else
+CSRS_GEN_ACCESSORS_NAMED(timel, time);
+CSRS_GEN_ACCESSORS(timeh);
+CSRS_GEN_ACCESSORS_MERGED(time, timel, timeh);
+CSRS_GEN_ACCESSORS_NAMED(stimecmpl, CSR_STIMECMP);
+CSRS_GEN_ACCESSORS_NAMED(stimecmph, CSR_STIMECMPH);
+CSRS_GEN_ACCESSORS_MERGED(stimecmp, stimecmpl, stimecmph);
+#endif
 
 
 #endif /* __ARCH_CSRS_H__ */
