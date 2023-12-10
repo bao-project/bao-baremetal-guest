@@ -11,9 +11,7 @@ void timer_enable()
 
 uint64_t timer_get()
 {
-    uint64_t time;
-    asm volatile("rdtime %0" : "=r"(time)); 
-    return time;
+    return csrs_time_read();
 }
 
 void timer_set(uint64_t n)
