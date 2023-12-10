@@ -8,9 +8,9 @@ void irq_enable(unsigned id) {
     if(id < 1024) {
         plic_enable_interrupt(get_cpuid(), id, true);
     } else if (id == TIMER_IRQ_ID) {
-        CSRS(sie, SIE_STIE);
+        csrs_sie_set(SIE_STIE);
     } else if (id == IPI_IRQ_ID) {
-        CSRS(sie, SIE_SSIE);
+        csrs_sie_set(SIE_SSIE);
     }
 }
 

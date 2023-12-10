@@ -152,22 +152,49 @@
 
 #define CSR_STIMECMP      0x14D
 
-#define CSR_STR(s) #s
+#define STR(s)  #s
+#define XSTR(s)  STR(s)
 
-#define CSRR(csr)                                     \
-    ({                                                \
-        unsigned long _temp;                          \
-        asm volatile("csrr  %0, " CSR_STR(csr) "\n\r" \
-                     : "=r"(_temp)::"memory");        \
-        _temp;                                        \
-    })
+#define CSRS_GEN_ACCESSORS_NAMED(csr_name, csr_id) \
+    static inline unsigned long csrs_##csr_name##_read(void) { \
+        unsigned long csr_value; \
+        __asm__ volatile ("csrr %0," XSTR(csr_id) : "=r"(csr_value) :: "memory");\
+        return csr_value; \
+    } \
+    static inline void csrs_##csr_name##_write(unsigned long csr_value) { \
+        __asm__ volatile ("csrw " XSTR(csr_id) ",%0" :: "r"(csr_value) : "memory");\
+    } \
+    static inline void csrs_##csr_name##_set(unsigned long csr_value) { \
+        __asm__ volatile ("csrs " XSTR(csr_id) ",%0" :: "r"(csr_value) : "memory");\
+    } \
+    static inline void csrs_##csr_name##_clear(unsigned long csr_value) { \
+        __asm__ volatile ("csrc " XSTR(csr_id) ",%0" :: "r"(csr_value) : "memory");\
+    } \
 
-#define CSRW(csr, rs) \
-    asm volatile("csrw  " CSR_STR(csr) ", %0\n\r" ::"rK"(rs) : "memory")
-#define CSRS(csr, rs) \
-    asm volatile("csrs  " CSR_STR(csr) ", %0\n\r" ::"rK"(rs) : "memory")
-#define CSRC(csr, rs) \
-    asm volatile("csrc  " CSR_STR(csr) ", %0\n\r" ::"rK"(rs) : "memory")
+#define CSRS_GEN_ACCESSORS(csr) CSRS_GEN_ACCESSORS_NAMED(csr, csr)
+
+#define CSRS_GEN_ACCESSORS_MERGED(csr_name, csrl, csrh) \
+    static inline unsigned long long csrs_##csr_name##_read(void) { \
+        return ((unsigned long long)csrs_##csrh##_read() << 32) | csrs_##csrl##_read(); \
+    } \
+    static inline void csrs_##csr_name##_write(unsigned long long csr_value) { \
+        csrs_##csrl##_write(csr_value); \
+        csrs_##csrh##_write(csr_value >> 32); \
+    } \
+    static inline void csrs_##csr_name##_set(unsigned long long csr_value) { \
+        csrs_##csrl##_set(csr_value); \
+        csrs_##csrh##_set(csr_value >> 32); \
+    } \
+    static inline void csrs_##csr_name##_clear(unsigned long long csr_value) { \
+        csrs_##csrl##_clear(csr_value); \
+        csrs_##csrh##_clear(csr_value >> 32); \
+    } \
+
+CSRS_GEN_ACCESSORS(sstatus);
+CSRS_GEN_ACCESSORS(sie);
+CSRS_GEN_ACCESSORS(sip);
+CSRS_GEN_ACCESSORS(scause);
+CSRS_GEN_ACCESSORS_NAMED(stimecmp, CSR_STIMECMP);
 
 
 #endif /* __ARCH_CSRS_H__ */
