@@ -19,6 +19,6 @@ void arch_init(){
     } while(i++, ret.error == SBI_SUCCESS);
 #endif
     plic_init();   
-    CSRS(sie, SIE_SEIE);
-    CSRS(sstatus, SSTATUS_SIE);
+    csrs_sie_set(SIE_SEIE);
+    csrs_sstatus_set(SSTATUS_SIE);
 }

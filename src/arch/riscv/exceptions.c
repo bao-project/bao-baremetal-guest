@@ -16,7 +16,7 @@ static bool is_external(unsigned long cause) {
 __attribute__((interrupt("supervisor"), aligned(4)))
 void exception_handler(){
     
-    unsigned long scause = CSRR(scause);
+    unsigned long scause = csrs_scause_read();
     if(is_external(scause)) {
         plic_handle();
     } else {
@@ -24,7 +24,7 @@ void exception_handler(){
        unsigned long id = (scause & ~(1ull << msb)) + 1024;
        irq_handle(id);
        if(id == IPI_IRQ_ID) {
-           CSRC(sip, SIP_SSIE);
+           csrs_sip_clear(SIP_SSIE);
        }
     }
 }
