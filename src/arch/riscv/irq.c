@@ -5,7 +5,7 @@
 #include <sbi.h>
 
 void irq_enable(unsigned id) {
-    if(id < 1024) {
+    if(id < PLIC_MAX_INTERRUPTS) {
         plic_enable_interrupt(get_cpuid(), id, true);
     } else if (id == TIMER_IRQ_ID) {
         csrs_sie_set(SIE_STIE);
@@ -15,7 +15,9 @@ void irq_enable(unsigned id) {
 }
 
 void irq_set_prio(unsigned id, unsigned prio) {
-    plic_set_prio(id, prio);
+    if(id < PLIC_MAX_INTERRUPTS) {
+        plic_set_prio(id, prio);
+    }
 }
 
 void irq_send_ipi(unsigned long target_cpu_mask) {
