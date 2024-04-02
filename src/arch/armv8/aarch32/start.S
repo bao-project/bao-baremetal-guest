@@ -68,18 +68,46 @@ entry_el1:
     // Set MPU region for cacheability and shareability
     mov r4, #0
     mcr p15, 0, r4, c6, c2, 1  // prselr
-    mov r4, #(PRBAR_BASE(0) | PRBAR_SH_IS | PRBAR_AP_RW_ALL)
+    ldr r4, =(PLAT_MEM_BASE)
+    and r4, r4, #PRBAR_BASE_MSK
+    orr r4, r4, #(PRBAR_SH_IS | PRBAR_AP_RW_ALL)
     mcr p15, 0, r4, c6, c3, 0  // prbar
-    mov r4, #(PRLAR_LIMIT(0x7fffffffUL) | PRLAR_ATTR(1) | PRLAR_EN)
+    ldr r4, =(PLAT_MEM_BASE + PLAT_MEM_SIZE - 1)
+    and r4, r4, #PRLAR_LIMIT_MSK
+    orr r4, r4, #(PRLAR_ATTR(1) | PRLAR_EN)
     mcr p15, 0, r4, c6, c3, 1  // prlar
 
+    ldr r4, =(PLAT_MEM_BASE)
+    cmp r4, #0
+    blne devices_low
+    ldr r5, =(PLAT_MEM_BASE + PLAT_MEM_SIZE)
+    cmp r5, #0xffffffff
+    bne devices_high
+    b 1f
+
+    devices_low:
     mov r4, #1
     mcr p15, 0, r4, c6, c2, 1  // prselr
-    mov r4, #(PRBAR_BASE(0x80000000UL) | PRBAR_SH_IS | PRBAR_AP_RW_ALL)
+    mov r4, #(PRBAR_BASE(0) | PRBAR_SH_IS | PRBAR_AP_RW_ALL)
+    mcr p15, 0, r4, c6, c3, 0  // prbar
+    ldr r4, =(PLAT_MEM_BASE - 1)
+    and r4, r4, #PRLAR_LIMIT_MSK
+    orr r4, r4, #(PRLAR_ATTR(2) | PRLAR_EN)
+    mcr p15, 0, r4, c6, c3, 1  // prlar
+    mov r4, #1
+    bx lr
+
+    devices_high:
+    add r4, r4, #1
+    mcr p15, 0, r4, c6, c2, 1  // prselr
+    ldr r4, =(PLAT_MEM_BASE + PLAT_MEM_SIZE)
+    and r4, r4, #PRBAR_BASE_MSK
+    orr r4, r4, #(PRBAR_SH_IS | PRBAR_AP_RW_ALL)
     mcr p15, 0, r4, c6, c3, 0  // prbar
     mov r4, #(PRLAR_LIMIT(0xffffffffUL) | PRLAR_ATTR(2) | PRLAR_EN)
     mcr p15, 0, r4, c6, c3, 1  // prlar
 
+    1:
     dsb
     isb
 

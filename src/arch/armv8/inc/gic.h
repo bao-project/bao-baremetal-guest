@@ -339,15 +339,15 @@ static inline bool gic_is_priv(unsigned long int_id)
 #endif
 
 #ifndef PLAT_GICD_BASE_ADDR
-#define PLAT_GICD_BASE_ADDR (0xF9010000)
+#define PLAT_GICD_BASE_ADDR (0x47800000)
 #endif
 
 #ifndef PLAT_GICC_BASE_ADDR
-#define PLAT_GICC_BASE_ADDR (0xF9020000)
+#define PLAT_GICC_BASE_ADDR (0x47900000)
 #endif
 
 #ifndef PLAT_GICR_BASE_ADDR
-#define PLAT_GICR_BASE_ADDR (0xF9020000)
+#define PLAT_GICR_BASE_ADDR (0x47900000)
 #endif
 
 

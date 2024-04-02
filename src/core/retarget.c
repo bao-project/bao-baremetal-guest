@@ -12,6 +12,7 @@
 #include <cpu.h>
 #include <fences.h>
 #include <wfi.h>
+#include <plat.h>
 
 int _read(int file, char *ptr, int len)
 {
@@ -102,10 +103,12 @@ void _init(){
     spin_lock(&init_lock);
     if(!init_done) {
         init_done = true;
+
+        plat_init();
         uart_init();
     }
     spin_unlock(&init_lock);
-    
+
     arch_init();
 
     int ret = main();
