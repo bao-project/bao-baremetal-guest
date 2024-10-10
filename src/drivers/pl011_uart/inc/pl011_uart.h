@@ -19,6 +19,7 @@
 #define __PL011_UART_H_
 
 #include <core.h>
+#include <plat.h>
 
 /* UART Base Address (PL011) */
 
@@ -40,7 +41,10 @@
 
 #define NUM_UART                 6
 
-#define UART_CLK                 19200000
+#ifndef UART_CLK
+#define UART_CLK                19200000
+#endif
+#define UART_BAUD_RATE           115200
 #define UART_BAUD_RATE           115200
 
 /* UART Data Register */
