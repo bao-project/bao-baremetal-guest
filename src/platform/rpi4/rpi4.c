@@ -1,32 +1,34 @@
 #include <plat.h>
-#include <8250_uart.h>
+#include <pl011_uart.h>
 
-#define VIRT_UART16550_ADDR		    (UART_ADDR + 0x40)
+Pl011_Uart *uart  = (void*) PLAT_UART_ADDR;
 
-#define VIRT_UART_BAUDRATE		    115200
-#define VIRT_UART_FREQ		        3000000
 
-void uart_init(){
+void uart_init(void)
+{
+    pl011_uart_init(uart);
+    pl011_uart_enable(uart);
 
-    uart8250_init(VIRT_UART16550_ADDR, VIRT_UART_FREQ, VIRT_UART_BAUDRATE, 0, 4);
+    return;
 }
 
 void uart_putc(char c)
 {
-    uart8250_putc(c);
+    pl011_uart_putc(uart, c);
 }
 
 char uart_getchar(void)
 {
-    return uart8250_getc();
+    return pl011_uart_getc(uart);
 }
 
-void uart_enable_rxirq()
-{
-    uart8250_enable_rx_int();
+void uart_enable_rxirq(){
+
 }
 
-void uart_clear_rxirq()
-{
-    uart8250_interrupt_handler(); 
+void uart_clear_rxirq(){
+    while(!(uart->flag & UART_FR_RXFE)) {
+        volatile char c = uart->data;
+    }
+    uart->isr_clear = 0xffff;
 }
