@@ -1,8 +1,18 @@
 
 gen_ld_file:=$(BUILD_DIR)/linker.ld
 
-objs:=$(C_SRC:$(ROOT_DIR)/%.c=$(BUILD_DIR)/%.o) \
-	$(ASM_SRC:$(ROOT_DIR)/%.S=$(BUILD_DIR)/%.o)
+inner_c_srcs:=$(filter $(ROOT_DIR)/%.c, $(C_SRC))
+inner_asm_srcs:=$(filter $(ROOT_DIR)/%.S, $(ASM_SRC))
+outer_c_srcs:=$(filter-out $(inner_c_srcs), $(C_SRC))
+outer_asm_srcs:=$(filter-out $(inner_asm_srcs), $(ASM_SRC))
+
+external_build_dir:=$(BUILD_DIR)/external
+
+objs:=$(inner_c_srcs:$(ROOT_DIR)/%.c=$(BUILD_DIR)/%.o) \
+	$(inner_asm_srcs:$(ROOT_DIR)/%.S=$(BUILD_DIR)/%.o) \
+	$(outer_c_srcs:%.c=$(external_build_dir)/%.o) \
+	$(outer_asm_srcs:%.S=$(external_build_dir)/%.o)
+
 deps:=$(objs:%=%.d) $(gen_ld_file).d
 dirs:=$(sort $(dir $(objs) $(deps)))
 
@@ -62,7 +72,15 @@ $(BUILD_DIR)/%.o: $(ROOT_DIR)/%.c
 	@echo $@
 	$(cc) $(CFLAGS) -c $< -o $@
 
+$(external_build_dir)/%.o: %.c
+	@echo $@
+	$(cc) $(CFLAGS) -c $< -o $@
+
 $(BUILD_DIR)/%.o: $(ROOT_DIR)/%.S
+	@echo $@
+	@$(cc) $(ASFLAGS) -c $< -o $@
+
+$(external_build_dir)/%.o: %.S
 	@echo $@
 	@$(cc) $(ASFLAGS) -c $< -o $@
 
