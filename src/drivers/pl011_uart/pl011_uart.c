@@ -63,32 +63,40 @@ void pl011_uart_set_baud_rate(volatile Pl011_Uart * ptr_uart, uint32_t baud_rate
 
 void pl011_uart_init(volatile Pl011_Uart * ptr_uart/*, uint32_t baud_rate*/) {
 
-	int lcrh_reg;
+    uint32_t lcrh_reg;
 
-	/* First, disable everything */
-	ptr_uart->control = 0x0;
+    /* First, disable everything */
+    ptr_uart->control = 0x0;
 
-	/* Default baudrate = 115200 */
-	uint32_t baud_rate = UART_BAUD_RATE;
-	pl011_uart_set_baud_rate(ptr_uart, baud_rate);
+    /* Disable FIFOs */
+    lcrh_reg = ptr_uart->line_control;
+    lcrh_reg &= ~UART_LCR_FEN;
+    ptr_uart->line_control = lcrh_reg;
 
-	/* Set the UART to be 8 bits, 1 stop bit and no parity */
-	ptr_uart->line_control = (UART_LCR_WLEN_8);
+    /* Default baudrate = 115200 */
+    uint32_t baud_rate = UART_BAUD_RATE;
+    pl011_uart_set_baud_rate(ptr_uart, baud_rate);
 
-	/* Enable the UART, enable TX and enable loop back*/
-	ptr_uart->control = (UART_CR_UARTEN | UART_CR_TXE | UART_CR_LBE);
+    /* Set the UART to be 8 bits, 1 stop bit and no parity, FIFOs enable*/
+    ptr_uart->line_control = (UART_LCR_WLEN_8 | UART_LCR_FEN);
 
-	ptr_uart->data = 0x0;
-	while(ptr_uart->flag & UART_FR_BUSY);
+    /* Enable the UART, enable TX and enable loop back*/
+    ptr_uart->control = (UART_CR_UARTEN | UART_CR_TXE | UART_CR_LBE);
 
-	/* Enable RX */
-	ptr_uart->control = (UART_CR_UARTEN | UART_CR_RXE | UART_CR_TXE);
+    /* Set the receive interrupt FIFO level to 1/2 full */
+    ptr_uart->isr_fifo_level_sel = UART_IFLS_RXIFLSEL_1_2;
 
-	/* Clear interrupts */
-	ptr_uart->isr_clear = 0xffff; 
+    ptr_uart->data = 0x0;
+    while (ptr_uart->flag & UART_FR_BUSY) { }
 
-	/* Enable receive interrupts */
-	ptr_uart->isr_mask = UART_MIS_RXMIS;
+    /* Enable RX */
+    ptr_uart->control = (UART_CR_UARTEN | UART_CR_RXE | UART_CR_TXE);
+
+    /* Clear interrupts */
+    ptr_uart->isr_clear = (UART_ICR_OEIC | UART_ICR_BEIC | UART_ICR_PEIC | UART_ICR_FEIC);
+
+    /* Enable receive and receive timeout interrupts */
+    ptr_uart->isr_mask = (UART_MIS_RXMIS | UART_MIS_RTMIS);
 
 }
 

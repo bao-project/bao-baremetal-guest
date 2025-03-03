@@ -18,8 +18,13 @@
 #ifndef __PL011_UART_H_
 #define __PL011_UART_H_
 
-#include <core.h>
+/* #include <core.h> */
 #include <plat.h>
+#include <stdint.h>
+
+#ifndef PL011_PAGE_OFFSET
+#define PL011_PAGE_OFFSET (0x000) /**< offset in range of 0-0xFFF */
+#endif
 
 /* UART Base Address (PL011) */
 
@@ -194,22 +199,26 @@
 
 typedef struct
 {
-   volatile uint32_t data;                // UART Data Register
-   volatile uint32_t status_error;        // UART Receive Status Register/Error Clear Register
-   const uint32_t reserved1[4];           	// Reserved: 4(0x4) bytes
-   volatile uint32_t flag;                // UART Flag Register
-   const uint32_t reserved2[1];            	// Reserved: 1(0x1) bytes
-   volatile uint32_t lp_counter;          // UART Low-power Counter Register
-   volatile uint32_t integer_br;          // UART Integer Baud Rate Register
-   volatile uint32_t fractional_br;       // UART Fractional Baud Rate Register
-   volatile uint32_t line_control;        // UART Line Control Register
-   volatile uint32_t control;             // UART Control Register
-   volatile uint32_t isr_fifo_level_sel;  // UART Interrupt FIFO level Select Register
-   volatile uint32_t isr_mask;            // UART Interrupt Mask Set/Clear Register
-   volatile uint32_t raw_isr_status;      // UART Raw Interrupt Status Register
-   volatile uint32_t masked_isr_status;   // UART Masked Interrupt Status Register
-   volatile uint32_t isr_clear;           // UART Interrupt Clear Register
-   volatile uint32_t DMA_control;         // UART DMA control Register
+  const uint8_t offset[PL011_PAGE_OFFSET];
+  volatile uint32_t data;               // UART Data Register
+  volatile uint32_t status_error;       // UART Receive Status Register/Error Clear
+  // Register
+  const uint32_t reserved1[4];          // Reserved: 4(0x4) bytes
+  volatile uint32_t flag;               // UART Flag Register
+  const uint32_t reserved2[1];          // Reserved: 1(0x1) bytes
+  volatile uint32_t lp_counter;         // UART Low-power Counter Register
+  volatile uint32_t integer_br;         // UART Integer Baud Rate Register
+  volatile uint32_t fractional_br;      // UART Fractional Baud Rate Register
+  volatile uint32_t line_control;       // UART Line Control Register
+  volatile uint32_t control;            // UART Control Register
+  volatile uint32_t isr_fifo_level_sel; // UART Interrupt FIFO level Select
+  // Register
+  volatile uint32_t isr_mask;           // UART Interrupt Mask Set/Clear Register
+  volatile uint32_t raw_isr_status;     // UART Raw Interrupt Status Register
+  volatile uint32_t masked_isr_status;  // UART Masked Interrupt Status
+  // Register
+  volatile uint32_t isr_clear;          // UART Interrupt Clear Register
+  volatile uint32_t DMA_control;        // UART DMA control Register
 } Pl011_Uart;
 
 /** Public PL011 UART interfaces */
