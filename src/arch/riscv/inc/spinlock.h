@@ -29,11 +29,11 @@ static inline void spin_lock(spinlock_t* lock){
 
     asm volatile (
         "1:\n\t"
-        "lr.w.aq  %0, %1 \n\t"
+        "lr.w.aq  %0, (%1) \n\t"
         "bne      %0, zero, 1b \n\t"
-        "sc.w.rl  %0, %2, %1 \n\t"
+        "sc.w.rl  %0, %2, (%1) \n\t"
         "bne      %0, zero, 1b \n\t"
-        : "=&r"(tmp), "+m"(*lock) 
+        : "=&r"(tmp), "+r"(lock) 
         : "r"(ONE)
     );
 
