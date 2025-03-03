@@ -10,4 +10,6 @@
 #define PLAT_UART_ADDR (0xfe215000)
 #define UART_IRQ_ID (125)
 
+#define UART_CLK                 48000000
+
 #endif
