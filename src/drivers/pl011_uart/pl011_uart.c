@@ -76,7 +76,7 @@ void pl011_uart_init(volatile Pl011_Uart * ptr_uart/*, uint32_t baud_rate*/) {
 	ptr_uart->line_control = (UART_LCR_WLEN_8);
 
 	/* Enable the UART, enable TX and enable loop back*/
-	ptr_uart->control = (UART_CR_UARTEN | UART_CR_TXE | UART_CR_LBE);
+	ptr_uart->control = (UART_CR_UARTEN | UART_CR_TXE);
 
 	ptr_uart->data = 0x0;
 	while(ptr_uart->flag & UART_FR_BUSY);
