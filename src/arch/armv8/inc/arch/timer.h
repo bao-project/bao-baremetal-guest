@@ -2,6 +2,7 @@
 #define ARCH_TIMER_H
 
 #include <core.h>
+#include <sysregs.h>
 
 extern unsigned long TIMER_FREQ;
 
