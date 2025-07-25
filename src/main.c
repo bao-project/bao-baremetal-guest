@@ -62,15 +62,15 @@ void main(void){
 
         timer_set(TIMER_INTERVAL);
         irq_enable(TIMER_IRQ_ID);
-        irq_set_prio(TIMER_IRQ_ID, IRQ_MAX_PRIO);
+        irq_set_prio(TIMER_IRQ_ID, TIMER_IRQ_PRIO);
 
         master_done = true;
     }
 
     irq_enable(UART_IRQ_ID);
-    irq_set_prio(UART_IRQ_ID, IRQ_MAX_PRIO);
+    irq_set_prio(UART_IRQ_ID, UART_IRQ_PRIO);
     irq_enable(IPI_IRQ_ID);
-    irq_set_prio(IPI_IRQ_ID, IRQ_MAX_PRIO);
+    irq_set_prio(IPI_IRQ_ID, UART_IRQ_PRIO);
 
     while(!master_done);
     spin_lock(&print_lock);
