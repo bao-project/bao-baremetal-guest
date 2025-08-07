@@ -17,7 +17,7 @@
 #include "sysregs.h"
 #include <plat.h>
 
-#define STACK_SIZE  0x4000
+#define STACK_SIZE  0x1000
 #define GICV3 (3)
 
 #define GENERIC_TIMER_CNTCTL_CNTCR_EN   (0x1)

@@ -2,7 +2,7 @@
 #include <sysregs.h>
 #include <plat.h>
 
-#define STACK_SIZE  0x4000
+#define STACK_SIZE  0x1000
 
 #define GENERIC_TIMER_CNTCTL_CNTCR_EN   (0x1)
 #define GENERIC_TIMER_CNTCTL_CNTCR_OFFSET  (0x0)
@@ -25,7 +25,7 @@ _start:
     mcr p15, 4, r0, c12, c9, 5 // icc_hsre
 #endif
 
-#if defined(MPU)
+#if defined(MPU) && defined(PLAT_GENERIC_TIMER_CNTCTL_BASE)
     ldr r0, =PLAT_GENERIC_TIMER_CNTCTL_BASE
     ldr r1, [r0, #GENERIC_TIMER_CNTCTL_CNTCR_OFFSET]
     orr r1, r1, #GENERIC_TIMER_CNTCTL_CNTCR_EN

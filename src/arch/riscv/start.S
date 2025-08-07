@@ -1,4 +1,4 @@
-#define STACK_SIZE  0x4000
+#define STACK_SIZE  0x1000
 
 .section .start, "ax"
 .global _start
