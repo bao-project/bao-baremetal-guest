@@ -56,8 +56,7 @@ void main(void){
 
         irq_set_handler(UART_IRQ_ID, uart_rx_handler);
         irq_set_handler(TIMER_IRQ_ID, timer_handler);
-        irq_set_handler(IPI_IRQ_ID, ipi_handler);
-
+        
         uart_enable_rxirq();
 
         timer_set(TIMER_INTERVAL);
@@ -66,16 +65,21 @@ void main(void){
 
         master_done = true;
     }
-
+    
     irq_enable(UART_IRQ_ID);
     irq_set_prio(UART_IRQ_ID, UART_IRQ_PRIO);
+
+    irq_set_handler(IPI_IRQ_ID, ipi_handler);
+
     irq_enable(IPI_IRQ_ID);
-    irq_set_prio(IPI_IRQ_ID, UART_IRQ_PRIO);
+    irq_set_prio(IPI_IRQ_ID, IPI_IRQ_PRIO);
 
     while(!master_done);
     spin_lock(&print_lock);
     printf("cpu %d up\n", get_cpuid());
     spin_unlock(&print_lock);
-
-    while(1) wfi();
+    
+    while(1){
+        wfi();
+    };
 }
