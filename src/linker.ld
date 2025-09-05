@@ -50,8 +50,8 @@ SECTIONS {
         __bss_end = .;
     }
 
-    . = ALIGN(16);
+    . = ALIGN(64);
     PROVIDE(_stack_base = .);
-    . = . + 2M; /* 2M of total stack size */
+    . = . + 64k; /* 2M of total stack size */
     PROVIDE(_heap_base = .);
 }
