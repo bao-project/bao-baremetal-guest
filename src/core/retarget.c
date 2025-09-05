@@ -39,6 +39,19 @@ int _write(int file, char *ptr, int len)
     return len;
 }
 
+ssize_t _write_r(struct _reent *r, int file, const void *ptr, size_t len)
+{
+    if (ptr == NULL) {
+        if (r) {
+            r->_errno = EINVAL;  // Set thread-local errno
+        }
+        return -1;
+    }
+
+    return _write(file, ptr, len);
+}
+
+
 int _lseek(int file, int ptr, int dir)
 {
     errno = ESPIPE;
