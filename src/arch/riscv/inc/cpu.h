@@ -14,7 +14,7 @@ static inline unsigned long get_cpuid(){
 }
 
 static inline bool cpu_is_master(){
-    return get_cpuid() == primary_hart;
+    return get_cpuid() == 0;
 }
 
 #endif
