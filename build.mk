@@ -38,6 +38,12 @@ endif
 ifneq ($(MEM_SIZE),)
 CPPFLAGS+=-DMEM_SIZE=$(MEM_SIZE)
 endif
+ifneq ($(SHMEM_BASE),)
+CPPFLAGS+=-DSHMEM_BASE=$(SHMEM_BASE)
+endif
+ifneq ($(SHMEM_SIZE),)
+CPPFLAGS+=-DSHMEM_SIZE=$(SHMEM_SIZE)
+endif
 ifneq ($(SINGLE_CORE),)
 CPPFLAGS+=-DSINGLE_CORE=y
 endif

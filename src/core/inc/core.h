@@ -34,4 +34,22 @@
 
 #endif
 
+#ifndef SHMEM_BASE
+#define SHMEM_BASE (0UL)
+#endif
+
+#ifndef SHMEM_SIZE
+#define SHMEM_SIZE (0UL)
+#endif
+
+#if (SHMEM_SIZE > 0)
+#if ((SHMEM_SIZE) > (0x100000000ULL - (SHMEM_BASE)))
+  #error "Invalid SHMEM_BASE and/or SHMEM_SIZE: SHMEM region crosses 4GiB boundary"
+#endif
+
+#if ((SHMEM_BASE) < ((MEM_BASE) + (MEM_SIZE)))
+  #error "Invalid SHMEM_BASE SHMEM region must be after MEM"
+#endif
+#endif
+
 #endif /* CORE_H */

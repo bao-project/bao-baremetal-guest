@@ -36,6 +36,20 @@ l2_page_tables:
     .set ADDR, ADDR + L2_BLOCK_SIZE
     .endr
 
+#if SHMEM_SIZE > 0
+    .set COUNT, (SHMEM_BASE - ADDR)/L2_BLOCK_SIZE
+    .rept   COUNT
+    .8byte (PTE_SUPERPAGE | PTE_DEV_FLAGS) + ADDR
+    .set ADDR, ADDR + L2_BLOCK_SIZE
+    .endr
+
+    .set COUNT, (SHMEM_BASE + SHMEM_SIZE - ADDR)/L2_BLOCK_SIZE
+    .rept   COUNT
+    .8byte (PTE_SUPERPAGE | PTE_MEM_FLAGS) + ADDR
+    .set ADDR, ADDR + L2_BLOCK_SIZE
+    .endr
+#endif
+
     .set COUNT, (0x100000000 - ADDR)/L2_BLOCK_SIZE
     .rept   COUNT
     .8byte (PTE_SUPERPAGE | PTE_DEV_FLAGS) + ADDR
