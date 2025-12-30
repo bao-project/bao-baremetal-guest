@@ -64,4 +64,18 @@
 #define PTE_MEM_FLAGS  (PTE_ATTR(1) | PTE_AP_RW_PRIV | PTE_SH_IS | PTE_AF)
 #define PTE_DEV_FLAGS  (PTE_ATTR(2) | PTE_AP_RW_PRIV | PTE_SH_IS | PTE_AF)
 
+#if ((MEM_BASE) % L2_BLOCK_SIZE)
+#error MEM_BASE is misaligned. It should be align to L2_BLOCK_SIZE.
+#endif
+#if ((MEM_SIZE) % L2_BLOCK_SIZE)
+#error MEM_SIZE is misaligned. It should be align to L2_BLOCK_SIZE.
+#endif
+
+#if ((SHMEM_BASE) % L2_BLOCK_SIZE)
+#error SHMEM_BASE is misaligned. It should be align to L2_BLOCK_SIZE.
+#endif
+#if ((SHMEM_SIZE) % L2_BLOCK_SIZE)
+#error SHMEM_SIZE is misaligned. It should be align to L2_BLOCK_SIZE.
+#endif
+
 #endif
