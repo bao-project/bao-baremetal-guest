@@ -1,6 +1,5 @@
 #include <core.h>
 #include <csrs.h>
-#include <plic.h>
 #include <irq.h>
 
 static bool is_external(unsigned long cause) {
@@ -18,10 +17,10 @@ void exception_handler(){
     
     unsigned long scause = csrs_scause_read();
     if(is_external(scause)) {
-        plic_handle();
+        irqc_handle();
     } else {
        size_t msb = sizeof(unsigned long) * 8 - 1;
-       unsigned long id = (scause & ~(1ull << msb)) + 1024;
+       unsigned long id = (scause & ~(1ull << msb)) + IRQC_MAX_INTERRUPTS;
        irq_handle(id);
        if(id == IPI_IRQ_ID) {
            csrs_sip_clear(SIP_SSIE);

@@ -16,20 +16,20 @@ _start:
 
 .pushsection .data
 .align 3
-.global primary_hart
-primary_hart: .word 0x0
-primary_hart_valid: .word 0x0
+.global boot_hart
+boot_hart: .word 0x0
+boot_hart_valid: .word 0x0
 .popsection
 
 
-    la  t0, primary_hart_valid
+    la  t0, boot_hart_valid
     li  t1, 1
 1:
     lr.w  t2, (t0)
     bnez  t2, skip
     sc.w  t2, t1, (t0)
     bnez  t2, 1b
-    la    t0, primary_hart
+    la    t0, boot_hart
     sw    a0, 0(t0)
 
     /* Clear bss */ 
@@ -44,10 +44,10 @@ primary_hart_valid: .word 0x0
 
 .pushsection .data
 .align 3
-primary_hart_ready: .word 0x0
+boot_hart_ready: .word 0x0
 .popsection
 
-    la      t0, primary_hart_ready
+    la      t0, boot_hart_ready
     li      t1, 1
     sw      t1, 0(t0)
 
@@ -56,7 +56,7 @@ skip:
     la      t0, exception_handler
     csrw    stvec, t0
 
-    la      t0, primary_hart_ready
+    la      t0, boot_hart_ready
 1:
     lw      t1, 0(t0)
     beqz    t1, 1b

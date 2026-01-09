@@ -155,6 +155,11 @@
     static inline void csrs_##csr_name##_clear(unsigned long csr_value) { \
         __asm__ volatile ("csrc " XSTR(csr_id) ",%0" :: "r"(csr_value) : "memory");\
     } \
+    static inline unsigned long csrs_##csr_name##_swap(unsigned long csr_value) { \
+        unsigned long reg_val; \
+        __asm__ volatile ("csrrw %0," XSTR(csr_id) ",%1" : "=r"(reg_val) : "r"(csr_value) : "memory");\
+        return reg_val; \
+    } \
 
 #define CSRS_GEN_ACCESSORS(csr) CSRS_GEN_ACCESSORS_NAMED(csr, csr)
 
@@ -191,6 +196,10 @@ CSRS_GEN_ACCESSORS_NAMED(stimecmpl, CSR_STIMECMP);
 CSRS_GEN_ACCESSORS_NAMED(stimecmph, CSR_STIMECMPH);
 CSRS_GEN_ACCESSORS_MERGED(stimecmp, stimecmpl, stimecmph);
 #endif
+
+CSRS_GEN_ACCESSORS(siselect);
+CSRS_GEN_ACCESSORS(sireg);
+CSRS_GEN_ACCESSORS(stopei);
 
 
 #endif /* __ARCH_CSRS_H__ */

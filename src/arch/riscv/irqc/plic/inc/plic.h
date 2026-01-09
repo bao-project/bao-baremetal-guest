@@ -17,7 +17,6 @@
 #define __PLIC_H__
 
 #include <core.h>
-#include <csrs.h>
 #include <plat.h>
 
 
@@ -38,6 +37,8 @@
 #define PLIC_NUM_PRIO_REGS  (PLIC_MAX_INTERRUPTS)
 #define PLIC_NUM_PEND_REGS  (PLIC_MAX_INTERRUPTS)
 #define PLIC_NUM_ENBL_REGS  (32)
+
+#define PLIC_MAX_PRIO       (0xFF)
 
 #define PLIC_ENBL_OFF       (0x002000)
 #define PLIC_CNTX_OFF       (0x200000)
