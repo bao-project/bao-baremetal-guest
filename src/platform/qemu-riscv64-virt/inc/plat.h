@@ -9,6 +9,11 @@
 #define PLAT_UART_ADDR (0x10000000)
 #define UART_IRQ_ID (10)
 
+#define PLAT_APLIC_CTL_BASE_ADDR     (0xd000000)
+#define PLAT_APLIC_MAX_INTERRUPTS    (97)
+#define PLAT_IMSIC_IF_BASE_ADDR      (0x28000000)
+#define PLAT_IMSIC_MAX_INTERRUPTS    (256)
+
 #define CPU_EXT_SSTC 1
 
 #endif

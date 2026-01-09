@@ -6,7 +6,7 @@
 
 #define CPU_HAS_EXTENSION(EXT) (DEFINED(EXT))
 
-extern int primary_hart;
+extern int boot_hart;
 
 static inline unsigned long get_cpuid(){
     register unsigned long hartid asm("tp");
@@ -15,6 +15,10 @@ static inline unsigned long get_cpuid(){
 
 static inline bool cpu_is_master(){
     return get_cpuid() == 0;
+}
+
+static inline bool cpu_is_boot_hart() {
+    return get_cpuid() == boot_hart;
 }
 
 #endif
