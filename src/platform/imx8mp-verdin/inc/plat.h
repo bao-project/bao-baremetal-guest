@@ -1,0 +1,13 @@
+#ifndef PLAT_H
+#define PLAT_H
+
+#define PLAT_MEM_BASE 0x80200000
+#define PLAT_MEM_SIZE 0x8000000
+
+#define PLAT_GICD_BASE_ADDR (0x38800000)
+#define PLAT_GICR_BASE_ADDR (0x38880000)
+
+#define PLAT_UART_ADDR (0x30880000UL)
+#define UART_IRQ_ID (60)
+
+#endif
