@@ -12,4 +12,6 @@ void irq_enable(unsigned id);
 void irq_set_prio(unsigned id, unsigned prio);
 void irq_send_ipi(unsigned long target_cpu_mask);
 
+void irq_clear_ipi(void);
+
 #endif // IRQ_H
