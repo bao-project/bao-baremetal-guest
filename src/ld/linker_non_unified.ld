@@ -3,7 +3,6 @@
 
 MEMORY
 {
-  /* Keep consistent with bao-demos/config.c */
   RO_MEM : ORIGIN = RO_MEM_BASE, LENGTH = RO_MEM_SIZE
   RW_MEM : ORIGIN = RW_MEM_BASE, LENGTH = RW_MEM_SIZE
 }
