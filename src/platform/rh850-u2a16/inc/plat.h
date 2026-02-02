@@ -30,4 +30,9 @@
 
 #define PLAT_BOOTCTRL_ADDR  (0xFFFB2000UL)
 
+#define PLAT_CLK_HSB (80000000UL)
+
+// OSTM use CLK_HSB
+#define TIMER_FREQ PLAT_CLK_HSB
+
 #endif
