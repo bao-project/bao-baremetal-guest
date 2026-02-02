@@ -70,6 +70,11 @@ stall:
     LOAD_ADDR __bss_end, r21
     jarl boot_clear, lp
 
+    // clear stack/heap region to avoid unitialized issues
+    LOAD_ADDR _stack_base, r20
+    LOAD_ADDR _heap_base, r21
+    jarl boot_clear, lp
+
 skip:
     // Initialize stack pointer
     LOAD_ADDR _stack_base, r20
