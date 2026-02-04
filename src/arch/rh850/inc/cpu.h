@@ -2,7 +2,7 @@
 #define CPU_H
 
 #include <core.h>
-#include <arch/srs.h>
+#include <srs.h>
 
 static inline unsigned long get_cpuid(){
     return get_peid();
