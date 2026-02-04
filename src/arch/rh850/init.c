@@ -9,8 +9,11 @@ static inline void ei(){
 }
 
 void arch_init(){
+
+#ifndef SINGLE_CORE
     static volatile uint32_t *const BOOTCTRL = (void*) PLAT_BOOTCTRL_ADDR;
     *BOOTCTRL = ~0UL;
+#endif
     intc_init();
     timer_enable();
     ei();
