@@ -389,6 +389,34 @@ static inline void set_rbip(unsigned long val)
     __asm__ volatile ("ldsr %0, 18, 2" : : "r"(val));
 }
 
+static inline uint32_t get_tscountl(void)
+{
+    uint32_t val;
+    __asm__ volatile ("stsr 0, %0, 11" : "=r"(val));
+    return val;
+}
+
+static inline uint32_t get_tscounth(void)
+{
+    uint32_t val;
+    __asm__ valolatile ("stsr 1, %0, 11" : "=r"(val));
+    return val;
+}
+
+static inline uint32_t get_tsctrl(void)
+{
+    uint32_t val;
+    __asm__ valolatile ("stsr 2, %0, 11" : "=r"(val));
+    return val;
+}
+
+static inline uint32_t set_tsctrl(unsigned long val)
+{
+    uint32_t val;
+    __asm__ valolatile ("ldsr 2, %0, 11" : "=r"(val));
+    return val;
+}
+
 /* INTERRUPT SYS REGS */
 static inline unsigned long get_ispr(void)
 {
