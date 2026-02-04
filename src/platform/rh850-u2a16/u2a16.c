@@ -11,14 +11,9 @@ void uart_init(){
     renesas_rlin3_init(uart);
 }
 
-void uart_putc(char c) {
-    if (c == '\n') {
-        // Considering compatibility, we manually add another one '\r'
-        renesas_rlin3_putc(uart, c);
-        renesas_rlin3_putc(uart, '\r');
-    } else {
-        renesas_rlin3_putc(uart, c);
-    }
+void uart_putc(char c)
+{
+    renesas_rlin3_putc(uart, c);
 }
 
 char uart_getchar(void) {
