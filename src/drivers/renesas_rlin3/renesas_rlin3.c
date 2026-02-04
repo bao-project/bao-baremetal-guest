@@ -22,7 +22,7 @@
 volatile unsigned int uart_rxcnt = 0;
 spinlock_t rx_lock = SPINLOCK_INITVAL;
 
-void renesas_rlin3_init(struct renesas_rlin3* uart)
+void renesas_rlin3_init(volatile struct renesas_rlin3* uart)
 {
     *((volatile uint32_t*) MSRKCPROT) = KCPROT_ENABLE;
     *((volatile uint32_t*) MSR_RLIN3) = 0;
@@ -58,13 +58,13 @@ void renesas_rlin3_init(struct renesas_rlin3* uart)
     uart->RLN3nLUOER = RLN3_LUOER_UROE | RLN3_LUOER_UTOE;
 }
 
-void renesas_rlin3_putc(struct renesas_rlin3* uart, int8_t c)
+void renesas_rlin3_putc(volatile struct renesas_rlin3* uart, int8_t c)
 {
     while (uart->RLN3nLST & RLN3_LST_UTS_MSK);
     uart->RLN3nLUTDR = c;
 }
 
-uint32_t renesas_rlin3_getc(struct renesas_rlin3* uart)
+uint32_t renesas_rlin3_getc(volatile struct renesas_rlin3* uart)
 {
     while(!uart_rxcnt);
 
@@ -73,12 +73,12 @@ uint32_t renesas_rlin3_getc(struct renesas_rlin3* uart)
     return uart->RLN3nLURDR;
 }
 
-void renesas_rlin3_enable_rxirq(struct renesas_rlin3 *uart)
+void renesas_rlin3_enable_rxirq(volatile struct renesas_rlin3 *uart)
 {
     // Enabled by default ?
 }
 
-void renesas_rlin3_clear_rxirq(struct renesas_rlin3 *uart)
+void renesas_rlin3_clear_rxirq(volatile struct renesas_rlin3 *uart)
 {   
     // Is this done automatically?
     // uart->RLN3nLST &= RLN3_LST_URS;

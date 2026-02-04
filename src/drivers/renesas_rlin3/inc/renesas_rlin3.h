@@ -45,10 +45,10 @@ struct renesas_rlin3 {
     volatile uint8_t RLN3nLRSS;     // 0x34
 };
 
-void renesas_rlin3_init(struct renesas_rlin3* uart);
-void renesas_rlin3_putc(struct renesas_rlin3* uart, int8_t c);
-uint32_t renesas_rlin3_getc(struct renesas_rlin3* uart);
-void renesas_rlin3_enable_rxirq(struct renesas_rlin3 *uart);
-void renesas_rlin3_clear_rxirq(struct renesas_rlin3* uart);
+void renesas_rlin3_init(volatile struct renesas_rlin3* uart);
+void renesas_rlin3_putc(volatile struct renesas_rlin3* uart, int8_t c);
+uint32_t renesas_rlin3_getc(volatile struct renesas_rlin3* uart);
+void renesas_rlin3_enable_rxirq(volatile struct renesas_rlin3 *uart);
+void renesas_rlin3_clear_rxirq(volatile struct renesas_rlin3* uart);
 
 #endif /* RENESAS_RLIN3_H */
