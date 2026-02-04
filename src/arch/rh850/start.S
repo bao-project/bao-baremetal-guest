@@ -4,8 +4,11 @@
  * Copyright (c) Bao Project and Contributors. All rights reserved.
  */
 
+#include <plat.h>
+#include <core.h>
+
 #define CPU_MASTER  0x0
-#define STACK_SIZE  0x100
+#define STACK_SIZE  0x200
 
 .macro LOAD_ADDR    sym, reg
     movhi hi(\sym), r0, \reg
@@ -59,6 +62,11 @@ stall:
     cmp r5, r10
     bne skip
 
+    // clear RAM
+    mov RW_MEM_BASE, r20
+    mov RW_MEM_BASE+RW_MEM_SIZE, r21
+    jarl boot_clear, lp
+
     // copy .data to RAM
     LOAD_ADDR __data_load_start, r20
     LOAD_ADDR __data_load_end, r21
@@ -68,11 +76,6 @@ stall:
     // clear .bss
     LOAD_ADDR __bss_start, r20
     LOAD_ADDR __bss_end, r21
-    jarl boot_clear, lp
-
-    // clear stack/heap region to avoid unitialized issues
-    LOAD_ADDR _stack_base, r20
-    LOAD_ADDR _heap_base, r21
     jarl boot_clear, lp
 
 skip:
