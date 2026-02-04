@@ -87,6 +87,10 @@ skip:
     add r21, r20
     mov r20, sp
 
+    // Initialize global and text pointer
+    LOAD_ADDR __gp, gp
+    LOAD_ADDR __init, tp
+
     jr __init
 
 // r20: start of region
