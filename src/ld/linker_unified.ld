@@ -18,7 +18,7 @@
 #include <plat.h>
 
 MEMORY {
-    RAM (rwx)    : ORIGIN = MEM_BASE, LENGTH = MEM_SIZE    
+    RAM (rwx)    : ORIGIN = MEM_BASE, LENGTH = MEM_SIZE
 }
 
 ENTRY(_start)
