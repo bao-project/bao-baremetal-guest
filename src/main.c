@@ -64,6 +64,8 @@ void main(void){
         irq_enable(TIMER_IRQ_ID);
         irq_set_prio(TIMER_IRQ_ID, TIMER_IRQ_PRIO);
 
+        timer_enable();
+
         master_done = true;
     }
 
