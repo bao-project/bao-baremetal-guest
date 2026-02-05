@@ -6,6 +6,11 @@
 
 extern unsigned long TIMER_FREQ;
 
+static inline unsigned long timer_get_freq(void)
+{
+    return sysreg_cntfrq_el0_read();
+}
+
 static inline void timer_set(uint64_t n)
 {
     uint64_t current = sysreg_cntvct_el0_read();

@@ -12,8 +12,8 @@ __attribute__((weak))
 void arch_init(){
     unsigned long cpuid = get_cpuid();
     gic_init();
-    TIMER_FREQ = sysreg_cntfrq_el0_read();
     sysreg_cntv_ctl_el0_write(1);
+    TIMER_FREQ = timer_get_freq();
 
 #if !(defined(SINGLE_CORE) || defined(NO_FIRMWARE))
     if(cpuid == 0){
