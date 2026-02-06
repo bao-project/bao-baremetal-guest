@@ -22,6 +22,7 @@
 #define UART_ADDR (0xff000000)
 #else
 
+#if !defined(MEM_NON_UNIFIED)
 #ifndef MEM_BASE
 #define MEM_BASE PLAT_MEM_BASE
 #endif
@@ -29,6 +30,8 @@
 #ifndef MEM_SIZE
 #define MEM_SIZE PLAT_MEM_SIZE
 #endif
+
+#else /* non-unified */
 
 #ifndef RO_MEM_BASE
 #define RO_MEM_BASE PLAT_RO_MEM_BASE
@@ -44,6 +47,7 @@
 
 #ifndef RW_MEM_SIZE
 #define RW_MEM_SIZE PLAT_RW_MEM_SIZE
+#endif
 #endif
 
 #ifndef STACKHEAP_SIZE
