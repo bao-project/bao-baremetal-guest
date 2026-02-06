@@ -15,6 +15,5 @@ void arch_init(){
     *BOOTCTRL = ~0UL;
 #endif
     intc_init();
-    timer_enable();
     ei();
 }
