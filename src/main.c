@@ -35,6 +35,7 @@ void uart_rx_handler(){
 }
 
 void ipi_handler(){
+    irq_clear_ipi();
     printf("cpu%d: %s\n", get_cpuid(), __func__);
     irq_send_ipi(1ull << (get_cpuid() + 1));
 }
