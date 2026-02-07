@@ -85,6 +85,7 @@ $(target).bin: $(target).elf
 
 $(target).elf: $(objs) $(gen_ld_file)
 	$(cc) $(LDFLAGS) -T$(gen_ld_file) $(objs) -o $@
+	$(objcopy) -O ihex $@ $(target).hex
 	$(objdump) -S $@ > $(target).asm
 	$(objdump) -x -d --wide $@ > $(target).lst
 
