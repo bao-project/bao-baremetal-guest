@@ -86,14 +86,14 @@ entry_el1:
     ldr r1, =(SCTLR_RES1 | SCTLR_C | SCTLR_I | SCTLR_BR | SCTLR_M)
     mcr p15, 0, r1, c1, c0, 0 // sctlr
 
-#else 
+#else
 
     ldr r1, =0x55555555
     mcr p15, 0, r1, c3, c0, 0 // dacr
 
     mov r1, #0
     mcr p15, 0, r1, c2, c0, 2 // ttbcr
-    
+
     ldr r1, =page_table
     ldr r2, =(TTBR_IRGN1 | TTBR_RGN_0 | TTBR_S | TTBR_NOS)
     orr r1, r1, r2
@@ -110,13 +110,22 @@ entry_el1:
 
 #endif
 
-	dsb	nsh
-	isb
+    dsb	nsh
+    isb
 
     cmp r0, #0
     bne 1f
 
-    ldr r11, =__bss_start 
+#ifdef MEM_NON_UNIFIED
+    /* Copy data from RX to RWX */
+    ldr r7,  =__data_load_start         // LMA start
+    ldr r11, =__data_start              // VMA start
+    ldr r12, =__data_load_end           // LMA end
+
+    bl  copy_data
+#endif
+
+    ldr r11, =__bss_start
     ldr r12, =__bss_end
     bl  clear
 
@@ -158,15 +167,25 @@ wait_flag:
 psci_wake_up:
     b .
 
- .func clear
+.func clear
 clear:
     mov r10, #0
 2:
-	cmp	r11, r12			
-	bge 1f				
-	str	r10, [r11]
+    cmp r11, r12
+    bge 1f
+    str r10, [r11]
     add r11, r11, #4
-	b	2b				
+    b   2b
 1:
-	bx lr
+    bx lr
 .endfunc
+
+/* Copies data from r7 to r11 up to the r12 limit */
+.global copy_data
+copy_data:
+1:
+    ldr r8, [r7], #4
+    str r8, [r11], #4
+    cmp r7, r12
+    bne 1b
+    bx lr
