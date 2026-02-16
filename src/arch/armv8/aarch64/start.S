@@ -54,7 +54,7 @@ _start:
     msr vtcr_el2, x1
 #if GIC_VERSION == GICV3
     mov x1, 0x9
-    msr icc_sre_el2, x1
+    msr ICC_SRE_EL2, x1
 #endif
 
 #ifdef MPU
