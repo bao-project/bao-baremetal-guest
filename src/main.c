@@ -65,13 +65,14 @@ void main(void){
         irq_enable(TIMER_IRQ_ID);
         irq_set_prio(TIMER_IRQ_ID, TIMER_IRQ_PRIO);
 
+        irq_enable(UART_IRQ_ID);
+        irq_set_prio(UART_IRQ_ID, UART_IRQ_PRIO);
+
         timer_enable();
 
         master_done = true;
     }
 
-    irq_enable(UART_IRQ_ID);
-    irq_set_prio(UART_IRQ_ID, UART_IRQ_PRIO);
     irq_enable(IPI_IRQ_ID);
     irq_set_prio(IPI_IRQ_ID, UART_IRQ_PRIO);
 
