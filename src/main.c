@@ -75,7 +75,7 @@ void main(void){
     irq_set_handler(IPI_IRQ_ID, ipi_handler);
 
     irq_enable(IPI_IRQ_ID);
-    irq_set_prio(IPI_IRQ_ID, UART_IRQ_PRIO);
+    irq_set_prio(IPI_IRQ_ID, IPI_IRQ_PRIO);
 
     while(!master_done);
     spin_lock(&print_lock);
