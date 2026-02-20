@@ -48,7 +48,7 @@
     static inline unsigned long long sysreg_##reg##_read() {\
         unsigned long long _temp, _tempH;\
         asm volatile("mrrc p15, "#op1", %0, %1, "#crm"\n\r": "=r"(_temp), "=r"(_tempH));\
-        return ((_tempH << 32) | _temp);\
+        return ((_tempH << 32) | (unsigned long)_temp);\
     } \
     static inline void sysreg_##reg##_write(unsigned long long val) {\
         unsigned long long _tempH = (val>>32);\
