@@ -39,15 +39,14 @@
 #define STM_CMCON_MSIZE1_OFFSET (16)
 #define STM_CMCON_MSTART1_OFFSET (24)
 
-#define TIMER_FREQ_HZ 400000000UL
+static bool timer_initialized = false;
 
-static unsigned long int core_id;
-uint64_t timer_ticks;
+#define MSTART_BIT0 0
+#define MSIZE_32BIT 31
+
 
 void timer_enable()
 {
-    volatile unsigned long * CMP0  = STM_CMP0_ADDR;
-    volatile unsigned long * CMCON = STM_CMCON_ADDR;
     volatile unsigned long * ICR   = STM_ICR_ADDR;
 
     *ICR = 0x1;
@@ -56,64 +55,31 @@ void timer_enable()
 uint64_t timer_get()
 {
     volatile unsigned long long * ABS   = STM_ABS_ADDR;
+    volatile unsigned long * CMP0  = STM_CMP0_ADDR;
 
     return *ABS;
 }
 
-
-// Returns the position (0-based) of the most significant bit set in value
-static int msb_position(uint32_t value) {
-    if (value == 0) return -1; // No bits set
-    int pos = 31;
-    while ((value & (1U << pos)) == 0) {
-        pos--;
-    }
-    return pos;
-}
-
-// Returns the position (0-based) of the least significant bit set in value
-static int lsb_position(uint32_t value) {
-    if (value == 0) return -1; // No bits set
-    int pos = 0;
-    while ((value & (1U << pos)) == 0) {
-        pos++;
-    }
-    return pos;
-}
-
-void timer_set(uint64_t n)
+void timer_set(uint64_t period_us)
 {
-    static bool timer_initialized = false;
-
     volatile unsigned long * CMP0  = STM_CMP0_ADDR;
-    volatile unsigned long * CMCON = STM_CMCON_ADDR;
-    volatile unsigned long * ICR   = STM_ICR_ADDR;
     volatile unsigned long long * ABS   = STM_ABS_ADDR;
+    volatile unsigned long * CMCON = STM_CMCON_ADDR;
 
-    timer_ticks = (TIMER_FREQ_HZ) / (n / 1000000) ;
-    if(!timer_initialized)
-    {
-        //assume n = period_us
-        uint32_t msb = msb_position(timer_ticks);
-        uint32_t lsb = lsb_position(timer_ticks);
-
-        uint32_t size = msb - lsb;
-        uint32_t start = lsb;
-
-        *CMCON =  ((start & STM_CMCON_Mx_MASK) << STM_CMCON_MSTART0_OFFSET) |
-            ((size & STM_CMCON_Mx_MASK) << STM_CMCON_MSIZE0_OFFSET);
-        *CMP0 = timer_ticks >> lsb;
-
-        timer_enable();
+    if (!timer_initialized) {
+        uint32_t size = 31;
+        uint32_t start = 0;
+        *CMCON =  ((MSTART_BIT0 & STM_CMCON_Mx_MASK) << STM_CMCON_MSTART0_OFFSET) |
+            ((MSIZE_32BIT & STM_CMCON_Mx_MASK) << STM_CMCON_MSIZE0_OFFSET);
+        /* Initial compare */
+        *CMP0 = (uint32_t)(*ABS + period_us);
         timer_initialized = true;
     }
-    else reload_timer();
-}
+    else {
+        uint32_t current = (uint32_t)(*ABS);
 
-void reload_timer()
-{
-    volatile unsigned long * CMP0  = STM_CMP0_ADDR;
-    volatile unsigned long long * ABS   = STM_ABS_ADDR;
+        uint32_t next = current + (uint32_t)period_us;
 
-    *CMP0 = timer_ticks + *ABS;
+        *CMP0 = next;
+    }
 }
