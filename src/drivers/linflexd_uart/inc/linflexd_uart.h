@@ -19,7 +19,6 @@
 
 #define UART_BAUDRATE             (115200U)
 
-#define LINFLEXD_CLKFREQ          (48000000UL)
 #define LINFLEXD_DFLT_OSR         (16UL)
 
 #define LINFLEXD_UARTCR_UART      (1UL << 0UL)
@@ -27,6 +26,9 @@
 #define LINFLEXD_UARTCR_WL1       (1UL << 7UL)
 #define LINFLEXD_UARTCR_TXEN      (1UL << 4UL)
 #define LINFLEXD_UARTCR_RXEN      (1UL << 5UL)
+#define LINFLEXD_UARTCR_PCE       (1UL << 2UL)
+#define LINFLEXD_UARTCR_TFBM      (1UL << 8UL)
+#define LINFLEXD_UARTCR_RFBM      (1UL << 9UL)
 
 #define LINFLEXD_UARTSR_RMB       (1UL << 9UL)
 #define LINFLEXD_UARTSR_DRFRFE    (1UL << 2UL)
@@ -74,7 +76,7 @@ struct linflexd {
 void linflexd_uart_enable(volatile struct linflexd * ptr_uart);
 void linflexd_uart_init(volatile struct linflexd * ptr_uart);
 uint8_t linflexd_uart_getc(volatile struct linflexd * ptr_uart);
-void linflexd_uart_putc(volatile struct linflexd * ptr_uart, int8_t c);
+void linflexd_uart_putc(volatile struct linflexd * ptr_uart, int8_t c, uint32_t timeout);
 void linflexd_uart_puts(volatile struct linflexd * ptr_uart, const char *s);
 void linflexd_uart_rxirq(volatile struct linflexd * uart);
 void linflexd_uart_clear_rxirq(volatile struct linflexd * uart);

@@ -11,7 +11,7 @@ void uart_init(void)
 
 void uart_putc(char c)
 {
-    linflexd_uart_putc(uart, c);
+    linflexd_uart_putc(uart, c, 0);
 }
 
 char uart_getchar(void)
