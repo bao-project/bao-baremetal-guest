@@ -32,6 +32,8 @@
 #define UART_RX_PIN     (LINFLEXD_9_RX_PIN)
 #endif
 
+#define UART_CLKFREQ   (48000000UL)
+
 #ifndef __ASSEMBLER__
 
 void plat_init(void);
