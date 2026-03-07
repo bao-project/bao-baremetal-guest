@@ -6,6 +6,10 @@ NAME:=baremetal
 ROOT_DIR:=$(realpath .)
 BUILD_DIR:=$(ROOT_DIR)/build/$(PLATFORM)
 
+ifneq ($(DEMO_IPC),)
+CPPFLAGS+=-DDEMO_IPC
+endif
+
 # Setup baremetal-runtime build
 include $(ROOT_DIR)/setup.mk
 
