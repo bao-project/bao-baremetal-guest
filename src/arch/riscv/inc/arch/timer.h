@@ -20,7 +20,7 @@ uint64_t timer_get()
     return csrs_time_read();
 }
 
-void timer_set(uint64_t n)
+uint64_t timer_set(uint64_t n)
 {
     uint64_t next_tick = timer_get() + n;
 
@@ -29,6 +29,8 @@ void timer_set(uint64_t n)
     } else {
         sbi_set_timer(next_tick);
     }
+
+    return next_tick;
 }
 
 #endif /* ARCH_TIMER_H */

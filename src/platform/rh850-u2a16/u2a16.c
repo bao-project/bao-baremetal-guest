@@ -47,7 +47,7 @@ uint64_t timer_get()
     return rh850_u2a16_OSTMn_get(timer);
 }
 
-void timer_set(uint64_t n)
+uint64_t timer_set(uint64_t n)
 {
-    rh850_u2a16_OSTMn_set(timer, n);
+    return rh850_u2a16_OSTMn_set(timer, n);
 }

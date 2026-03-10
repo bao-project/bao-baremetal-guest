@@ -11,6 +11,6 @@
 
 void timer_enable();
 uint64_t timer_get();
-void timer_set(uint64_t n);
+uint64_t timer_set(uint64_t n);
 
 #endif /* ARCH_TIMER_H */
