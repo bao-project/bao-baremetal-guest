@@ -7,4 +7,6 @@
 #define PLAT_UART_ADDR 0xFF000000
 #define UART_IRQ_ID 53
 
+#define PMU_FREQ_HZ 1200000000
+
 #endif
