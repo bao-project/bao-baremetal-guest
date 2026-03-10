@@ -43,7 +43,7 @@ static inline uint64_t rh850_u2a16_OSTMn_get(volatile struct rh850_u2a16_OSTMn* 
     return timer->OSTMnCNT;
 }
 
-static inline void rh850_u2a16_OSTMn_set(volatile struct rh850_u2a16_OSTMn* timer, uint64_t n)
+static inline uint64_t rh850_u2a16_OSTMn_set(volatile struct rh850_u2a16_OSTMn* timer, uint64_t n)
 {
     // Stop
     timer->OSTMnTT = 0x01;
@@ -51,5 +51,7 @@ static inline void rh850_u2a16_OSTMn_set(volatile struct rh850_u2a16_OSTMn* time
     timer->OSTMnCMP = n;
     // Start
     timer->OSTMnTS |= (0x01);
+
+    return n;
 }
 #endif /* RH850_U2A16_OSTM_H */

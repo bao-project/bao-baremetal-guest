@@ -59,7 +59,7 @@ uint64_t timer_get()
     return *ABS;
 }
 
-void timer_set(uint64_t period_us)
+uint64_t timer_set(uint64_t period_us)
 {
     volatile unsigned long* CMP0 = STM_CMP0_ADDR;
     volatile unsigned long long* ABS = STM_ABS_ADDR;
@@ -79,5 +79,7 @@ void timer_set(uint64_t period_us)
         uint32_t next = current + (uint32_t)period_us;
 
         *CMP0 = next;
+
+        return next;
     }
 }
