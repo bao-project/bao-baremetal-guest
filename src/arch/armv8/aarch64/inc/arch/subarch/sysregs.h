@@ -93,6 +93,13 @@ SYSREG_GEN_ACCESSORS(icc_rpr_el1);
 SYSREG_GEN_ACCESSORS(icc_ctlr_el1);
 SYSREG_GEN_ACCESSORS(icc_igrpen1_el1);
 SYSREG_GEN_ACCESSORS(icc_sgi1r_el1);
+SYSREG_GEN_ACCESSORS(pmcntenclr_el0);
+SYSREG_GEN_ACCESSORS(pmcntenset_el0);
+SYSREG_GEN_ACCESSORS(pmselr_el0);
+SYSREG_GEN_ACCESSORS(pmxevtyper_el0);
+SYSREG_GEN_ACCESSORS(pmxevcntr_el0);
+SYSREG_GEN_ACCESSORS(pmccntr_el0);
+SYSREG_GEN_ACCESSORS(pmccfiltr_el0);
 
 static inline void arm_dc_civac(uintptr_t cache_addr) {
     asm volatile ("dc civac, %0\n\t" :: "r"(cache_addr));
