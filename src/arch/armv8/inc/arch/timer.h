@@ -29,10 +29,16 @@ static inline void timer_enable(void)
     sysreg_cntv_ctl_el0_write(CNTV_CTL_ENABLE);
 }
 
-static inline void timer_set(uint64_t n)
+static inline void timer_disable()
+{
+    sysreg_cntv_ctl_el0_write(0);
+}
+
+static uint64_t timer_set(uint64_t n)
 {
     uint64_t current = sysreg_cntvct_el0_read();
     sysreg_cntv_cval_el0_write(current + n);
+    return current + n;
 }
 
 static inline uint64_t timer_get()
