@@ -33,6 +33,7 @@
 #endif
 
 #define UART_CLKFREQ   (48000000UL)
+#define PMU_FREQ_HZ     1000000000
 
 #ifndef __ASSEMBLER__
 
