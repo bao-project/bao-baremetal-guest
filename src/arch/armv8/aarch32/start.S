@@ -37,14 +37,20 @@ _start:
     mcr p15, 4, r0, c12, c9, 5 // icc_hsre
 #endif
 
-#if defined(MPU) && defined(PLAT_GENERIC_TIMER_CNTCTL_BASE)
+#if defined(MPU)
+#if defined(PLAT_GENERIC_TIMER_FIXED_FREQ)
+    ldr r1, =PLAT_GENERIC_TIMER_FIXED_FREQ
+#elif defined(PLAT_GENERIC_TIMER_CNTCTL_BASE)
     ldr r0, =PLAT_GENERIC_TIMER_CNTCTL_BASE
     ldr r1, [r0, #GENERIC_TIMER_CNTCTL_CNTCR_OFFSET]
     orr r1, r1, #GENERIC_TIMER_CNTCTL_CNTCR_EN
     str r1, [r0, #GENERIC_TIMER_CNTCTL_CNTCR_OFFSET]
     ldr r1, [r0, #GENERIC_TIMER_CNTCTL_CNTDIF0_OFFSET]
-    mcr p15, 0, r1, c14, c0, 0 // cntfrq
+#else
+    #error "No generic timer frequency source defined"
 #endif
+    mcr p15, 0, r1, c14, c0, 0 // cntfrq
+#endif  /* defined(MPU) */
 
     mrs r0, cpsr
     mov r1, #MODE_SVC
