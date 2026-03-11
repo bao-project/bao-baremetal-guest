@@ -19,20 +19,27 @@ _start:
     cps #MODE_SVC
     b entry_el1
 1:
+    bl plat_early_init
 #if GIC_VERSION == GICV3
     mrc p15, 4, r0, c12, c9, 5 // icc_hsre
     orr r0, r0, #0x9
     mcr p15, 4, r0, c12, c9, 5 // icc_hsre
 #endif
 
-#if defined(MPU) && defined(PLAT_GENERIC_TIMER_CNTCTL_BASE)
+#if defined(MPU)
+#if defined(PLAT_GENERIC_TIMER_FIXED_FREQ)
+    ldr r1, =PLAT_GENERIC_TIMER_FIXED_FREQ
+#elif defined(PLAT_GENERIC_TIMER_CNTCTL_BASE)
     ldr r0, =PLAT_GENERIC_TIMER_CNTCTL_BASE
     ldr r1, [r0, #GENERIC_TIMER_CNTCTL_CNTCR_OFFSET]
     orr r1, r1, #GENERIC_TIMER_CNTCTL_CNTCR_EN
     str r1, [r0, #GENERIC_TIMER_CNTCTL_CNTCR_OFFSET]
     ldr r1, [r0, #GENERIC_TIMER_CNTCTL_CNTDIF0_OFFSET]
-    mcr p15, 0, r1, c14, c0, 0 // cntfrq
+#else
+    #error "No generic timer frequency source defined"
 #endif
+    mcr p15, 0, r1, c14, c0, 0 // cntfrq
+#endif  /* defined(MPU) */
 
     mrs r0, cpsr
     mov r1, #MODE_SVC
@@ -188,4 +195,8 @@ copy_data:
     str r8, [r11], #4
     cmp r7, r12
     bne 1b
+    bx lr
+
+.weak plat_early_init
+plat_early_init:
     bx lr

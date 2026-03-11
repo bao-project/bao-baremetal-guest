@@ -44,6 +44,9 @@ _start:
     b.eq .
     cmp x1, 1
     b.eq _enter_el1
+
+    bl plat_early_init
+
     mrs x1, mpidr_el1
     msr vmpidr_el2, x1
     mov x1, 0
@@ -57,14 +60,20 @@ _start:
     msr icc_sre_el2, x1
 #endif
 
-#ifdef MPU
+#if defined(MPU)
+#if defined(PLAT_GENERIC_TIMER_FIXED_FREQ)
+    ldr x2, =PLAT_GENERIC_TIMER_FIXED_FREQ
+#elif defined(PLAT_GENERIC_TIMER_CNTCTL_BASE)
     ldr x1, =PLAT_GENERIC_TIMER_CNTCTL_BASE
     ldr w2, [x1, GENERIC_TIMER_CNTCTL_CNTCR_OFFSET]
     orr w2, w2, GENERIC_TIMER_CNTCTL_CNTCR_EN
     str w2, [x1, GENERIC_TIMER_CNTCTL_CNTCR_OFFSET]
     ldr w2, [x1, GENERIC_TIMER_CNTCTL_CNTDIF0_OFFSET]
-    msr cntfrq_el0, x2
+#else
+    #error "No generic timer frequency source defined"
 #endif
+    msr cntfrq_el0, x2
+#endif  /* defined(MPU) */
 
     adr x1, _exception_vector
     msr	VBAR_EL2, x1
@@ -193,3 +202,7 @@ clear:
 1:
 	ret
 .endfunc
+
+.weak plat_early_init
+plat_early_init:
+    ret
