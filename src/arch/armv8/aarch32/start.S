@@ -8,6 +8,9 @@
 #define GENERIC_TIMER_CNTCTL_CNTCR_OFFSET  (0x0)
 #define GENERIC_TIMER_CNTCTL_CNTDIF0_OFFSET  (0x20)
 
+.extern plat_mpu_regs
+.extern plat_mpu_num_regs
+
 .section .start, "ax"
 .global _start
 _start:
@@ -65,21 +68,28 @@ entry_el1:
 
 #ifdef MPU
 
-    // Set MPU region for cacheability and shareability
-    mov r4, #0
-    mcr p15, 0, r4, c6, c2, 1  // prselr
-    mov r4, #(PRBAR_BASE(0) | PRBAR_SH_IS | PRBAR_AP_RW_ALL)
-    mcr p15, 0, r4, c6, c3, 0  // prbar
-    mov r4, #(PRLAR_LIMIT(0x7fffffffUL) | PRLAR_ATTR(1) | PRLAR_EN)
-    mcr p15, 0, r4, c6, c3, 1  // prlar
+    // Program MPU regions from the platform descriptor array.
+    ldr r5, =plat_mpu_regs
+    ldr r6, =plat_mpu_num_regs
+    ldr r6, [r6]
 
-    mov r4, #1
-    mcr p15, 0, r4, c6, c2, 1  // prselr
-    mov r4, #(PRBAR_BASE(0x80000000UL) | PRBAR_SH_IS | PRBAR_AP_RW_ALL)
-    mcr p15, 0, r4, c6, c3, 0  // prbar
-    mov r4, #(PRLAR_LIMIT(0xffffffffUL) | PRLAR_ATTR(2) | PRLAR_EN)
-    mcr p15, 0, r4, c6, c3, 1  // prlar
+    mov r7, #0
+1:
+    cmp r7, r6
+    bge 2f
 
+    mcr p15, 0, r7, c6, c2, 1  // prselr
+
+    add r8, r5, r7, lsl #3     // sizeof(struct mpu_region) = 8 bytes
+    ldr r1, [r8]               // prbar
+    mcr p15, 0, r1, c6, c3, 0  // prbar
+
+    ldr r1, [r8, #4]           // prlar
+    mcr p15, 0, r1, c6, c3, 1  // prlar
+
+    add r7, r7, #1
+    b 1b
+2:
     dsb
     isb
 

@@ -1,4 +1,4 @@
-arch_c_srcs:= init.c psci.c irq.c timer.c
+arch_c_srcs:= init.c psci.c irq.c timer.c mem.c
 
 ifeq ($(GIC_VERSION),GICV3)
 	arch_c_srcs+=gicv3.c

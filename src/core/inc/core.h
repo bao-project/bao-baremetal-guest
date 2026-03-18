@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <plat.h>
 
 #endif /* __ASSEMBLER__ */
 
