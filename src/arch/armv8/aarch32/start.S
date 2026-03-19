@@ -10,6 +10,7 @@
 
 .extern plat_mpu_regs
 .extern plat_mpu_num_regs
+.weak plat_early_init
 
 .section .start, "ax"
 .global _start
@@ -22,6 +23,10 @@ _start:
     cps #MODE_SVC
     b entry_el1
 1:
+    /* This is a weak symbol needed for early platform initialization routines when the baremetal
+       guest is used standalone. If not defined, the compiler replaces the branch with a NOP */
+    b plat_early_init
+
 #if GIC_VERSION == GICV3
     mrc p15, 4, r0, c12, c9, 5 // icc_hsre
     orr r0, r0, #0x9
