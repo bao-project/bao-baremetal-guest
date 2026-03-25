@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) Bao Project and Contributors. All rights reserved.
+ */
+
 #ifndef RENESAS_RLIN3_H
 #define RENESAS_RLIN3_H
 

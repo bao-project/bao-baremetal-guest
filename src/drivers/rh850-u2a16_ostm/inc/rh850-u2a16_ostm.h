@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) Bao Project and Contributors. All rights reserved.
+ */
+
 #ifndef RH850_U2A16_OSTM_H
 #define RH850_U2A16_OSTM_H
 

@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) Bao Project and Contributors. All rights reserved.
+ */
+
 #include <renesas_rlin3.h>
 #include <rh850-u2a16_ostm.h>
 
