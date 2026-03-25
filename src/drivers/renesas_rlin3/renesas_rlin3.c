@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) Bao Project and Contributors. All rights reserved.
+ */
+
 #include <renesas_rlin3.h>
 
 #define RLIN3_LWBR_LPRS_16      (0x4 << 1)

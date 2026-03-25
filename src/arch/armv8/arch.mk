@@ -1,3 +1,5 @@
+## SPDX-License-Identifier: Apache-2.0
+## Copyright (c) Bao Project and Contributors. All rights reserved.
 
 ARCH_SUB?=aarch64
 arch_sub_dir:=$(cur_dir)/$(ARCH_SUB)
