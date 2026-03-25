@@ -7,7 +7,8 @@ INC_DIRS:=
 C_SRC:=
 ASM_SRC:=
 
-ifneq ($(MAKECMDGOALS), clean)
+ifneq ($(filter clean ci gitlint license-check format-check format,$(MAKECMDGOALS)),)
+else
 ifeq ($(PLATFORM),)
 $(error Undefined platform)
 endif
