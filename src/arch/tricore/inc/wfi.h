@@ -10,7 +10,7 @@
 
 static inline void wfi()
 {
-    __asm__ volatile ("wait");
+    __asm__ volatile("wait");
 }
 
 #endif

@@ -8,14 +8,13 @@
 
 #include <intc.h>
 
-#define IPI_IRQ_ID (0UL)
+#define IPI_IRQ_ID     (0UL)
 
+#define IRQ_NUM        (ARCH_MAX_INTERRUPTS)
+#define IRQ_MAX_PRIO   (0x1)
 
-#define IRQ_NUM (ARCH_MAX_INTERRUPTS)
-#define IRQ_MAX_PRIO (0x1)
-
-#define UART_IRQ_PRIO   IRQ_MAX_PRIO
-#define TIMER_IRQ_PRIO  IRQ_MAX_PRIO
-#define IPI_IRQ_PRIO    IRQ_MAX_PRIO
+#define UART_IRQ_PRIO  IRQ_MAX_PRIO
+#define TIMER_IRQ_PRIO IRQ_MAX_PRIO
+#define IPI_IRQ_PRIO   IRQ_MAX_PRIO
 
 #endif /* ARCH_IRQ_H */

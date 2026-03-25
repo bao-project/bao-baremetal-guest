@@ -9,18 +9,17 @@
 #include <core.h>
 #include <plat.h>
 
-
 #ifdef STD_ADDR_SPACE
 #undef PLAT_PLIC_BASE
 #endif
 
 #ifdef PLAT_PLIC_BASE
-#define PLIC_BASE   PLAT_PLIC_BASE
+#define PLIC_BASE PLAT_PLIC_BASE
 #else
-#define PLIC_BASE   (0xc000000)
+#define PLIC_BASE (0xc000000)
 #endif
 
-#define PLIC_HART_BASE   (PLIC_BASE+0x200000)
+#define PLIC_HART_BASE      (PLIC_BASE + 0x200000)
 
 #define PLIC_MAX_INTERRUPTS (1024)
 #define PLIC_MAX_CONTEXTS   (24)
@@ -39,9 +38,9 @@ typedef struct {
     uint32_t enbl[PLIC_MAX_CONTEXTS][PLIC_NUM_ENBL_REGS];
 } plic_global_t;
 
-#define PLIC_GLOBAL_SIZE(num_harts)\
-    (((PLIC_NUM_PRIO_REGS+PLIC_NUM_PEND_REGS)*sizeof(uint32_t)) +\
-    (num_harts*PLIC_NUM_ENBL_REGS))
+#define PLIC_GLOBAL_SIZE(num_harts)                                   \
+    (((PLIC_NUM_PRIO_REGS + PLIC_NUM_PEND_REGS) * sizeof(uint32_t)) + \
+        (num_harts * PLIC_NUM_ENBL_REGS))
 
 typedef struct {
     uint32_t threshold;
@@ -49,11 +48,11 @@ typedef struct {
         uint32_t claim;
         uint32_t complete;
     };
-    uint8_t res[0x1000-0x0008];
+    uint8_t res[0x1000 - 0x0008];
 } plic_hart_t;
 
-extern volatile plic_global_t * plic_global;
-extern volatile plic_hart_t *plic_hart;
+extern volatile plic_global_t* plic_global;
+extern volatile plic_hart_t* plic_hart;
 
 void plic_init();
 void plic_handle();

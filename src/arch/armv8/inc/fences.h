@@ -10,7 +10,7 @@
 
 #define DSB(shdmn) asm volatile("dsb " #shdmn "\n\t" ::: "memory")
 
-#define ISB() asm volatile("isb\n\t" ::: "memory")
+#define ISB()      asm volatile("isb\n\t" ::: "memory")
 
 static inline void fence_ord_write()
 {

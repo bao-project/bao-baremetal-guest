@@ -12,13 +12,15 @@
 static inline void tricore_uart_enable_clock(volatile struct asclin_hw* uart, uint32_t clk_mode)
 {
     uart->CSR = clk_mode;
-   while ((uart->CSR) >> ASCLIN_CSR_CON_OFFSET);
+    while ((uart->CSR) >> ASCLIN_CSR_CON_OFFSET)
+        ;
 }
 
 static inline void tricore_uart_disable_clock(volatile struct asclin_hw* uart)
 {
     uart->CSR = 0;
-    while ((uart->CSR) >> ASCLIN_CSR_CON_OFFSET);
+    while ((uart->CSR) >> ASCLIN_CSR_CON_OFFSET)
+        ;
 }
 
 bool tricore_uart_init(volatile struct asclin_hw* uart)
@@ -72,9 +74,7 @@ void tricore_uart_enable(volatile struct asclin_hw* uart)
     return;
 }
 
-void tricore_uart_disable(volatile struct asclin_hw* uart)
-{
-}
+void tricore_uart_disable(volatile struct asclin_hw* uart) { }
 
 bool tricore_uart_set_baud_rate(volatile struct asclin_hw* uart, uint32_t baud_rate)
 {
@@ -89,6 +89,7 @@ uint32_t tricore_uart_getc(volatile struct asclin_hw* uart)
 void tricore_uart_putc(volatile struct asclin_hw* uart, int8_t c)
 {
     uart->TXDATA[0] = (uint32_t)c;
-    while (!(uart->FLAGS & TFL));
+    while (!(uart->FLAGS & TFL))
+        ;
     uart->FLAGSCLEAR = ASCLIN_ALLFLAGS_MASK;
 }

@@ -38,11 +38,11 @@
 #endif /* IRQC == AIA */
 
 #if (IRQC == AIA)
-#define IRQC_MAX_INTERRUPTS   (PLAT_IMSIC_MAX_INTERRUPTS)
+#define IRQC_MAX_INTERRUPTS (PLAT_IMSIC_MAX_INTERRUPTS)
 #else
-#define IRQC_MAX_INTERRUPTS   (APLIC_MAX_INTERRUPTS)
+#define IRQC_MAX_INTERRUPTS (APLIC_MAX_INTERRUPTS)
 #endif /* IRQC == AIA */
-#define IRQC_MAX_PRIO         (APLIC_TARGET_MAX_PRIO)
+#define IRQC_MAX_PRIO (APLIC_TARGET_MAX_PRIO)
 
 #if (IRQC == AIA)
 /**
@@ -102,15 +102,17 @@ static inline void irqc_enable_irq(unsigned long target, unsigned long int_id)
     }
 }
 
-static inline void irqc_set_prio(unsigned id, unsigned prio) {
+static inline void irqc_set_prio(unsigned id, unsigned prio)
+{
     if (IRQC == APLIC) {
         aplic_set_target_prio(id, prio);
     }
 }
 
-static inline void irqc_send_ipi(unsigned long target_cpu_mask) {
+static inline void irqc_send_ipi(unsigned long target_cpu_mask)
+{
 #if (IRQC == AIA)
-    for (size_t i = 0; i < (sizeof(target_cpu_mask)*8) && (target_cpu_mask != 0); i++) {
+    for (size_t i = 0; i < (sizeof(target_cpu_mask) * 8) && (target_cpu_mask != 0); i++) {
         if (bit_get(target_cpu_mask, i)) {
             imsic_send_msi(i);
         }
@@ -120,7 +122,8 @@ static inline void irqc_send_ipi(unsigned long target_cpu_mask) {
 #endif /* IRQC == AIA */
 }
 
-static inline void irqc_enable_ipi(void) {
+static inline void irqc_enable_ipi(void)
+{
 #if (IRQC == AIA)
     imsic_set_enbl(IPI_IRQ_ID);
 #else

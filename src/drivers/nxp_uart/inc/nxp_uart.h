@@ -10,7 +10,7 @@
 #include <uart.h>
 
 struct lpuart {
-    uint32_t verid; 
+    uint32_t verid;
     uint32_t param;
     uint32_t global;
     uint32_t pincfg;
@@ -24,18 +24,18 @@ struct lpuart {
     uint32_t water;
 };
 
-#define LPUART_GLOBAL_RST_BIT  (1U << 1)
+#define LPUART_GLOBAL_RST_BIT    (1U << 1)
 #define LPUART_BAUD_80MHZ_115200 ((4 << 24) | (1 << 17) | 138)
-#define LPUART_CTRL_TE_BIT (1U << 19)
-#define LPUART_CTRL_RE_BIT (1U << 18)
-#define LPUART_CTRL_RIE_BIT (1U << 21)
-#define LPUART_STAT_TDRE_BIT (1U << 23)
-#define LPUART_STAT_OR_BIT (1U << 19)
+#define LPUART_CTRL_TE_BIT       (1U << 19)
+#define LPUART_CTRL_RE_BIT       (1U << 18)
+#define LPUART_CTRL_RIE_BIT      (1U << 21)
+#define LPUART_STAT_TDRE_BIT     (1U << 23)
+#define LPUART_STAT_OR_BIT       (1U << 19)
 
-void nxp_uart_init(volatile struct lpuart *uart);
-void nxp_uart_putc(volatile struct lpuart *uart, char c);
-char nxp_uart_getchar(volatile struct lpuart *uart);
-void nxp_uart_enable_rxirq(volatile struct lpuart *uart);
-void nxp_uart_clear_rxirq(volatile struct lpuart *uart);
+void nxp_uart_init(volatile struct lpuart* uart);
+void nxp_uart_putc(volatile struct lpuart* uart, char c);
+char nxp_uart_getchar(volatile struct lpuart* uart);
+void nxp_uart_enable_rxirq(volatile struct lpuart* uart);
+void nxp_uart_clear_rxirq(volatile struct lpuart* uart);
 
 #endif /* __UART_NXP_H */

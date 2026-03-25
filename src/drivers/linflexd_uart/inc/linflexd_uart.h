@@ -74,13 +74,13 @@ struct linflexd {
 
 /** Public LINFLEXD UART interfaces */
 
-void linflexd_uart_enable(volatile struct linflexd * ptr_uart);
-void linflexd_uart_init(volatile struct linflexd * ptr_uart);
-uint8_t linflexd_uart_getc(volatile struct linflexd * ptr_uart);
-void linflexd_uart_putc(volatile struct linflexd * ptr_uart, int8_t c, uint32_t timeout);
-void linflexd_uart_puts(volatile struct linflexd * ptr_uart, const char *s);
-void linflexd_uart_rxirq(volatile struct linflexd * uart);
-void linflexd_uart_clear_rxirq(volatile struct linflexd * uart);
+void linflexd_uart_enable(volatile struct linflexd* ptr_uart);
+void linflexd_uart_init(volatile struct linflexd* ptr_uart);
+uint8_t linflexd_uart_getc(volatile struct linflexd* ptr_uart);
+void linflexd_uart_putc(volatile struct linflexd* ptr_uart, int8_t c, uint32_t timeout);
+void linflexd_uart_puts(volatile struct linflexd* ptr_uart, const char* s);
+void linflexd_uart_rxirq(volatile struct linflexd* uart);
+void linflexd_uart_clear_rxirq(volatile struct linflexd* uart);
 
 #endif /* __ASSEMBLER__ */
 

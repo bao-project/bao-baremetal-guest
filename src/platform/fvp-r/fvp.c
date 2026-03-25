@@ -6,7 +6,7 @@
 #include <plat.h>
 #include <pl011_uart.h>
 
-Pl011_Uart *uart  = (void*) PLAT_UART_ADDR;
+Pl011_Uart* uart = (void*)PLAT_UART_ADDR;
 
 void uart_init(void)
 {
@@ -26,12 +26,11 @@ char uart_getchar(void)
     return pl011_uart_getc(uart);
 }
 
-void uart_enable_rxirq(){
+void uart_enable_rxirq() { }
 
-}
-
-void uart_clear_rxirq(){
-    while(!(uart->flag & UART_FR_RXFE)) {
+void uart_clear_rxirq()
+{
+    while (!(uart->flag & UART_FR_RXFE)) {
         volatile char c = uart->data;
     }
     uart->isr_clear = 0xffff;

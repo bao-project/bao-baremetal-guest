@@ -12,9 +12,8 @@
 
 extern void _start();
 
-__attribute__((weak))
-void arch_init(){
-
+__attribute__((weak)) void arch_init()
+{
     irqc_init();
 
 #ifndef SINGLE_CORE
@@ -26,9 +25,9 @@ void arch_init(){
         imsic_target_valid |= (1UL << hart_id);
 #endif
         while (true) {
-            if(i != hart_id) {
-                ret = sbi_hart_start(i, (unsigned long) &_start, 0);
-                if (ret.error ==  SBI_SUCCESS) {
+            if (i != hart_id) {
+                ret = sbi_hart_start(i, (unsigned long)&_start, 0);
+                if (ret.error == SBI_SUCCESS) {
 #if (IRQC == AIA)
                     imsic_target_valid |= (1UL << i);
 #endif

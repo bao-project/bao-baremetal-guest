@@ -17,5 +17,4 @@
 #define __DEFINED(VALUE)                ___DEFINED(VALUE true, false)
 #define ___DEFINED(IGNORE, RESULT, ...) (RESULT)
 
-
 #endif /* UTIL_H */

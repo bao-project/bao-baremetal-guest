@@ -13,16 +13,19 @@
 
 extern int boot_hart;
 
-static inline unsigned long get_cpuid(){
+static inline unsigned long get_cpuid()
+{
     register unsigned long hartid asm("tp");
     return hartid;
 }
 
-static inline bool cpu_is_master(){
+static inline bool cpu_is_master()
+{
     return get_cpuid() == 0;
 }
 
-static inline bool cpu_is_boot_hart() {
+static inline bool cpu_is_boot_hart()
+{
     return get_cpuid() == boot_hart;
 }
 

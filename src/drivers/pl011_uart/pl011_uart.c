@@ -5,111 +5,98 @@
 
 #include <pl011_uart.h>
 
-
-void pl011_uart_disable(volatile Pl011_Uart * ptr_uart){
-
-	uint32_t ctrl_reg = ptr_uart->control;					
-	ctrl_reg &= ((~UART_CR_UARTEN) | (~UART_CR_TXE) | (~UART_CR_RXE));	
-	ptr_uart->control = ctrl_reg;						
-
+void pl011_uart_disable(volatile Pl011_Uart* ptr_uart)
+{
+    uint32_t ctrl_reg = ptr_uart->control;
+    ctrl_reg &= ((~UART_CR_UARTEN) | (~UART_CR_TXE) | (~UART_CR_RXE));
+    ptr_uart->control = ctrl_reg;
 }
 
-
-void pl011_uart_enable(volatile Pl011_Uart * ptr_uart){
-
-	uint32_t ctrl_reg = ptr_uart->control;				
-	ctrl_reg |= (UART_CR_UARTEN | UART_CR_TXE | UART_CR_RXE);	
-	ptr_uart->control = ctrl_reg;				
-
+void pl011_uart_enable(volatile Pl011_Uart* ptr_uart)
+{
+    uint32_t ctrl_reg = ptr_uart->control;
+    ctrl_reg |= (UART_CR_UARTEN | UART_CR_TXE | UART_CR_RXE);
+    ptr_uart->control = ctrl_reg;
 }
 
+void pl011_uart_set_baud_rate(volatile Pl011_Uart* ptr_uart, uint32_t baud_rate)
+{
+    uint32_t temp;
+    uint32_t ibrd;
+    uint32_t mod;
+    uint32_t fbrd;
 
-void pl011_uart_set_baud_rate(volatile Pl011_Uart * ptr_uart, uint32_t baud_rate){
+    if (baud_rate == 0) {
+        baud_rate = UART_BAUD_RATE;
+    }
 
-	uint32_t temp;
-	uint32_t ibrd;
-	uint32_t mod;
-	uint32_t fbrd;
+    /* Set baud rate, IBRD = UART_CLK / (16 * BAUD_RATE)
+    FBRD = ROUND((64 * MOD(UART_CLK,(16 * BAUD_RATE))) / (16 * BAUD_RATE)) */
+    temp = 16 * baud_rate;
+    ibrd = UART_CLK / temp;
+    mod = UART_CLK % temp;
+    fbrd = (4 * mod) / baud_rate;
 
-	if(baud_rate == 0)
-	{
-		baud_rate =  UART_BAUD_RATE;
-	}
-
-	/* Set baud rate, IBRD = UART_CLK / (16 * BAUD_RATE)
-	FBRD = ROUND((64 * MOD(UART_CLK,(16 * BAUD_RATE))) / (16 * BAUD_RATE)) */
-	temp = 16 * baud_rate;
-	ibrd = UART_CLK / temp;
-	mod = UART_CLK % temp;
-	fbrd = (4 * mod) / baud_rate;
-
-	/* Set the values of the baudrate divisors */
-	ptr_uart->integer_br = ibrd;
-	ptr_uart->fractional_br = fbrd;
-
+    /* Set the values of the baudrate divisors */
+    ptr_uart->integer_br = ibrd;
+    ptr_uart->fractional_br = fbrd;
 }
 
+void pl011_uart_init(volatile Pl011_Uart* ptr_uart /*, uint32_t baud_rate*/)
+{
+    int lcrh_reg;
 
-void pl011_uart_init(volatile Pl011_Uart * ptr_uart/*, uint32_t baud_rate*/) {
+    /* First, disable everything */
+    ptr_uart->control = 0x0;
 
-	int lcrh_reg;
+    /* Default baudrate = 115200 */
+    uint32_t baud_rate = UART_BAUD_RATE;
+    pl011_uart_set_baud_rate(ptr_uart, baud_rate);
 
-	/* First, disable everything */
-	ptr_uart->control = 0x0;
+    /* Set the UART to be 8 bits, 1 stop bit and no parity */
+    ptr_uart->line_control = (UART_LCR_WLEN_8);
 
-	/* Default baudrate = 115200 */
-	uint32_t baud_rate = UART_BAUD_RATE;
-	pl011_uart_set_baud_rate(ptr_uart, baud_rate);
+    /* Enable the UART, enable TX and enable loop back*/
+    ptr_uart->control = (UART_CR_UARTEN | UART_CR_TXE);
 
-	/* Set the UART to be 8 bits, 1 stop bit and no parity */
-	ptr_uart->line_control = (UART_LCR_WLEN_8);
+    ptr_uart->data = 0x0;
+    while (ptr_uart->flag & UART_FR_BUSY)
+        ;
 
-	/* Enable the UART, enable TX and enable loop back*/
-	ptr_uart->control = (UART_CR_UARTEN | UART_CR_TXE);
+    /* Enable RX */
+    ptr_uart->control = (UART_CR_UARTEN | UART_CR_RXE | UART_CR_TXE);
 
-	ptr_uart->data = 0x0;
-	while(ptr_uart->flag & UART_FR_BUSY);
+    /* Clear interrupts */
+    ptr_uart->isr_clear = 0xffff;
 
-	/* Enable RX */
-	ptr_uart->control = (UART_CR_UARTEN | UART_CR_RXE | UART_CR_TXE);
-
-	/* Clear interrupts */
-	ptr_uart->isr_clear = 0xffff; 
-
-	/* Enable receive interrupts */
-	ptr_uart->isr_mask = UART_MIS_RXMIS;
-
+    /* Enable receive interrupts */
+    ptr_uart->isr_mask = UART_MIS_RXMIS;
 }
 
+uint32_t pl011_uart_getc(volatile Pl011_Uart* ptr_uart)
+{
+    uint32_t data = 0;
 
-uint32_t pl011_uart_getc(volatile Pl011_Uart * ptr_uart){
+    // wait until there is data in FIFO
+    while (!(ptr_uart->flag & UART_FR_RXFE))
+        ;
 
-	uint32_t data = 0;
-
-	//wait until there is data in FIFO
-	while(!(ptr_uart->flag & UART_FR_RXFE));
-
-	data = ptr_uart->data;
-	return data;
-
+    data = ptr_uart->data;
+    return data;
 }
 
+void pl011_uart_putc(volatile Pl011_Uart* ptr_uart, int8_t c)
+{
+    // wait until txFIFO is not full
+    while (ptr_uart->flag & UART_FR_TXFF)
+        ;
 
-void pl011_uart_putc(volatile Pl011_Uart * ptr_uart,int8_t c){
-
-	//wait until txFIFO is not full
-	while(ptr_uart->flag & UART_FR_TXFF);
-
-	ptr_uart->data = c;
-
+    ptr_uart->data = c;
 }
 
-
-void pl011_uart_puts(volatile Pl011_Uart * ptr_uart,const char *s){
-
-	while (*s)
-	{
-		pl011_uart_putc(ptr_uart,*s++);
-	}
-
+void pl011_uart_puts(volatile Pl011_Uart* ptr_uart, const char* s)
+{
+    while (*s) {
+        pl011_uart_putc(ptr_uart, *s++);
+    }
 }

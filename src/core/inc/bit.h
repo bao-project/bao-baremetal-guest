@@ -33,7 +33,7 @@ static inline unsigned long bit_extract(unsigned long word, unsigned long off, u
 }
 
 static inline unsigned long bit_insert(unsigned long word, unsigned long val, unsigned long off,
-                                  unsigned long len)
+    unsigned long len)
 {
     return (~BIT_MASK(off, len) & word) | ((BIT_MASK(0, len) & val) << off);
 }
