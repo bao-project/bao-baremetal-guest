@@ -8,7 +8,7 @@
 #include <uart.h>
 
 /* Global uart structure definition */
-volatile struct e3650_uart *const uart = (void *)PLAT_UART_ADDR;
+volatile struct e3650_uart* const uart = (void*)PLAT_UART_ADDR;
 
 void uart_init(void)
 {

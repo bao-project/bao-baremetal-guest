@@ -6,7 +6,7 @@
 #include <plat.h>
 #include <zynq_uart.h>
 
-Xil_Uart *uart  = (void*) UART_ADDR;
+Xil_Uart* uart = (void*)UART_ADDR;
 
 void uart_init(void)
 {
@@ -26,11 +26,13 @@ char uart_getchar(void)
     return xil_uart_getc(uart);
 }
 
-void uart_enable_rxirq(){
+void uart_enable_rxirq()
+{
     xil_uart_enable_irq(uart, UART_ISR_EN_RTRIG);
 }
 
-void uart_clear_rxirq(){
+void uart_clear_rxirq()
+{
     xil_uart_clear_rxbuf(uart);
     xil_uart_clear_irq(uart, 0xFFFFFFFF);
 }

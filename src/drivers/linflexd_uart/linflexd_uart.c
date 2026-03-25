@@ -6,7 +6,7 @@
 #include <linflexd_uart.h>
 #include <plat.h>
 
-void linflexd_uart_enable(volatile struct linflexd * uart)
+void linflexd_uart_enable(volatile struct linflexd* uart)
 {
     /* Request normal mode */
     uart->lincr1 &= ~(LINFLEXD_LINCR1_SLEEP | LINFLEXD_LINCR1_INIT);
@@ -23,7 +23,7 @@ static void uart_set_baudrate(volatile struct linflexd* uart)
     uart->linibrr = ibr;
 }
 
-void linflexd_uart_init(volatile struct linflexd * uart)
+void linflexd_uart_init(volatile struct linflexd* uart)
 {
     /* Request init mode */
     uart->lincr1 = (uart->lincr1 & ~(LINFLEXD_LINCR1_SLEEP)) | LINFLEXD_LINCR1_INIT;
@@ -55,24 +55,24 @@ void linflexd_uart_init(volatile struct linflexd * uart)
     uart->uartsr |= LINFLEXD_UARTSR_DTFTFF;
 }
 
-void linflexd_uart_rxirq(volatile struct linflexd * uart)
+void linflexd_uart_rxirq(volatile struct linflexd* uart)
 {
     /* Enable data transmitted interrupt */
     uart->linier |= LINFLEXD_LINIER_DRIE;
 }
 
-void linflexd_uart_clear_rxirq(volatile struct linflexd * uart)
+void linflexd_uart_clear_rxirq(volatile struct linflexd* uart)
 {
     /* Clear the receive buffer full flag */
     uart->uartsr |= LINFLEXD_UARTSR_RMB;
 }
 
-uint8_t linflexd_uart_getc(volatile struct linflexd * uart){
-
+uint8_t linflexd_uart_getc(volatile struct linflexd* uart)
+{
     uint8_t data = 0;
 
     while ((uart->uartsr & LINFLEXD_UARTSR_RMB) == 0u) {
-    /* wait for receive buffer full */
+        /* wait for receive buffer full */
     }
 
     data = uart->bdrm & (0xFF);
@@ -82,15 +82,14 @@ uint8_t linflexd_uart_getc(volatile struct linflexd * uart){
     return data;
 }
 
-void linflexd_uart_putc(volatile struct linflexd * uart, int8_t c, uint32_t timeout)
+void linflexd_uart_putc(volatile struct linflexd* uart, int8_t c, uint32_t timeout)
 {
     uint32_t reg_val;
 
-    if (timeout)
-    {
-        /* 
+    if (timeout) {
+        /*
          * Add temporary delay to avoid TX data corruption.
-         * 
+         *
          * Without this delay, characters may be lost or reordered, indicating that
          * the transmitter is not immediately ready to accept data after Tx enable.
          * The delay provides sufficient time for the hardware to settle before the
@@ -99,8 +98,9 @@ void linflexd_uart_putc(volatile struct linflexd * uart, int8_t c, uint32_t time
          * TODO: This is a temporary workaround to stabilize UART output while a proper
          * solution is investigated, such as synchronizing on the correct hardware
          * status flags or reworking the TX state machine.
-        */
-        for (volatile int i = 0; i < timeout; i++);
+         */
+        for (volatile int i = 0; i < timeout; i++)
+            ;
     }
 
     uart->uartcr |= LINFLEXD_UARTCR_TXEN;
@@ -110,13 +110,11 @@ void linflexd_uart_putc(volatile struct linflexd * uart, int8_t c, uint32_t time
     } while (reg_val == LINFLEXD_LINSR_LINS_DRDT || reg_val == LINFLEXD_LINSR_LINS_HRT);
 
     uart->bdrl = (uint32_t)c;
-
 }
 
-void linflexd_uart_puts(volatile struct linflexd * uart, const char *s)
+void linflexd_uart_puts(volatile struct linflexd* uart, const char* s)
 {
-    while (*s)
-    {
-        linflexd_uart_putc(uart,*s++, 0);
+    while (*s) {
+        linflexd_uart_putc(uart, *s++, 0);
     }
 }

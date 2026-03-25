@@ -10,81 +10,78 @@
 #include <bit.h>
 #include <plat.h>
 
-#define GICV2 (2)
-#define GICV3 (3)
+#define GICV2                     (2)
+#define GICV3                     (3)
 
-#define GIC_MAX_INTERUPTS 1024
-#define GIC_MAX_SGIS 16
-#define GIC_MAX_PPIS 16
-#define GIC_CPU_PRIV (GIC_MAX_SGIS + GIC_MAX_PPIS)
-#define GIC_MAX_SPIS (GIC_MAX_INTERUPTS - GIC_CPU_PRIV)
-#define GIC_PRIO_BITS 8
-#define GIC_TARGET_BITS 8
-#define GIC_MAX_TARGETS GIC_TARGET_BITS
-#define GIC_CONFIG_BITS 2
-#define GIC_SEC_BITS 2
-#define GIC_SGI_BITS 8
+#define GIC_MAX_INTERUPTS         1024
+#define GIC_MAX_SGIS              16
+#define GIC_MAX_PPIS              16
+#define GIC_CPU_PRIV              (GIC_MAX_SGIS + GIC_MAX_PPIS)
+#define GIC_MAX_SPIS              (GIC_MAX_INTERUPTS - GIC_CPU_PRIV)
+#define GIC_PRIO_BITS             8
+#define GIC_TARGET_BITS           8
+#define GIC_MAX_TARGETS           GIC_TARGET_BITS
+#define GIC_CONFIG_BITS           2
+#define GIC_SEC_BITS              2
+#define GIC_SGI_BITS              8
 
-#define GIC_INT_REG(NINT) (NINT / (sizeof(uint32_t) * 8))
-#define GIC_INT_MASK(NINT) (1U << NINT % (sizeof(uint32_t) * 8))
-#define GIC_NUM_INT_REGS(NINT) GIC_INT_REG(NINT)
-#define GIC_NUM_PRIVINT_REGS (GIC_CPU_PRIV / (sizeof(uint32_t) * 8))
+#define GIC_INT_REG(NINT)         (NINT / (sizeof(uint32_t) * 8))
+#define GIC_INT_MASK(NINT)        (1U << NINT % (sizeof(uint32_t) * 8))
+#define GIC_NUM_INT_REGS(NINT)    GIC_INT_REG(NINT)
+#define GIC_NUM_PRIVINT_REGS      (GIC_CPU_PRIV / (sizeof(uint32_t) * 8))
 
-#define GIC_PRIO_REG(NINT) ((NINT * GIC_PRIO_BITS) / (sizeof(uint32_t) * 8))
-#define GIC_NUM_PRIO_REGS(NINT) GIC_PRIO_REG(NINT)
-#define GIC_PRIO_OFF(NINT) (NINT * GIC_PRIO_BITS) % (sizeof(uint32_t) * 8)
+#define GIC_PRIO_REG(NINT)        ((NINT * GIC_PRIO_BITS) / (sizeof(uint32_t) * 8))
+#define GIC_NUM_PRIO_REGS(NINT)   GIC_PRIO_REG(NINT)
+#define GIC_PRIO_OFF(NINT)        (NINT * GIC_PRIO_BITS) % (sizeof(uint32_t) * 8)
 
-#define GIC_TARGET_REG(NINT) ((NINT * GIC_TARGET_BITS) / (sizeof(uint32_t) * 8))
+#define GIC_TARGET_REG(NINT)      ((NINT * GIC_TARGET_BITS) / (sizeof(uint32_t) * 8))
 #define GIC_NUM_TARGET_REGS(NINT) GIC_TARGET_REG(NINT)
-#define GIC_TARGET_OFF(NINT) (NINT * GIC_TARGET_BITS) % (sizeof(uint32_t) * 8)
+#define GIC_TARGET_OFF(NINT)      (NINT * GIC_TARGET_BITS) % (sizeof(uint32_t) * 8)
 
-#define GIC_CONFIG_REG(NINT) ((NINT * GIC_CONFIG_BITS) / (sizeof(uint32_t) * 8))
+#define GIC_CONFIG_REG(NINT)      ((NINT * GIC_CONFIG_BITS) / (sizeof(uint32_t) * 8))
 #define GIC_NUM_CONFIG_REGS(NINT) GIC_CONFIG_REG(NINT)
-#define GIC_CONFIG_OFF(NINT) (NINT * GIC_CONFIG_BITS) % (sizeof(uint32_t) * 8)
+#define GIC_CONFIG_OFF(NINT)      (NINT * GIC_CONFIG_BITS) % (sizeof(uint32_t) * 8)
 
-#define GIC_NUM_SEC_REGS(NINT) ((NINT * GIC_SEC_BITS) / (sizeof(uint32_t) * 8))
+#define GIC_NUM_SEC_REGS(NINT)    ((NINT * GIC_SEC_BITS) / (sizeof(uint32_t) * 8))
 
-#define GIC_NUM_SGI_REGS \
-    ((GIC_MAX_SGIS * GIC_SGI_BITS) / (sizeof(uint32_t) * 8))
-#define GICD_SGI_REG(NINT) (NINT / 4)
-#define GICD_SGI_OFF(NINT) ((NINT % 4) * 8)
+#define GIC_NUM_SGI_REGS          ((GIC_MAX_SGIS * GIC_SGI_BITS) / (sizeof(uint32_t) * 8))
+#define GICD_SGI_REG(NINT)        (NINT / 4)
+#define GICD_SGI_OFF(NINT)        ((NINT % 4) * 8)
 
-#define GIC_NUM_APR_REGS ((1UL << (GIC_PRIO_BITS - 1)) / (sizeof(uint32_t) * 8))
-#define GIC_NUM_LIST_REGS (64)
+#define GIC_NUM_APR_REGS          ((1UL << (GIC_PRIO_BITS - 1)) / (sizeof(uint32_t) * 8))
+#define GIC_NUM_LIST_REGS         (64)
 
 /* Distributor Control Register, GICD_CTLR */
 
-#define GICD_CTLR_EN_BIT (0x1)
-#define GICD_CTLR_ENA_BIT (0x2)
-#define GICD_CTLR_ARE_NS_BIT (0x10)
+#define GICD_CTLR_EN_BIT          (0x1)
+#define GICD_CTLR_ENA_BIT         (0x2)
+#define GICD_CTLR_ARE_NS_BIT      (0x10)
 
 /*  Interrupt Controller Type Register, GICD_TYPER */
 
-#define GICD_TYPER_ITLINENUM_OFF (0)
-#define GICD_TYPER_ITLINENUM_LEN (5)
-#define GICD_TYPER_CPUNUM_OFF (5)
-#define GICD_TYPER_CPUNUM_LEN (3)
-#define GICD_TYPER_SECUREXT_BIT (1UL << 10)
-#define GICD_TYPER_LSPI_OFF (11)
-#define GICD_TYPER_LSPI_LEN (6)
+#define GICD_TYPER_ITLINENUM_OFF  (0)
+#define GICD_TYPER_ITLINENUM_LEN  (5)
+#define GICD_TYPER_CPUNUM_OFF     (5)
+#define GICD_TYPER_CPUNUM_LEN     (3)
+#define GICD_TYPER_SECUREXT_BIT   (1UL << 10)
+#define GICD_TYPER_LSPI_OFF       (11)
+#define GICD_TYPER_LSPI_LEN       (6)
 
 /* Software Generated Interrupt Register, GICD_SGIR */
 
-#define GICD_TYPER_ITLN_OFF 0
-#define GICD_TYPER_ITLN_LEN 5
-#define GICD_TYPER_ITLN_MSK BIT_MASK(GICD_TYPER_ITLN_OFF, GICD_TYPER_ITLN_LEN)
-#define GICD_TYPER_CPUN_OFF 5
-#define GICD_TYPER_CPUN_LEN 3
-#define GICD_TYPER_CPUN_MSK BIT_MASK(GICD_TYPER_CPUN_OFF, GICD_TYPER_CPUN_LEN)
+#define GICD_TYPER_ITLN_OFF       0
+#define GICD_TYPER_ITLN_LEN       5
+#define GICD_TYPER_ITLN_MSK       BIT_MASK(GICD_TYPER_ITLN_OFF, GICD_TYPER_ITLN_LEN)
+#define GICD_TYPER_CPUN_OFF       5
+#define GICD_TYPER_CPUN_LEN       3
+#define GICD_TYPER_CPUN_MSK       BIT_MASK(GICD_TYPER_CPUN_OFF, GICD_TYPER_CPUN_LEN)
 
-#define GICD_SGIR_SGIINTID_OFF 0
-#define GICD_SGIR_SGIINTID_LEN 4
-#define GICD_SGIR_SGIINTID_MSK \
-    (BIT_MASK(GICD_SGIR_SGIINTID_OFF, GICD_SGIR_SGIINTID_LEN))
-#define GICD_SGIR_SGIINTID(sgir) \
-    bit_extract(sgir, GICD_SGIR_SGIINTID_OFF, GICD_SGIR_SGIINTID_LEN)
-#define GICD_SGIR_CPUTRGLST_OFF 16
-#define GICD_SGIR_CPUTRGLST_LEN 8
+#define GICD_SGIR_SGIINTID_OFF    0
+#define GICD_SGIR_SGIINTID_LEN    4
+#define GICD_SGIR_SGIINTID_MSK    (BIT_MASK(GICD_SGIR_SGIINTID_OFF, GICD_SGIR_SGIINTID_LEN))
+#define GICD_SGIR_SGIINTID(sgir)  bit_extract(sgir, GICD_SGIR_SGIINTID_OFF, GICD_SGIR_SGIINTID_LEN)
+#define GICD_SGIR_CPUTRGLST_OFF   16
+#define GICD_SGIR_CPUTRGLST_LEN   8
 #define GICD_SGIR_CPUTRGLST(sgir) \
     bit_extract(sgir, GICD_SGIR_CPUTRGLST_OFF, GICD_SGIR_CPUTRGLST_LEN)
 #define GICD_SGIR_TRGLSTFLT_OFF 24
@@ -107,7 +104,7 @@ typedef struct {
     uint8_t pad4[0x0058 - 0x0054];
     uint32_t CLRSPI_SR;
     uint8_t pad9[0x0080 - 0x005C];
-    uint32_t IGROUPR[GIC_NUM_INT_REGS(GIC_MAX_INTERUPTS)];  // banked CPU
+    uint32_t IGROUPR[GIC_NUM_INT_REGS(GIC_MAX_INTERUPTS)]; // banked CPU
     uint32_t ISENABLER[GIC_NUM_INT_REGS(GIC_MAX_INTERUPTS)];
     uint32_t ICENABLER[GIC_NUM_INT_REGS(GIC_MAX_INTERUPTS)];
     uint32_t ISPENDR[GIC_NUM_INT_REGS(GIC_MAX_INTERUPTS)];
@@ -132,7 +129,7 @@ typedef struct {
 
 /* Redistributor Wake Register, GICD_WAKER */
 
-#define GICR_CTRL_DS_BIT (1 << 6)
+#define GICR_CTRL_DS_BIT        (1 << 6)
 #define GICR_ProcessorSleep_BIT (0x2)
 #define GICR_ChildrenASleep_BIT (0x4)
 typedef struct {
@@ -186,15 +183,15 @@ typedef struct {
 
 /* CPU Interface Control Register, GICC_CTLR */
 
-#define GICC_CTLR_EN_BIT (0x1)
+#define GICC_CTLR_EN_BIT        (0x1)
 #define GICC_CTLR_EOImodeNS_BIT (1UL << 9)
-#define GICC_CTLR_WR_MSK (0x1)
-#define GICC_IAR_ID_OFF (0)
-#define GICC_IAR_ID_LEN (10)
-#define GICC_IAR_ID_MSK (BIT_MASK(GICC_IAR_ID_OFF, GICC_IAR_ID_LEN))
-#define GICC_IAR_CPU_OFF (10)
-#define GICC_IAR_CPU_LEN (3)
-#define GICC_IAR_CPU_MSK (BIT_MASK(GICC_IAR_CPU_OFF, GICC_IAR_CPU_LEN))
+#define GICC_CTLR_WR_MSK        (0x1)
+#define GICC_IAR_ID_OFF         (0)
+#define GICC_IAR_ID_LEN         (10)
+#define GICC_IAR_ID_MSK         (BIT_MASK(GICC_IAR_ID_OFF, GICC_IAR_ID_LEN))
+#define GICC_IAR_CPU_OFF        (10)
+#define GICC_IAR_CPU_LEN        (3)
+#define GICC_IAR_CPU_MSK        (BIT_MASK(GICC_IAR_CPU_OFF, GICC_IAR_CPU_LEN))
 
 typedef struct {
     uint32_t CTLR;
@@ -217,61 +214,58 @@ typedef struct {
     uint32_t DIR;
 } __attribute__((__packed__, aligned(0x1000))) gicc_t;
 
-#define GICH_HCR_En_BIT (1 << 0)
-#define GICH_HCR_UIE_BIT (1 << 1)
-#define GICH_HCR_LRENPIE_BIT (1 << 2)
-#define GICH_HCR_NPIE_BIT (1 << 3)
-#define GICH_HCR_VGrp0DIE_BIT (1 << 4)
-#define GICH_HCR_VGrp0EIE_BIT (1 << 5)
-#define GICH_HCR_VGrp1EIE_BIT (1 << 6)
-#define GICH_HCR_VGrp1DIE_BIT (1 << 7)
-#define GICH_HCR_EOICount_OFF (27)
-#define GICH_HCR_EOICount_LEN (5)
-#define GICH_HCR_EOICount_MASK \
-    BIT_MASK(GICH_HCR_EOICount_OFF, GICH_HCR_EOICount_LEN)
+#define GICH_HCR_En_BIT        (1 << 0)
+#define GICH_HCR_UIE_BIT       (1 << 1)
+#define GICH_HCR_LRENPIE_BIT   (1 << 2)
+#define GICH_HCR_NPIE_BIT      (1 << 3)
+#define GICH_HCR_VGrp0DIE_BIT  (1 << 4)
+#define GICH_HCR_VGrp0EIE_BIT  (1 << 5)
+#define GICH_HCR_VGrp1EIE_BIT  (1 << 6)
+#define GICH_HCR_VGrp1DIE_BIT  (1 << 7)
+#define GICH_HCR_EOICount_OFF  (27)
+#define GICH_HCR_EOICount_LEN  (5)
+#define GICH_HCR_EOICount_MASK BIT_MASK(GICH_HCR_EOICount_OFF, GICH_HCR_EOICount_LEN)
 
-#define GICH_VTR_OFF (0)
-#define GICH_VTR_LEN (6)
-#define GICH_VTR_MSK BIT_MASK(GICH_VTR_OFF, GICH_VTR_LEN)
+#define GICH_VTR_OFF           (0)
+#define GICH_VTR_LEN           (6)
+#define GICH_VTR_MSK           BIT_MASK(GICH_VTR_OFF, GICH_VTR_LEN)
 
-#define GICH_LR_VID_OFF (0)
-#define GICH_LR_VID_LEN (10)
-#define GICH_LR_VID_MSK BIT_MASK(GICH_LR_VID_OFF, GICH_LR_VID_LEN)
-#define GICH_LR_VID(LR) (bit_extract(LR, GICH_LR_VID_OFF, GICH_LR_VID_LEN))
+#define GICH_LR_VID_OFF        (0)
+#define GICH_LR_VID_LEN        (10)
+#define GICH_LR_VID_MSK        BIT_MASK(GICH_LR_VID_OFF, GICH_LR_VID_LEN)
+#define GICH_LR_VID(LR)        (bit_extract(LR, GICH_LR_VID_OFF, GICH_LR_VID_LEN))
 
-#define GICH_LR_PID_OFF (10)
-#define GICH_LR_PID_LEN (10)
-#define GICH_LR_PID_MSK BIT_MASK(GICH_LR_PID_OFF, GICH_LR_PID_LEN)
-#define GICH_LR_CPUID_OFF (10)
-#define GICH_LR_CPUID_LEN (3)
-#define GICH_LR_CPUID_MSK BIT_MASK(GICH_LR_CPUID_OFF, GICH_LR_CPUID_LEN)
-#define GICH_LR_CPUID(LR) \
-    (bit_extract(LR, GICH_LR_CPUID_OFF, GICH_LR_CPUID_LEN))
-#define GICH_LR_PRIO_OFF (23)
-#define GICH_LR_PRIO_LEN (5)
-#define GICH_LR_PRIO_MSK BIT_MASK(GICH_LR_PRIO_OFF, GICH_LR_PRIO_LEN)
-#define GICH_LR_STATE_OFF (28)
-#define GICH_LR_STATE_LEN (2)
-#define GICH_LR_STATE_MSK BIT_MASK(GICH_LR_STATE_OFF, GICH_LR_STATE_LEN)
-#define GICH_LR_STATE(LR) \
-    (bit_extract(LR, GICH_LR_STATE_OFF, GICH_LR_STATE_LEN))
+#define GICH_LR_PID_OFF        (10)
+#define GICH_LR_PID_LEN        (10)
+#define GICH_LR_PID_MSK        BIT_MASK(GICH_LR_PID_OFF, GICH_LR_PID_LEN)
+#define GICH_LR_CPUID_OFF      (10)
+#define GICH_LR_CPUID_LEN      (3)
+#define GICH_LR_CPUID_MSK      BIT_MASK(GICH_LR_CPUID_OFF, GICH_LR_CPUID_LEN)
+#define GICH_LR_CPUID(LR)      (bit_extract(LR, GICH_LR_CPUID_OFF, GICH_LR_CPUID_LEN))
+#define GICH_LR_PRIO_OFF       (23)
+#define GICH_LR_PRIO_LEN       (5)
+#define GICH_LR_PRIO_MSK       BIT_MASK(GICH_LR_PRIO_OFF, GICH_LR_PRIO_LEN)
+#define GICH_LR_STATE_OFF      (28)
+#define GICH_LR_STATE_LEN      (2)
+#define GICH_LR_STATE_MSK      BIT_MASK(GICH_LR_STATE_OFF, GICH_LR_STATE_LEN)
+#define GICH_LR_STATE(LR)      (bit_extract(LR, GICH_LR_STATE_OFF, GICH_LR_STATE_LEN))
 
-#define GICH_LR_STATE_INV ((0 << GICH_LR_STATE_OFF) & GICH_LR_STATE_MSK)
-#define GICH_LR_STATE_PND ((1 << GICH_LR_STATE_OFF) & GICH_LR_STATE_MSK)
-#define GICH_LR_STATE_ACT ((2 << GICH_LR_STATE_OFF) & GICH_LR_STATE_MSK)
-#define GICH_LR_STATE_ACTPEND ((3 << GICH_LR_STATE_OFF) & GICH_LR_STATE_MSK)
+#define GICH_LR_STATE_INV      ((0 << GICH_LR_STATE_OFF) & GICH_LR_STATE_MSK)
+#define GICH_LR_STATE_PND      ((1 << GICH_LR_STATE_OFF) & GICH_LR_STATE_MSK)
+#define GICH_LR_STATE_ACT      ((2 << GICH_LR_STATE_OFF) & GICH_LR_STATE_MSK)
+#define GICH_LR_STATE_ACTPEND  ((3 << GICH_LR_STATE_OFF) & GICH_LR_STATE_MSK)
 
-#define GICH_LR_HW_BIT (1U << 31)
-#define GICH_LR_EOI_BIT (1U << 19)
+#define GICH_LR_HW_BIT         (1U << 31)
+#define GICH_LR_EOI_BIT        (1U << 19)
 
-#define GICH_MISR_EOI (1U << 0)
-#define GICH_MISR_U (1U << 1)
-#define GICH_MISR_LRPEN (1U << 2)
-#define GICH_MISR_NP (1U << 3)
-#define GICH_MISR_VGrp0E (1U << 4)
-#define GICH_MISR_VGrp0D (1U << 5)
-#define GICH_MISR_VGrp1E (1U << 6)
-#define GICH_MISR_VGrp1D (1U << 7)
+#define GICH_MISR_EOI          (1U << 0)
+#define GICH_MISR_U            (1U << 1)
+#define GICH_MISR_LRPEN        (1U << 2)
+#define GICH_MISR_NP           (1U << 3)
+#define GICH_MISR_VGrp0E       (1U << 4)
+#define GICH_MISR_VGrp0D       (1U << 5)
+#define GICH_MISR_VGrp1E       (1U << 6)
+#define GICH_MISR_VGrp1D       (1U << 7)
 
 enum int_state { INV, PEND, ACT, PENDACT };
 
@@ -338,7 +332,5 @@ static inline bool gic_is_priv(unsigned long int_id)
 #ifndef PLAT_GICR_BASE_ADDR
 #define PLAT_GICR_BASE_ADDR (0xF9020000)
 #endif
-
-
 
 #endif /* __GIC_H__ */

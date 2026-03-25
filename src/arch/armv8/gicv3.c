@@ -16,14 +16,11 @@ volatile gicr_t* gicr = (void*)PLAT_GICR_BASE_ADDR;
 spinlock_t gicd_lock = SPINLOCK_INITVAL;
 spinlock_t gicr_lock = SPINLOCK_INITVAL;
 
-
 inline unsigned long gic_num_irqs()
 {
-    uint32_t itlinenumber =
-        bit_extract(gicd->TYPER, GICD_TYPER_ITLN_OFF, GICD_TYPER_ITLN_LEN);
+    uint32_t itlinenumber = bit_extract(gicd->TYPER, GICD_TYPER_ITLN_OFF, GICD_TYPER_ITLN_LEN);
     return 32 * itlinenumber + 1;
 }
-
 
 static inline void gicc_init()
 {
@@ -37,7 +34,7 @@ static inline void gicr_init()
 {
     gicd->CTLR |= (1ull << 6);
     gicr[get_cpuid()].WAKER &= ~GICR_ProcessorSleep_BIT;
-    while(gicr[get_cpuid()].WAKER & GICR_ChildrenASleep_BIT) { }
+    while (gicr[get_cpuid()].WAKER & GICR_ChildrenASleep_BIT) { }
 
     gicr[get_cpuid()].IGROUPR0 = -1;
     gicr[get_cpuid()].ICENABLER0 = -1;
@@ -49,47 +46,47 @@ static inline void gicr_init()
     }
 }
 
-//void gicc_save_state(gicc_state_t *state)
+// void gicc_save_state(gicc_state_t *state)
 //{
-//    state->CTLR = sysreg_icc_ctlr_el1_read();
-//    state->PMR = sysreg_icc_pmr_el1_read();
-//    //state->IAR = sysreg_icc_iar1_el1_read();
-//    state->BPR = sysreg_icc_bpr1_el1_read();
-//    //state->EOIR = sysreg_icc_eoir1_el1_read();
-//    state->RPR = sysreg_icc_rpr_el1_read();
-//    state->HPPIR = sysreg_icc_hppir1_el1_read();
-//    state->priv_ISENABLER = gicr[get_cpuid()].ISENABLER0;
+//     state->CTLR = sysreg_icc_ctlr_el1_read();
+//     state->PMR = sysreg_icc_pmr_el1_read();
+//     //state->IAR = sysreg_icc_iar1_el1_read();
+//     state->BPR = sysreg_icc_bpr1_el1_read();
+//     //state->EOIR = sysreg_icc_eoir1_el1_read();
+//     state->RPR = sysreg_icc_rpr_el1_read();
+//     state->HPPIR = sysreg_icc_hppir1_el1_read();
+//     state->priv_ISENABLER = gicr[get_cpuid()].ISENABLER0;
 //
-//    for (int i = 0; i < GIC_NUM_PRIO_REGS(GIC_CPU_PRIV); i++) {
-//        state->priv_IPRIORITYR[i] = gicr[get_cpuid()].IPRIORITYR[i];
-//    }
+//     for (int i = 0; i < GIC_NUM_PRIO_REGS(GIC_CPU_PRIV); i++) {
+//         state->priv_IPRIORITYR[i] = gicr[get_cpuid()].IPRIORITYR[i];
+//     }
 //
-//    state->HCR = sysreg_ich_hcr_el2_read();
-//    for (int i = 0; i < gich_num_lrs(); i++) {
-//        state->LR[i] = gich_read_lr(i);
-//    }
-//}
+//     state->HCR = sysreg_ich_hcr_el2_read();
+//     for (int i = 0; i < gich_num_lrs(); i++) {
+//         state->LR[i] = gich_read_lr(i);
+//     }
+// }
 //
-//void gicc_restore_state(gicc_state_t *state)
+// void gicc_restore_state(gicc_state_t *state)
 //{
-//    sysreg_icc_ctlr_el1_write(state->CTLR);
-//    sysreg_icc_pmr_el1_write(state->PMR);
-//    sysreg_icc_bpr1_el1_write(state->BPR);
-//    //sysreg_icc_eoir1_el1_write(state->EOIR);
-//    //sysreg_icc_iar1_el1_write(state->IAR);
-//    sysreg_icc_rpr_el1_write(state->RPR);
-//    sysreg_icc_hppir1_el1_write(state->HPPIR);
-//    gicr[get_cpuid()].ISENABLER0 = state->priv_ISENABLER;
+//     sysreg_icc_ctlr_el1_write(state->CTLR);
+//     sysreg_icc_pmr_el1_write(state->PMR);
+//     sysreg_icc_bpr1_el1_write(state->BPR);
+//     //sysreg_icc_eoir1_el1_write(state->EOIR);
+//     //sysreg_icc_iar1_el1_write(state->IAR);
+//     sysreg_icc_rpr_el1_write(state->RPR);
+//     sysreg_icc_hppir1_el1_write(state->HPPIR);
+//     gicr[get_cpuid()].ISENABLER0 = state->priv_ISENABLER;
 //
-//    for (int i = 0; i < GIC_NUM_PRIO_REGS(GIC_CPU_PRIV); i++) {
-//        gicr[get_cpuid()].IPRIORITYR[i] = state->priv_IPRIORITYR[i];
-//    }
+//     for (int i = 0; i < GIC_NUM_PRIO_REGS(GIC_CPU_PRIV); i++) {
+//         gicr[get_cpuid()].IPRIORITYR[i] = state->priv_IPRIORITYR[i];
+//     }
 //
-//    sysreg_ich_hcr_el2_write(state->HCR);
-//    for (int i = 0; i < gich_num_lrs(); i++) {
-//        gich_write_lr(i, state->LR[i]);
-//    }
-//}
+//     sysreg_ich_hcr_el2_write(state->HCR);
+//     for (int i = 0; i < gich_num_lrs(); i++) {
+//         gich_write_lr(i, state->LR[i]);
+//     }
+// }
 
 void gic_cpu_init()
 {
@@ -116,12 +113,14 @@ void gicd_init()
     }
 
     /* All interrupts have lowest priority possible by default */
-    for (int i = GIC_CPU_PRIV; i < GIC_NUM_PRIO_REGS(int_num); i++)
+    for (int i = GIC_CPU_PRIV; i < GIC_NUM_PRIO_REGS(int_num); i++) {
         gicd->IPRIORITYR[i] = -1;
+    }
 
     /* No CPU targets for any interrupt by default */
-    for (int i = GIC_CPU_PRIV; i < GIC_NUM_TARGET_REGS(int_num); i++)
+    for (int i = GIC_CPU_PRIV; i < GIC_NUM_TARGET_REGS(int_num); i++) {
         gicd->ITARGETSR[i] = 0;
+    }
 
     /* ICFGR are platform dependent, lets leave them as is */
 
@@ -138,20 +137,21 @@ void gic_init()
     if (get_cpuid() == 0) {
         gicd_init();
     }
-
 }
 
 void gic_handle()
 {
     unsigned long ack = sysreg_icc_iar1_el1_read();
-    unsigned long id = ack & ((1UL << 24) -1);
+    unsigned long id = ack & ((1UL << 24) - 1);
 
-    if (id >= 1022) return;
+    if (id >= 1022) {
+        return;
+    }
 
     irq_handle(id);
 
     sysreg_icc_eoir1_el1_write(ack);
-    //sysreg_icc_dir_el1_write(ack);
+    // sysreg_icc_dir_el1_write(ack);
 }
 
 unsigned long gicd_get_prio(unsigned long int_id)
@@ -161,8 +161,7 @@ unsigned long gicd_get_prio(unsigned long int_id)
 
     spin_lock(&gicd_lock);
 
-    unsigned long prio =
-        gicd->IPRIORITYR[reg_ind] >> off & BIT_MASK(off, GIC_PRIO_BITS);
+    unsigned long prio = gicd->IPRIORITYR[reg_ind] >> off & BIT_MASK(off, GIC_PRIO_BITS);
 
     spin_unlock(&gicd_lock);
 
@@ -190,8 +189,7 @@ void gicd_set_prio(unsigned long int_id, uint8_t prio)
 
     spin_lock(&gicd_lock);
 
-    gicd->IPRIORITYR[reg_ind] =
-        (gicd->IPRIORITYR[reg_ind] & ~mask) | ((prio << off) & mask);
+    gicd->IPRIORITYR[reg_ind] = (gicd->IPRIORITYR[reg_ind] & ~mask) | ((prio << off) & mask);
 
     spin_unlock(&gicd_lock);
 }
@@ -266,25 +264,26 @@ void gicd_set_trgt(unsigned long int_id, uint8_t trgt)
 
     spin_lock(&gicd_lock);
 
-    gicd->ITARGETSR[reg_ind] =
-        (gicd->ITARGETSR[reg_ind] & ~mask) | ((trgt << off) & mask);
+    gicd->ITARGETSR[reg_ind] = (gicd->ITARGETSR[reg_ind] & ~mask) | ((trgt << off) & mask);
 
     spin_unlock(&gicd_lock);
 }
 
 void gicd_set_route(unsigned long int_id, unsigned long trgt)
 {
-    if (gic_is_priv(int_id)) return;
+    if (gic_is_priv(int_id)) {
+        return;
+    }
 
     /**
      * In aarch32 the compiler might issue a single strd access. However, this
      * instruction is complex to emulate since it does not generate a valid
-     * syndrome register. Bao has no support for its emulation. Therefore 
+     * syndrome register. Bao has no support for its emulation. Therefore
      * we perform the 64-bit access explicitly as two 32-bit stores.
      */
 
     uint64_t _trgt = trgt;
-    volatile uint32_t *irouter = (uint32_t*) &gicd->IROUTER[int_id];
+    volatile uint32_t* irouter = (uint32_t*)&gicd->IROUTER[int_id];
     irouter[0] = _trgt;
     irouter[1] = (_trgt >> 32);
 }
@@ -295,10 +294,11 @@ void gicd_set_enable(unsigned long int_id, bool en)
 
     unsigned long reg_ind = GIC_INT_REG(int_id);
     spin_lock(&gicd_lock);
-    if (en)
+    if (en) {
         gicd->ISENABLER[reg_ind] = bit;
-    else
+    } else {
         gicd->ICENABLER[reg_ind] = bit;
+    }
     spin_unlock(&gicd_lock);
 }
 
@@ -323,8 +323,7 @@ unsigned long gicr_get_prio(unsigned long int_id, uint32_t gicr_id)
 
     spin_lock(&gicr_lock);
 
-    unsigned long prio =
-        gicr[gicr_id].IPRIORITYR[reg_ind] >> off & BIT_MASK(off, GIC_PRIO_BITS);
+    unsigned long prio = gicr[gicr_id].IPRIORITYR[reg_ind] >> off & BIT_MASK(off, GIC_PRIO_BITS);
 
     spin_unlock(&gicr_lock);
 
@@ -340,11 +339,9 @@ void gicr_set_icfgr(unsigned long int_id, uint8_t cfg, uint32_t gicr_id)
     unsigned long mask = ((1U << GIC_CONFIG_BITS) - 1) << off;
 
     if (reg_ind == 0) {
-        gicr[gicr_id].ICFGR0 =
-            (gicr[gicr_id].ICFGR0 & ~mask) | ((cfg << off) & mask);
+        gicr[gicr_id].ICFGR0 = (gicr[gicr_id].ICFGR0 & ~mask) | ((cfg << off) & mask);
     } else {
-        gicr[gicr_id].ICFGR1 =
-            (gicr[gicr_id].ICFGR1 & ~mask) | ((cfg << off) & mask);
+        gicr[gicr_id].ICFGR1 = (gicr[gicr_id].ICFGR1 & ~mask) | ((cfg << off) & mask);
     }
 
     spin_unlock(&gicr_lock);
@@ -411,25 +408,31 @@ void gicr_set_enable(unsigned long int_id, bool en, uint32_t gicr_id)
     unsigned long bit = GIC_INT_MASK(int_id);
 
     spin_lock(&gicr_lock);
-    if (en)
+    if (en) {
         gicr[gicr_id].ISENABLER0 = bit;
-    else
+    } else {
         gicr[gicr_id].ICENABLER0 = bit;
+    }
     spin_unlock(&gicr_lock);
 }
 
 static bool irq_in_gicd(unsigned long int_id)
 {
-    if (int_id > 32 && int_id < 1025) return true;
-    else return false;
+    if (int_id > 32 && int_id < 1025) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void gic_send_sgi(unsigned long cpu_target, unsigned long sgi_num)
 {
-    if (sgi_num >= GIC_MAX_SGIS) return;
-    
+    if (sgi_num >= GIC_MAX_SGIS) {
+        return;
+    }
+
     unsigned long sgi = (1UL << (cpu_target & 0xffull)) | (sgi_num << 24);
-    sysreg_icc_sgi1r_el1_write(sgi); 
+    sysreg_icc_sgi1r_el1_write(sgi);
 }
 
 void gic_set_prio(unsigned long int_id, uint8_t prio)
@@ -517,4 +520,3 @@ void gic_set_enable(unsigned long int_id, bool en)
         return gicr_set_enable(int_id, en, get_cpuid());
     }
 }
-

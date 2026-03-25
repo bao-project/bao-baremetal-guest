@@ -16,7 +16,7 @@ const struct mpu_region plat_mpu_regs[] = {
 #endif
 };
 
-volatile struct linflexd *uart  =  (volatile struct linflexd *)PLAT_UART_ADDR;
+volatile struct linflexd* uart = (volatile struct linflexd*)PLAT_UART_ADDR;
 
 void uart_init(void)
 {

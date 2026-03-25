@@ -10,15 +10,16 @@
 
 extern void _start();
 
-static inline void ei(){
+static inline void ei()
+{
     asm volatile("ei\n\t");
 }
 
-void arch_init(){
-
+void arch_init()
+{
 #ifndef SINGLE_CORE
-    if(cpu_is_master()){
-        static volatile uint32_t *const BOOTCTRL = (void*) PLAT_BOOTCTRL_ADDR;
+    if (cpu_is_master()) {
+        static volatile uint32_t* const BOOTCTRL = (void*)PLAT_BOOTCTRL_ADDR;
         *BOOTCTRL = ~0UL;
     }
 #endif

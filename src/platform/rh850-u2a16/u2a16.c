@@ -8,11 +8,12 @@
 
 #include <plat.h>
 
-static volatile struct renesas_rlin3 *uart = (void*)PLAT_UART_ADDR;
+static volatile struct renesas_rlin3* uart = (void*)PLAT_UART_ADDR;
 
 static volatile struct rh850_u2a16_OSTMn* timer = (void*)PLAT_OSTM0_BASE;
 
-void uart_init(){
+void uart_init()
+{
     renesas_rlin3_init(uart);
 }
 
@@ -21,27 +22,32 @@ void uart_putc(char c)
     renesas_rlin3_putc(uart, c);
 }
 
-char uart_getchar(void) {
+char uart_getchar(void)
+{
     return renesas_rlin3_getc(uart);
 }
 
-void uart_enable_rxirq() {
+void uart_enable_rxirq()
+{
     renesas_rlin3_enable_rxirq(uart);
 }
 
-void uart_clear_rxirq() {
+void uart_clear_rxirq()
+{
     renesas_rlin3_clear_rxirq(uart);
 }
 
-void timer_enable() {
+void timer_enable()
+{
     rh850_u2a16_OSTMn_enable(timer);
 }
 
-uint64_t timer_get() {
+uint64_t timer_get()
+{
     return rh850_u2a16_OSTMn_get(timer);
 }
 
-void timer_set(uint64_t n) {
+void timer_set(uint64_t n)
+{
     rh850_u2a16_OSTMn_set(timer, n);
 }
-

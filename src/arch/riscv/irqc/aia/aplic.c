@@ -15,7 +15,8 @@
 
 /** APLIC public data */
 static volatile struct aplic_control_hw* const aplic_control = (void*)PLAT_APLIC_CTL_BASE_ADDR;
-static volatile struct aplic_idc_hw* const aplic_idc = (void*)(PLAT_APLIC_CTL_BASE_ADDR + APLIC_IDC_OFF);
+static volatile struct aplic_idc_hw* const aplic_idc =
+    (void*)(PLAT_APLIC_CTL_BASE_ADDR + APLIC_IDC_OFF);
 
 void aplic_init(void)
 {

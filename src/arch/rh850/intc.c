@@ -7,12 +7,12 @@
 #include <cpu.h>
 #include <plat.h>
 
-volatile struct intc1* intc1_hw = (void*) PLAT_INTC1_BASE;
-volatile struct intc2* intc2_hw = (void*) PLAT_INTC2_BASE;
-volatile struct intif* intif_hw = (void*) PLAT_INTIF_BASE;
-volatile struct eint* eint_hw = (void*) PLAT_EINTS_BASE;
-volatile struct fenc* fenc_hw = (void*) PLAT_FENC_BASE;
-volatile struct feinc* feinc_hw = (void*) PLAT_FEINC_BASE;
+volatile struct intc1* intc1_hw = (void*)PLAT_INTC1_BASE;
+volatile struct intc2* intc2_hw = (void*)PLAT_INTC2_BASE;
+volatile struct intif* intif_hw = (void*)PLAT_INTIF_BASE;
+volatile struct eint* eint_hw = (void*)PLAT_EINTS_BASE;
+volatile struct fenc* fenc_hw = (void*)PLAT_FENC_BASE;
+volatile struct feinc* feinc_hw = (void*)PLAT_FEINC_BASE;
 
 // EIC Register Bit Definitions
 #define EICTn_BIT                (1 << 15)
@@ -145,7 +145,4 @@ void intc_set_prio(unsigned long int_id, unsigned long prio)
     }
 }
 
-void intc_init()
-{
-
-}
+void intc_init() { }

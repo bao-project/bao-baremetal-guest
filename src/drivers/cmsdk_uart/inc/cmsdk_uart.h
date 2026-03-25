@@ -18,7 +18,6 @@ struct cmsdk_uart_hw {
 
 typedef struct cmsdk_uart_hw bao_uart_t;
 
-
 void cmsdk_uart_enable(volatile struct cmsdk_uart_hw* ptr_uart);
 void cmsdk_uart_init(volatile struct cmsdk_uart_hw* ptr_uart);
 char cmsdk_uart_getc(volatile struct cmsdk_uart_hw* ptr_uart);

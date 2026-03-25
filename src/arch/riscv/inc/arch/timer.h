@@ -13,9 +13,7 @@
 
 #define TIMER_FREQ (PLAT_TIMER_FREQ)
 
-void timer_enable()
-{
-}
+void timer_enable() { }
 
 uint64_t timer_get()
 {
@@ -32,6 +30,5 @@ void timer_set(uint64_t n)
         sbi_set_timer(next_tick);
     }
 }
-
 
 #endif /* ARCH_TIMER_H */

@@ -16,24 +16,21 @@
 #include <fences.h>
 #include <wfi.h>
 
-int _read(int file, char *ptr, int len)
+int _read(int file, char* ptr, int len)
 {
     int i;
-    for (i = 0; i < len; ++i)
-    {
+    for (i = 0; i < len; ++i) {
         ptr[i] = uart_getchar();
     }
 
     return len;
 }
 
-int _write(int file, char *ptr, int len)
+int _write(int file, char* ptr, int len)
 {
     int i;
-    for (i = 0; i < len; ++i)
-    {
-        if (ptr[i] == '\n')
-        {
+    for (i = 0; i < len; ++i) {
+        if (ptr[i] == '\n') {
             uart_putc('\r');
         }
         uart_putc(ptr[i]);
@@ -42,18 +39,17 @@ int _write(int file, char *ptr, int len)
     return len;
 }
 
-ssize_t _write_r(struct _reent *r, int file, const void *ptr, size_t len)
+ssize_t _write_r(struct _reent* r, int file, const void* ptr, size_t len)
 {
     if (ptr == NULL) {
         if (r) {
-            r->_errno = EINVAL;  // Set thread-local errno
+            r->_errno = EINVAL; // Set thread-local errno
         }
         return -1;
     }
 
     return _write(file, ptr, len);
 }
-
 
 int _lseek(int file, int ptr, int dir)
 {
@@ -66,7 +62,7 @@ int _close(int file)
     return -1;
 }
 
-int _fstat(int file, struct stat *st)
+int _fstat(int file, struct stat* st)
 {
     st->st_mode = S_IFCHR;
     return 0;
@@ -97,7 +93,7 @@ void _exit(int return_value)
 
 int _getpid(void)
 {
-  return 1;
+    return 1;
 }
 
 int _kill(int pid, int sig)
@@ -112,11 +108,10 @@ extern int main();
 static bool init_done = false;
 static spinlock_t init_lock = SPINLOCK_INITVAL;
 
-__attribute__((weak))
-void _init(){
-
+__attribute__((weak)) void _init()
+{
     spin_lock(&init_lock);
-    if(!init_done) {
+    if (!init_done) {
         init_done = true;
         uart_init();
     }
@@ -127,4 +122,3 @@ void _init(){
     int ret = main();
     _exit(ret);
 }
-

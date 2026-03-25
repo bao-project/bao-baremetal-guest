@@ -17,63 +17,66 @@
  * https://docs.oasis-open.org/virtio/virtio/v1.3/csd01/virtio-v1.3-csd01.html#x1-430005
  */
 
-#define VIRTQ_DESC_F_NEXT       1           /**< This marks a buffer as continuing via the next field */
-#define VIRTQ_DESC_F_WRITE      2           /**< This marks a buffer as device write-only (otherwise device read-only) */
-#define VIRTQ_DESC_F_INDIRECT   4           /**< This means the buffer contains a list of buffer descriptors */
-#define VIRTQ_DESC_F_AVAIL      (1 << 7)    /**< This marks a buffer as available for the device to use */
-#define VIRTQ_DESC_F_USED       (1 << 15)   /**< This marks a buffer as used by the device */
+#define VIRTQ_DESC_F_NEXT 1 /**< This marks a buffer as continuing via the next field */
+#define VIRTQ_DESC_F_WRITE \
+    2 /**< This marks a buffer as device write-only (otherwise device read-only) */
+#define VIRTQ_DESC_F_INDIRECT                                          \
+    4 /**< This means the buffer contains a list of buffer descriptors \
+       */
+#define VIRTQ_DESC_F_AVAIL (1 << 7)  /**< This marks a buffer as available for the device to use */
+#define VIRTQ_DESC_F_USED  (1 << 15) /**< This marks a buffer as used by the device */
 
 /* Default VirtIO queue size */
-#define VIRTQ_SIZE               1024       /**< Virtqueue size */
+#define VIRTQ_SIZE         1024 /**< Virtqueue size */
 
 /**
- * @struct virtq_desc 
+ * @struct virtq_desc
  * @brief VirtIO descriptor ring element
  */
 struct virtq_desc {
-    uint64_t addr;              /**< I/O buffer guest-physical address */
-    uint32_t len;               /**< Length of the I/O buffer buffer */
-    uint16_t flags;             /**< Flags (NEXT, WRITE, INDIRECT) */
-    uint16_t next;              /**< Index (in descriptor ring) of next chained descriptor */
+    uint64_t addr;  /**< I/O buffer guest-physical address */
+    uint32_t len;   /**< Length of the I/O buffer buffer */
+    uint16_t flags; /**< Flags (NEXT, WRITE, INDIRECT) */
+    uint16_t next;  /**< Index (in descriptor ring) of next chained descriptor */
 };
 
 /**
- * @struct virtq_avail 
+ * @struct virtq_avail
  * @brief VirtIO available ring
  */
 struct virtq_avail {
-    uint16_t flags;             /**< Configuration flags */
-    uint16_t idx;               /**< Index of next available descriptor ring entry */
-    uint16_t ring[VIRTQ_SIZE];  /**< The actual available ring array */
+    uint16_t flags;            /**< Configuration flags */
+    uint16_t idx;              /**< Index of next available descriptor ring entry */
+    uint16_t ring[VIRTQ_SIZE]; /**< The actual available ring array */
 };
 
 /**
- * @struct virtq_used_elem 
+ * @struct virtq_used_elem
  * @brief VirtIO used ring element
  */
 struct virtq_used {
-    uint16_t flags;             /**< Configuration flags */
-    uint16_t idx;               /**< Index of next available used ring entry */
+    uint16_t flags;   /**< Configuration flags */
+    uint16_t idx;     /**< Index of next available used ring entry */
     struct virtq_used_elem {
-        uint32_t id;            /**< Index of descriptor ring this element refers to */
-        uint32_t len;           /**< Length of data written to descriptor(s) buffer(s) */
+        uint32_t id;  /**< Index of descriptor ring this element refers to */
+        uint32_t len; /**< Length of data written to descriptor(s) buffer(s) */
     } ring[VIRTQ_SIZE];
 };
 
 /**
- * @struct virtq 
+ * @struct virtq
  * @brief VirtIO virtqueue
  */
 struct virtq {
-    volatile struct virtq_desc *desc;   /**< Descriptor ring */
-    volatile struct virtq_avail *avail; /**< Available ring */
-    volatile struct virtq_used *used;   /**< Used ring */
+    volatile struct virtq_desc* desc;   /**< Descriptor ring */
+    volatile struct virtq_avail* avail; /**< Available ring */
+    volatile struct virtq_used* used;   /**< Used ring */
     uint16_t queue_index;               /**< The index of queue */
     uint16_t desc_next_free;            /**< The next free descriptor index */
-    uint16_t desc_num_free;             /**< The number of free descriptors */ 
+    uint16_t desc_num_free;             /**< The number of free descriptors */
     uint16_t avail_last_idx;            /**< The last index we checked for available buffers */
     uint16_t last_used_idx;             /**< The last index we checked for used buffers */
-    struct virtio_memory_pool pool;     /**< Memory pool used to allocate memory for the I/O buffers */
+    struct virtio_memory_pool pool; /**< Memory pool used to allocate memory for the I/O buffers */
 };
 
 /**
@@ -86,23 +89,29 @@ struct virtq {
  * shared memory must be at least 96KB x the number of virtqueues.
  */
 
-#define PAGE_SIZE 4096
+#define PAGE_SIZE                4096
 #define ROUND_UP_TO_PAGE_SIZE(x) (((x) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
-#define VIRTQ_AVAIL_DESC_SIZE                   (sizeof(uint16_t) + sizeof(uint16_t) + 2 + (sizeof(uint16_t) * VIRTQ_SIZE))
-#define VIRTQ_USED_DESC_SIZE                    (sizeof(uint16_t) + sizeof(uint16_t) + 2 + ((sizeof(uint32_t) + sizeof(uint32_t)) * VIRTQ_SIZE))
+#define VIRTQ_AVAIL_DESC_SIZE \
+    (sizeof(uint16_t) + sizeof(uint16_t) + 2 + (sizeof(uint16_t) * VIRTQ_SIZE))
+#define VIRTQ_USED_DESC_SIZE \
+    (sizeof(uint16_t) + sizeof(uint16_t) + 2 + ((sizeof(uint32_t) + sizeof(uint32_t)) * VIRTQ_SIZE))
 
-#define VIRTQ_DESC_SIZE                         (sizeof(struct virtq_desc) * VIRTQ_SIZE)                    // 16KB (for a 1024 queue size)
-#define VIRTQ_AVAIL_SIZE                        (ROUND_UP_TO_PAGE_SIZE(VIRTQ_AVAIL_DESC_SIZE))              // 4KB (for a 1024 queue size)
-#define VIRTQ_USED_SIZE                         (ROUND_UP_TO_PAGE_SIZE(VIRTQ_USED_DESC_SIZE))               // 12KB (for a 1024 queue size)
-#define VIRTQ_VRINGS_SIZE_TOTAL                 (VIRTQ_DESC_SIZE + VIRTQ_AVAIL_SIZE + VIRTQ_USED_SIZE)      // Total size for the three rings
-#define VIRTQ_MEMORY_POOL_SIZE                  (VIRTQ_SIZE * 64)                                           // 64KB (for a 1024 queue size)
-#define VIRTQ_SIZE_TOTAL                        (VIRTQ_VRINGS_SIZE_TOTAL + VIRTQ_MEMORY_POOL_SIZE)          // Total size for one queue
+#define VIRTQ_DESC_SIZE (sizeof(struct virtq_desc) * VIRTQ_SIZE) // 16KB (for a 1024 queue size)
+#define VIRTQ_AVAIL_SIZE \
+    (ROUND_UP_TO_PAGE_SIZE(VIRTQ_AVAIL_DESC_SIZE))               // 4KB (for a 1024 queue size)
+#define VIRTQ_USED_SIZE \
+    (ROUND_UP_TO_PAGE_SIZE(VIRTQ_USED_DESC_SIZE))                // 12KB (for a 1024 queue size)
+#define VIRTQ_VRINGS_SIZE_TOTAL \
+    (VIRTQ_DESC_SIZE + VIRTQ_AVAIL_SIZE + VIRTQ_USED_SIZE)       // Total size for the three rings
+#define VIRTQ_MEMORY_POOL_SIZE (VIRTQ_SIZE * 64)                 // 64KB (for a 1024 queue size)
+#define VIRTQ_SIZE_TOTAL \
+    (VIRTQ_VRINGS_SIZE_TOTAL + VIRTQ_MEMORY_POOL_SIZE)           // Total size for one queue
 
-#define VIRTQ_DESC_ADDR(vq_base_addr)           (vq_base_addr)
-#define VIRTQ_AVAIL_ADDR(vq_base_addr)          (vq_base_addr + VIRTQ_DESC_SIZE)
-#define VIRTQ_USED_ADDR(vq_base_addr)           (vq_base_addr + VIRTQ_DESC_SIZE + VIRTQ_AVAIL_SIZE)
-#define VIRTQ_MEMORY_POOL_ADDR(vq_base_addr)    (vq_base_addr + VIRTQ_VRINGS_SIZE_TOTAL)
+#define VIRTQ_DESC_ADDR(vq_base_addr)        (vq_base_addr)
+#define VIRTQ_AVAIL_ADDR(vq_base_addr)       (vq_base_addr + VIRTQ_DESC_SIZE)
+#define VIRTQ_USED_ADDR(vq_base_addr)        (vq_base_addr + VIRTQ_DESC_SIZE + VIRTQ_AVAIL_SIZE)
+#define VIRTQ_MEMORY_POOL_ADDR(vq_base_addr) (vq_base_addr + VIRTQ_VRINGS_SIZE_TOTAL)
 
 /**
  * @brief Initialize the virtqueue
@@ -110,12 +119,11 @@ struct virtq {
  * @param queue_index Queue index
  * @param vq_base_addr Base address of the virtqueue
  */
-static inline void virtq_init(struct virtq *vq, uint16_t queue_index, char* vq_base_addr)
+static inline void virtq_init(struct virtq* vq, uint16_t queue_index, char* vq_base_addr)
 {
     /* Initialize the descriptor ring */
-    vq->desc = (volatile struct virtq_desc *)VIRTQ_DESC_ADDR(vq_base_addr);
-    for (int i = 0; i < VIRTQ_SIZE; i++)
-    {
+    vq->desc = (volatile struct virtq_desc*)VIRTQ_DESC_ADDR(vq_base_addr);
+    for (int i = 0; i < VIRTQ_SIZE; i++) {
         vq->desc[i].addr = 0;
         vq->desc[i].len = 0;
         vq->desc[i].flags = 0;
@@ -126,21 +134,19 @@ static inline void virtq_init(struct virtq *vq, uint16_t queue_index, char* vq_b
     vq->desc_num_free = VIRTQ_SIZE;
 
     /* Initialize the available ring */
-    vq->avail = (volatile struct virtq_avail *)VIRTQ_AVAIL_ADDR(vq_base_addr);
+    vq->avail = (volatile struct virtq_avail*)VIRTQ_AVAIL_ADDR(vq_base_addr);
     vq->avail->flags = 0;
     vq->avail->idx = 0;
-    for (int i = 0; i < VIRTQ_SIZE; i++)
-    {
+    for (int i = 0; i < VIRTQ_SIZE; i++) {
         vq->avail->ring[i] = 0;
     }
     vq->avail_last_idx = 0;
 
     /* Initialize the used ring */
-    vq->used = (volatile struct virtq_used *)VIRTQ_USED_ADDR(vq_base_addr);
+    vq->used = (volatile struct virtq_used*)VIRTQ_USED_ADDR(vq_base_addr);
     vq->used->flags = 0;
     vq->used->idx = 0;
-    for (int i = 0; i < VIRTQ_SIZE; i++)
-    {
+    for (int i = 0; i < VIRTQ_SIZE; i++) {
         vq->used->ring[i].id = 0;
         vq->used->ring[i].len = 0;
     }
@@ -149,7 +155,8 @@ static inline void virtq_init(struct virtq *vq, uint16_t queue_index, char* vq_b
     vq->queue_index = queue_index;
 
     /* Initialize the memory pool */
-    virtio_memory_pool_init(&vq->pool, (char *)VIRTQ_MEMORY_POOL_ADDR(vq_base_addr), VIRTQ_MEMORY_POOL_SIZE);
+    virtio_memory_pool_init(&vq->pool, (char*)VIRTQ_MEMORY_POOL_ADDR(vq_base_addr),
+        VIRTQ_MEMORY_POOL_SIZE);
 }
 
 /**
@@ -158,7 +165,7 @@ static inline void virtq_init(struct virtq *vq, uint16_t queue_index, char* vq_b
  * @param id Descriptor index
  * @return Returns the descriptor at the specified index
  */
-static inline volatile struct virtq_desc *virtq_get_desc_by_id(struct virtq *vq, uint16_t id)
+static inline volatile struct virtq_desc* virtq_get_desc_by_id(struct virtq* vq, uint16_t id)
 {
     return &vq->desc[id % VIRTQ_SIZE];
 }
@@ -168,7 +175,7 @@ static inline volatile struct virtq_desc *virtq_get_desc_by_id(struct virtq *vq,
  * @param vq VirtIO virtqueue
  * @return true if there are free slots, false otherwise
  */
-static inline bool virtq_has_free_slots(struct virtq *vq)
+static inline bool virtq_has_free_slots(struct virtq* vq)
 {
     return vq->desc_num_free != 0;
 }
@@ -178,7 +185,7 @@ static inline bool virtq_has_free_slots(struct virtq *vq)
  * @param vq VirtIO virtqueue
  * @return Returns the next free descriptor index
  */
-static inline uint16_t virtq_get_free_desc_id(struct virtq *vq)
+static inline uint16_t virtq_get_free_desc_id(struct virtq* vq)
 {
     assert(virtq_has_free_slots(vq));
     uint16_t idx = vq->desc_next_free;
@@ -192,7 +199,7 @@ static inline uint16_t virtq_get_free_desc_id(struct virtq *vq)
  * @param vq VirtIO virtqueue
  * @param id Descriptor index
  */
-static inline void virtq_put_free_desc(struct virtq *vq, uint16_t id)
+static inline void virtq_put_free_desc(struct virtq* vq, uint16_t id)
 {
     assert(vq->desc_num_free < VIRTQ_SIZE);
     virtq_get_desc_by_id(vq, id)->next = vq->desc_next_free;
@@ -206,7 +213,7 @@ static inline void virtq_put_free_desc(struct virtq *vq, uint16_t id)
  * @param addr I/O buffer guest-physical address
  * @param len Length of the I/O buffer buffer
  */
-static inline void virtq_desc_init(volatile struct virtq_desc *desc, uint64_t addr, uint32_t len)
+static inline void virtq_desc_init(volatile struct virtq_desc* desc, uint64_t addr, uint32_t len)
 {
     desc->addr = addr;
     desc->len = len;
@@ -218,7 +225,7 @@ static inline void virtq_desc_init(volatile struct virtq_desc *desc, uint64_t ad
  * @brief Set the descriptor as read only
  * @param desc VirtIO descriptor
  */
-static inline void virtq_desc_set_read_only(volatile struct virtq_desc *desc)
+static inline void virtq_desc_set_read_only(volatile struct virtq_desc* desc)
 {
     desc->flags &= ~VIRTQ_DESC_F_WRITE;
 }
@@ -227,7 +234,7 @@ static inline void virtq_desc_set_read_only(volatile struct virtq_desc *desc)
  * @brief Set the descriptor as write only
  * @param desc VirtIO descriptor
  */
-static inline void virtq_desc_set_write_only(volatile struct virtq_desc *desc)
+static inline void virtq_desc_set_write_only(volatile struct virtq_desc* desc)
 {
     desc->flags |= VIRTQ_DESC_F_WRITE;
 }
@@ -237,7 +244,7 @@ static inline void virtq_desc_set_write_only(volatile struct virtq_desc *desc)
  * @param desc VirtIO descriptor
  * @return Returns true if the descriptor is read only, false otherwise
  */
-static inline bool virtq_desc_is_read_only(volatile struct virtq_desc *desc)
+static inline bool virtq_desc_is_read_only(volatile struct virtq_desc* desc)
 {
     return !(desc->flags & VIRTQ_DESC_F_WRITE);
 }
@@ -247,7 +254,7 @@ static inline bool virtq_desc_is_read_only(volatile struct virtq_desc *desc)
  * @param desc VirtIO descriptor
  * @param next Index of next chained descriptor
  */
-static inline void virtq_desc_set_next(volatile struct virtq_desc *desc, uint16_t next)
+static inline void virtq_desc_set_next(volatile struct virtq_desc* desc, uint16_t next)
 {
     desc->flags |= VIRTQ_DESC_F_NEXT;
     desc->next = next;
@@ -258,7 +265,7 @@ static inline void virtq_desc_set_next(volatile struct virtq_desc *desc, uint16_
  * @param desc VirtIO descriptor
  * @return Returns true if the descriptor is chainable, false otherwise
  */
-static inline bool virtq_desc_has_next(volatile struct virtq_desc *desc)
+static inline bool virtq_desc_has_next(volatile struct virtq_desc* desc)
 {
     return desc->flags & VIRTQ_DESC_F_NEXT;
 }
@@ -268,7 +275,7 @@ static inline bool virtq_desc_has_next(volatile struct virtq_desc *desc)
  * @param desc VirtIO descriptor
  * @return Returns the next chained descriptor index
  */
-static inline uint16_t virtq_desc_get_next(volatile struct virtq_desc *desc)
+static inline uint16_t virtq_desc_get_next(volatile struct virtq_desc* desc)
 {
     return desc->next;
 }
@@ -278,7 +285,7 @@ static inline uint16_t virtq_desc_get_next(volatile struct virtq_desc *desc)
  * @param vq VirtIO virtqueue
  * @return true if there are available buffers, false otherwise
  */
-static inline bool virtq_avail_has_buf(struct virtq *vq)
+static inline bool virtq_avail_has_buf(struct virtq* vq)
 {
     return vq->avail->idx != vq->avail_last_idx;
 }
@@ -288,7 +295,7 @@ static inline bool virtq_avail_has_buf(struct virtq *vq)
  * @param vq VirtIO virtqueue
  * @return true if there are used buffers, false otherwise
  */
-static inline bool virtq_used_has_buf(struct virtq *vq)
+static inline bool virtq_used_has_buf(struct virtq* vq)
 {
     return vq->used->idx != vq->last_used_idx;
 }
@@ -298,7 +305,7 @@ static inline bool virtq_used_has_buf(struct virtq *vq)
  * @param vq VirtIO virtqueue
  * @param id Descriptor index
  */
-static inline void virtq_add_avail_buf(struct virtq *vq, uint16_t id)
+static inline void virtq_add_avail_buf(struct virtq* vq, uint16_t id)
 {
     vq->avail->ring[vq->avail->idx % VIRTQ_SIZE] = id;
     vq->avail->idx++;
@@ -310,7 +317,7 @@ static inline void virtq_add_avail_buf(struct virtq *vq, uint16_t id)
  * @param id Descriptor index
  * @param len Length of data written to the buffer
  */
-static inline void virtq_add_used_buf(struct virtq *vq, uint16_t id, uint32_t len)
+static inline void virtq_add_used_buf(struct virtq* vq, uint16_t id, uint32_t len)
 {
     vq->used->ring[vq->used->idx % VIRTQ_SIZE].id = id;
     vq->used->ring[vq->used->idx % VIRTQ_SIZE].len = len;
@@ -323,19 +330,19 @@ static inline void virtq_add_used_buf(struct virtq *vq, uint16_t id, uint32_t le
  * @param vq VirtIO virtqueue
  * @return Returns the next available buffer index
  */
-static inline uint16_t virtq_get_avail_buf_id(struct virtq *vq)
+static inline uint16_t virtq_get_avail_buf_id(struct virtq* vq)
 {
     assert(virtq_avail_has_buf(vq));
     return vq->avail->ring[vq->avail_last_idx++ % VIRTQ_SIZE];
 }
 
-static inline uint16_t virtq_get_used_buf_id(struct virtq *vq)
+static inline uint16_t virtq_get_used_buf_id(struct virtq* vq)
 {
     assert(virtq_used_has_buf(vq));
     return vq->used->ring[vq->last_used_idx++ % VIRTQ_SIZE].id;
 }
 
-static inline void virtq_dump(struct virtq *vq)
+static inline void virtq_dump(struct virtq* vq)
 {
     printf("queue index = 0x%x\n", vq->queue_index);
     printf("desc_next_free = 0x%x\n", vq->desc_next_free);
@@ -347,7 +354,9 @@ static inline void virtq_dump(struct virtq *vq)
         printf("virtq_desc is NULL\n");
     } else {
         for (int i = 0; i < VIRTQ_SIZE; i++) {
-            printf("desc[%d] addr = 0x%lx (data = %s), len = 0x%x, flags = 0x%x, next = 0x%x\n", i, vq->desc[i].addr, (char*)vq->desc[i].addr, vq->desc[i].len, vq->desc[i].flags, vq->desc[i].next);
+            printf("desc[%d] addr = 0x%lx (data = %s), len = 0x%x, flags = 0x%x, next = 0x%x\n", i,
+                vq->desc[i].addr, (char*)vq->desc[i].addr, vq->desc[i].len, vq->desc[i].flags,
+                vq->desc[i].next);
         }
     }
     if (!vq->avail) {
@@ -363,7 +372,8 @@ static inline void virtq_dump(struct virtq *vq)
     } else {
         printf("used flags = 0x%x, idx = 0x%x\n", vq->used->flags, vq->used->idx);
         for (int i = 0; i < VIRTQ_SIZE; i++) {
-            printf("used ring[%d] id = 0x%x, len = 0x%x\n", i, vq->used->ring[i].id, vq->used->ring[i].len);
+            printf("used ring[%d] id = 0x%x, len = 0x%x\n", i, vq->used->ring[i].id,
+                vq->used->ring[i].len);
         }
     }
 }

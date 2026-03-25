@@ -6,8 +6,8 @@
 #ifndef ARCH_PROFILE_SYSREGS_H
 #define ARCH_PROFILE_SYSREGS_H
 
-#define STR(s)  #s
-#define XSTR(s)  STR(s)
+#define STR(s)          #s
+#define XSTR(s)         STR(s)
 
 #define mpuir_el1       S3_0_C0_C0_4
 #define prselr_el1      S3_0_C6_C2_1
@@ -30,17 +30,19 @@
 
 #include <core.h>
 
-#define SYSREG_GEN_ACCESSORS_NAME(reg, name) \
-    static inline unsigned long sysreg##reg##read() {\
-        unsigned long _temp;\
-        asm volatile("mrs %0, " XSTR(name) "\n\r" : "=r"(_temp));\
-        return _temp;\
-    } \
-    static inline void sysreg##reg##write(unsigned long val) {\
-        asm volatile("msr " XSTR(name)  ", %0\n\r" ::"r"(val));\
+#define SYSREG_GEN_ACCESSORS_NAME(reg, name)                      \
+    static inline unsigned long sysreg##reg##read()               \
+    {                                                             \
+        unsigned long _temp;                                      \
+        asm volatile("mrs %0, " XSTR(name) "\n\r" : "=r"(_temp)); \
+        return _temp;                                             \
+    }                                                             \
+    static inline void sysreg##reg##write(unsigned long val)      \
+    {                                                             \
+        asm volatile("msr " XSTR(name) ", %0\n\r" ::"r"(val));    \
     }
 
-#define SYSREG_GEN_ACCESSORS(reg)  SYSREG_GEN_ACCESSORS_NAME(_##reg##_, reg)
+#define SYSREG_GEN_ACCESSORS(reg) SYSREG_GEN_ACCESSORS_NAME(_##reg##_, reg)
 
 SYSREG_GEN_ACCESSORS(esr_el1);
 SYSREG_GEN_ACCESSORS(elr_el1);
@@ -84,19 +86,23 @@ SYSREG_GEN_ACCESSORS(icc_ctlr_el1);
 SYSREG_GEN_ACCESSORS(icc_igrpen1_el1);
 SYSREG_GEN_ACCESSORS(icc_sgi1r_el1);
 
-static inline void arm_dc_civac(uintptr_t cache_addr) {
-    asm volatile ("dc civac, %0\n\t" :: "r"(cache_addr));
+static inline void arm_dc_civac(uintptr_t cache_addr)
+{
+    asm volatile("dc civac, %0\n\t" ::"r"(cache_addr));
 }
 
-static inline void arm_at_s1e2w(uintptr_t vaddr) {
-     asm volatile("at s1e2w, %0" ::"r"(vaddr));
+static inline void arm_at_s1e2w(uintptr_t vaddr)
+{
+    asm volatile("at s1e2w, %0" ::"r"(vaddr));
 }
 
-static inline void arm_at_s12e1w(uintptr_t vaddr) {
-     asm volatile("at s12e1w, %0" ::"r"(vaddr));
+static inline void arm_at_s12e1w(uintptr_t vaddr)
+{
+    asm volatile("at s12e1w, %0" ::"r"(vaddr));
 }
 
-static inline void arm_unmask_irq() {
+static inline void arm_unmask_irq()
+{
     asm volatile("MSR   DAIFClr, #2\n\t");
 }
 

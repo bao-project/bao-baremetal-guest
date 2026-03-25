@@ -18,13 +18,13 @@ void cmsdk_uart_enable(volatile struct cmsdk_uart_hw* ptr_uart)
 
 char cmsdk_uart_getc(volatile struct cmsdk_uart_hw* ptr_uart)
 {
-    while(!(ptr_uart->state & 0x2)) { }
+    while (!(ptr_uart->state & 0x2)) { }
     return (char)ptr_uart->data;
 }
 
 void cmsdk_uart_putc(volatile struct cmsdk_uart_hw* ptr_uart, int8_t c)
 {
-    while(ptr_uart->state & 0x1) { }
+    while (ptr_uart->state & 0x1) { }
     ptr_uart->data = (uint32_t)c;
 }
 

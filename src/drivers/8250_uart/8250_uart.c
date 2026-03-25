@@ -7,13 +7,12 @@
 // #include <sbi_utils/serial/uart8250.h>
 #include <8250_uart.h>
 
-#define readb(addr)  (*((volatile uint8_t*)addr))
-#define writeb(val, addr)  (*(volatile uint8_t*)(addr) = val)
-#define readw(addr)  (*((volatile uint16_t*)addr))
-#define writew(val, addr)  (*(volatile uint16_t*)(addr) = val)
-#define readl(addr)  (*((volatile uint32_t*)addr))
-#define writel(val, addr)  (*((volatile uint32_t*)addr) = val)
-
+#define readb(addr)       (*((volatile uint8_t*)addr))
+#define writeb(val, addr) (*(volatile uint8_t*)(addr) = val)
+#define readw(addr)       (*((volatile uint16_t*)addr))
+#define writew(val, addr) (*(volatile uint16_t*)(addr) = val)
+#define readl(addr)       (*((volatile uint32_t*)addr))
+#define writel(val, addr) (*((volatile uint32_t*)addr) = val)
 
 /* clang-format off */
 
@@ -43,7 +42,7 @@
 
 /* clang-format on */
 
-static volatile void *uart8250_base;
+static volatile void* uart8250_base;
 static u32 uart8250_in_freq;
 static u32 uart8250_baudrate;
 static u32 uart8250_reg_width;
@@ -51,84 +50,88 @@ static u32 uart8250_reg_shift;
 
 static volatile u32 get_reg(u32 num)
 {
-	u32 offset = num << uart8250_reg_shift;
+    u32 offset = num << uart8250_reg_shift;
 
-	if (uart8250_reg_width == 1)
-		return readb(uart8250_base + offset);
-	else if (uart8250_reg_width == 2)
-		return readw(uart8250_base + offset);
-	else
-		return readl(uart8250_base + offset);
+    if (uart8250_reg_width == 1) {
+        return readb(uart8250_base + offset);
+    } else if (uart8250_reg_width == 2) {
+        return readw(uart8250_base + offset);
+    } else {
+        return readl(uart8250_base + offset);
+    }
 }
 
 static void set_reg(u32 num, u32 val)
 {
-	u32 offset = num << uart8250_reg_shift;
+    u32 offset = num << uart8250_reg_shift;
 
-	if (uart8250_reg_width == 1)
-		writeb(val, uart8250_base + offset);
-	else if (uart8250_reg_width == 2)
-		writew(val, uart8250_base + offset);
-	else
-		writel(val, uart8250_base + offset);
+    if (uart8250_reg_width == 1) {
+        writeb(val, uart8250_base + offset);
+    } else if (uart8250_reg_width == 2) {
+        writew(val, uart8250_base + offset);
+    } else {
+        writel(val, uart8250_base + offset);
+    }
 }
 
 void uart8250_putc(char ch)
 {
-	while ((get_reg(UART_LSR_OFFSET) & UART_LSR_THRE) == 0)
-		;
+    while ((get_reg(UART_LSR_OFFSET) & UART_LSR_THRE) == 0)
+        ;
 
-	set_reg(UART_THR_OFFSET, ch);
+    set_reg(UART_THR_OFFSET, ch);
 }
 
 int uart8250_getc(void)
 {
-	if (get_reg(UART_LSR_OFFSET) & UART_LSR_DR)
-		return get_reg(UART_RBR_OFFSET);
-	return -1;
+    if (get_reg(UART_LSR_OFFSET) & UART_LSR_DR) {
+        return get_reg(UART_RBR_OFFSET);
+    }
+    return -1;
 }
 
-void uart8250_interrupt_handler(){
-	volatile char c = get_reg(UART_RBR_OFFSET);
-}
-
-void uart8250_enable_rx_int(){
-	set_reg(UART_IER_OFFSET, 1);
-}
-
-int uart8250_init(unsigned long base, u32 in_freq, u32 baudrate, u32 reg_shift,
-		  u32 reg_width)
+void uart8250_interrupt_handler()
 {
-	u16 bdiv;
+    volatile char c = get_reg(UART_RBR_OFFSET);
+}
 
-	uart8250_base	   = (volatile void *)base;
-	uart8250_reg_shift = reg_shift;
-	uart8250_reg_width = reg_width;
-	uart8250_in_freq   = in_freq;
-	uart8250_baudrate  = baudrate;
+void uart8250_enable_rx_int()
+{
+    set_reg(UART_IER_OFFSET, 1);
+}
 
-	bdiv = uart8250_in_freq / (16 * uart8250_baudrate);
+int uart8250_init(unsigned long base, u32 in_freq, u32 baudrate, u32 reg_shift, u32 reg_width)
+{
+    u16 bdiv;
 
-	/* Disable all interrupts */
-	set_reg(UART_IER_OFFSET, 0x00);
-	/* Enable DLAB */
-	set_reg(UART_LCR_OFFSET, 0x80);
-	// /* Set divisor low byte */
-	// set_reg(UART_DLL_OFFSET, bdiv & 0xff);
-	// /* Set divisor high byte */
-	// set_reg(UART_DLM_OFFSET, (bdiv >> 8) & 0xff);
-	/* 8 bits, no parity, one stop bit */
-	set_reg(UART_LCR_OFFSET, 0x03);
-	/* Enable FIFO */
-	set_reg(UART_FCR_OFFSET, 0x01);
-	/* No modem control DTR RTS */
-	set_reg(UART_MCR_OFFSET, 0x00);
-	/* Clear line status */
-	get_reg(UART_LSR_OFFSET);
-	/* Read receive buffer */
-	get_reg(UART_RBR_OFFSET);
-	/* Set scratchpad */
-	set_reg(UART_SCR_OFFSET, 0x00);
+    uart8250_base = (volatile void*)base;
+    uart8250_reg_shift = reg_shift;
+    uart8250_reg_width = reg_width;
+    uart8250_in_freq = in_freq;
+    uart8250_baudrate = baudrate;
 
-	return 0;
+    bdiv = uart8250_in_freq / (16 * uart8250_baudrate);
+
+    /* Disable all interrupts */
+    set_reg(UART_IER_OFFSET, 0x00);
+    /* Enable DLAB */
+    set_reg(UART_LCR_OFFSET, 0x80);
+    // /* Set divisor low byte */
+    // set_reg(UART_DLL_OFFSET, bdiv & 0xff);
+    // /* Set divisor high byte */
+    // set_reg(UART_DLM_OFFSET, (bdiv >> 8) & 0xff);
+    /* 8 bits, no parity, one stop bit */
+    set_reg(UART_LCR_OFFSET, 0x03);
+    /* Enable FIFO */
+    set_reg(UART_FCR_OFFSET, 0x01);
+    /* No modem control DTR RTS */
+    set_reg(UART_MCR_OFFSET, 0x00);
+    /* Clear line status */
+    get_reg(UART_LSR_OFFSET);
+    /* Read receive buffer */
+    get_reg(UART_RBR_OFFSET);
+    /* Set scratchpad */
+    set_reg(UART_SCR_OFFSET, 0x00);
+
+    return 0;
 }

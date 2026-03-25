@@ -6,7 +6,6 @@
 #ifndef __FENCES_ARCH_H__
 #define __FENCES_ARCH_H__
 
-
 static inline void fence_ord_write(void)
 {
     __asm__ volatile("dsync\n\t" ::: "memory");

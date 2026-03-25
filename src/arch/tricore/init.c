@@ -9,7 +9,7 @@
 
 extern void _start();
 
-__attribute__((weak))
-void arch_init(){
+__attribute__((weak)) void arch_init()
+{
     ir_init();
 }

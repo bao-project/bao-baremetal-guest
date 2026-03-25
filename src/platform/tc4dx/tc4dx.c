@@ -15,11 +15,11 @@
 #define PORT_DRVCFG_DIR_IN       0x1UL
 #define PORT_DRVCFG_DIR_OUT      0UL
 
-#define UART_ADDR 0xF46C0000UL
-struct asclin_hw *uart  = (void*) UART_ADDR;
+#define UART_ADDR                0xF46C0000UL
+struct asclin_hw* uart = (void*)UART_ADDR;
 
-void uart_init(){
-
+void uart_init()
+{
     unsigned long* P14_0_DRVCFG = PORT_PIN_ADDR(PORT14_BASE, 0);
     unsigned long* P14_1_DRVCFG = PORT_PIN_ADDR(PORT14_BASE, 1);
 
@@ -32,7 +32,7 @@ void uart_init(){
 
 void uart_putc(char c)
 {
-    tricore_uart_putc(uart,c);
+    tricore_uart_putc(uart, c);
 }
 
 char uart_getchar(void)
@@ -40,10 +40,6 @@ char uart_getchar(void)
     return -1;
 }
 
-void uart_enable_rxirq()
-{
-}
+void uart_enable_rxirq() { }
 
-void uart_clear_rxirq()
-{
-}
+void uart_clear_rxirq() { }

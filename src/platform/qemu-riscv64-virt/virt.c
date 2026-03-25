@@ -6,18 +6,16 @@
 #include <plat.h>
 #include <8250_uart.h>
 
+#define VIRT_UART16550_INTERRUPT 10
 
-#define VIRT_UART16550_INTERRUPT	10
+#define VIRT_UART16550_ADDR      UART_ADDR
 
-#define VIRT_UART16550_ADDR		UART_ADDR
+#define VIRT_UART_BAUDRATE       115200
+#define VIRT_UART_SHIFTREG_ADDR  1843200
 
-#define VIRT_UART_BAUDRATE		115200
-#define VIRT_UART_SHIFTREG_ADDR		1843200
-
-
-void uart_init(){
-    uart8250_init(VIRT_UART16550_ADDR, VIRT_UART_SHIFTREG_ADDR,
-			     VIRT_UART_BAUDRATE, 0, 1);
+void uart_init()
+{
+    uart8250_init(VIRT_UART16550_ADDR, VIRT_UART_SHIFTREG_ADDR, VIRT_UART_BAUDRATE, 0, 1);
 }
 
 void uart_putc(char c)
@@ -37,5 +35,5 @@ void uart_enable_rxirq()
 
 void uart_clear_rxirq()
 {
-    uart8250_interrupt_handler(); 
+    uart8250_interrupt_handler();
 }

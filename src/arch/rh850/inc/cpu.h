@@ -9,11 +9,13 @@
 #include <core.h>
 #include <srs.h>
 
-static inline unsigned long get_cpuid(){
+static inline unsigned long get_cpuid()
+{
     return srs_peid_read();
 }
 
-static inline bool cpu_is_master(){
+static inline bool cpu_is_master()
+{
     return get_cpuid() == 0;
 }
 
