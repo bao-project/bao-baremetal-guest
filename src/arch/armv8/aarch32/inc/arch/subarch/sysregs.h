@@ -105,6 +105,17 @@ SYSREG_GEN_ACCESSORS(icc_ctlr_el1, 0, c12, c12, 4);
 SYSREG_GEN_ACCESSORS(icc_igrpen1_el1, 0, c12, c12, 7);
 SYSREG_GEN_ACCESSORS_64(icc_sgi1r_el1, 0, c12);
 
+SYSREG_GEN_ACCESSORS(pmcntenclr_el0, 0, c9, c12, 2)
+SYSREG_GEN_ACCESSORS(pmcntenset_el0, 0, c9, c12, 1)
+SYSREG_GEN_ACCESSORS(pmselr_el0, 0, c9, c12, 5)
+SYSREG_GEN_ACCESSORS(pmxevtyper_el0, 0, c9, c13, 1)
+SYSREG_GEN_ACCESSORS(pmxevcntr_el0, 0, c9, c13, 2)
+SYSREG_GEN_ACCESSORS(pmintenset_el1, 0, c9, c14, 1)
+SYSREG_GEN_ACCESSORS(pmintenclr_el1, 0, c9, c14, 2)
+SYSREG_GEN_ACCESSORS(pmovsclr_el0, 0, c9, c12, 3)
+SYSREG_GEN_ACCESSORS(pmccfiltr_el0, 0, c14, c15, 7)
+SYSREG_GEN_ACCESSORS(pmccntr_el0, 0, c9, c13, 0)
+
 SYSREG_GEN_ACCESSORS(dccivac, 0, c7, c14, 1);
 static inline void arm_dc_civac(uintptr_t cache_addr)
 {
