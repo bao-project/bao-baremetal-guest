@@ -13,6 +13,9 @@
 #define GENERIC_TIMER_CNTCTL_CNTCR_OFFSET  (0x0)
 #define GENERIC_TIMER_CNTCTL_CNTDIF0_OFFSET  (0x20)
 
+.extern plat_mpu_regs
+.extern plat_mpu_num_regs
+
 .section .start, "ax"
 .global _start
 _start:
@@ -77,36 +80,31 @@ _enter_el1:
     msr CPACR_EL1, x1
 
 #ifdef MPU
+    // Program MPU regions from the platform descriptor array.
+    ldr x5, =plat_mpu_regs
+    ldr x6, =plat_mpu_num_regs
+    ldr x6, [x6]
 
-    // FIXME(?):
-    // We need to set permissions to EL1 only. If we don't code execution
-    // triggers a trap even if the XN is not set. However, armv8-r does
-    // not seem to provide any PxN (privileged execute-never) facilities.
-    // The PAN bit is clear.
-    // The spec actually states that PXN = PX. Don't know if this is a bug
-    // in the FVP model we used to develop or if there might be another
-    // configuration bit that is triggering this behaviour.
+    mov x7, #0
+1:
+    cmp x7, x6
+    bge 2f
 
-    // Set MPU region for cacheability and shareability
-    mov x4, #0
-    msr prselr_el1, x4
+    msr prselr_el1, x7
     isb
-    ldr x4, =(PRBAR_BASE(0) | PRBAR_SH_IS | PRBAR_AP_RW_EL1)
-    msr prbar_el1, x4
-    ldr x4, =(PRLAR_LIMIT(0x7fffffffUL) | PRLAR_ATTR(1) | PRLAR_EN)
-    msr prlar_el1, x4
+    add x8, x5, x7, lsl #4  // sizeof(struct mpu_region) = 16 bytes
+    ldr x1, [x8]            // prbar
+    msr prbar_el1, x1       // prbar
 
-    mov x4, #1
-    msr prselr_el1, x4
-    isb
-    ldr x4, =(PRBAR_BASE(0x80000000UL) | PRBAR_SH_IS | PRBAR_AP_RW_EL1)
-    msr prbar_el1, x4
-    ldr x4, =(PRLAR_LIMIT(0xffffffffUL) | PRLAR_ATTR(2) | PRLAR_EN)
-    msr prlar_el1, x4
+    ldr x1, [x8, #8]        // prlar
+    msr prlar_el1, x1       // prlar
 
+    add x7, x7, #1
+    b 1b
+2:
     isb
 
-    ldr x1, =(SCTLR_RES1 | SCTLR_C | SCTLR_I | SCTLR_M )
+    ldr x1, =(SCTLR_RES1 | SCTLR_C | SCTLR_I | SCTLR_M)
     msr sctlr_el1, x1
 
 #else 
