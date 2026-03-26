@@ -17,4 +17,16 @@
 #define __DEFINED(VALUE)                ___DEFINED(VALUE true, false)
 #define ___DEFINED(IGNORE, RESULT, ...) (RESULT)
 
+#define INFO(...)                       printf("BAO-BAREMETAL INFO: " __VA_ARGS__);
+
+#define WARNING(...)                    printf("BAO-BAREMETAL WARNING: " __VA_ARGS__);
+
+#define ERROR(...)                               \
+    printf("BAO-BAREMETAL ERROR: " __VA_ARGS__); \
+    while (true) {                               \
+        wfi();                                   \
+    };
+
+#define NOT_IMPLEMENTED() ERROR("%s not implemented\n", __func__)
+
 #endif /* UTIL_H */
