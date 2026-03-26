@@ -5,6 +5,21 @@
 
 #include <plat.h>
 #include <pl011_uart.h>
+#include <mem.h>
+
+// FIXME(?):
+// We need to set permissions to EL1 only. If we don't code execution
+// triggers a trap even if the XN is not set. However, armv8-r does
+// not seem to provide any PxN (privileged execute-never) facilities.
+// The PAN bit is clear.
+// The spec actually states that PXN = PX. Don't know if this is a bug
+// in the FVP model we used to develop or if there might be another
+// configuration bit that is triggering this behaviour.
+const struct mpu_region plat_mpu_regs[] = {
+    MPU_REGION_DESC(0, 0x80000000, PRBAR_SH_IS, PRBAR_AP_RW_EL1, 1),
+    MPU_REGION_DESC(0x80000000, 0x80000000, PRBAR_SH_IS, PRBAR_AP_RW_EL1, 2),
+};
+DEFINE_PLAT_MPU_NUM_REGS();
 
 Pl011_Uart* uart = (void*)PLAT_UART_ADDR;
 
