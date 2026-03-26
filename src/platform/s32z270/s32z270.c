@@ -15,6 +15,7 @@ const struct mpu_region plat_mpu_regs[] = {
     MPU_REGION_DESC(SHMEM_BASE, SHMEM_SIZE, PRBAR_SH_OS, 1),
 #endif
 };
+DEFINE_PLAT_MPU_NUM_REGS();
 
 volatile struct linflexd* uart = (volatile struct linflexd*)PLAT_UART_ADDR;
 
