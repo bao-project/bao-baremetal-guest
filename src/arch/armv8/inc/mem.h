@@ -11,6 +11,11 @@
 #ifndef __ASSEMBLER__
 
 #if defined(MPU)
+
+/* MAIR attribute indices for memory regions */
+#define PRBAR_ATTR_NORMAL 1 /* Normal memory (cacheable, code/data) */
+#define PRBAR_ATTR_DEVICE 2 /* Device memory (peripherals, IO) */
+
 /* MPU-based platforms need to define their MPU regions in the platform description. This involves
  * defining the base address, size, and access permissions for each region using the
  * MPU_REGION_DESC macro. The platform must also define the number of regions using the
@@ -21,9 +26,9 @@ struct mpu_region {
     unsigned long prlar;
 };
 
-#define MPU_REGION_DESC(_base, _size, _sh, _attr)                                   \
+#define MPU_REGION_DESC(_base, _size, _sh, _perm, _attr)                            \
     {                                                                               \
-        .prbar = PRBAR_BASE((_base)) | (_sh) | PRBAR_AP_RW_ALL,                     \
+        .prbar = PRBAR_BASE((_base)) | (_sh) | (_perm),                             \
         .prlar = PRLAR_LIMIT((_base) + (_size) - 1) | PRLAR_ATTR(_attr) | PRLAR_EN, \
     }
 

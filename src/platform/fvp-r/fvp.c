@@ -16,8 +16,8 @@
 // in the FVP model we used to develop or if there might be another
 // configuration bit that is triggering this behaviour.
 const struct mpu_region plat_mpu_regs[] = {
-    MPU_REGION_DESC(0, 0x80000000, PRBAR_SH_IS, PRBAR_AP_RW_EL1, 1),
-    MPU_REGION_DESC(0x80000000, 0x80000000, PRBAR_SH_IS, PRBAR_AP_RW_EL1, 2),
+    MPU_REGION_DESC(0, 0x80000000, PRBAR_SH_IS, PRBAR_AP_RW_EL1, PRBAR_ATTR_NORMAL),
+    MPU_REGION_DESC(0x80000000, 0x80000000, PRBAR_SH_IS, PRBAR_AP_RW_EL1, PRBAR_ATTR_DEVICE),
 };
 DEFINE_PLAT_MPU_NUM_REGS();
 
