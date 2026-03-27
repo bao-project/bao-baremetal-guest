@@ -1,0 +1,138 @@
+# ============================================================
+# stale-contrib.yml
+#
+# Tracks staleness from the CONTRIBUTOR side:
+#   - Warns contributor after 30 days of no reply to a reviewer
+#   - Closes after 30 more days of silence
+#   - Exempts items still awaiting a reviewer (covered by stale-reviewer.yml)
+#
+# Label contract (create these in your repo):
+#   awaiting-contributor  – set by stale-reviewer.yml or manually by reviewers
+#   awaiting-reviewer     – set by stale-reviewer.yml or manually by contributors
+#   stale-contributor     – set by this workflow
+#   stale-reviewer        – set by stale-reviewer.yml
+#   pinned                – opt-out of all stale automation
+#   no-stale              – opt-out of all stale automation
+# ============================================================
+
+name: "Stale PR & Issue Checker – Contributor"
+
+on:
+  schedule:
+    - cron: "0 2 * * *"     # Runs every day at 02:00 UTC
+  workflow_dispatch:        # allow manual trigger for testing
+
+permissions:
+  pull-requests: write # to comment on stale pull requests
+  issues: write        # to comment on stale issues
+
+jobs:
+  # ----------------------------------------------------------
+  # JOB 1 – Issues where the contributor hasn't replied
+  # ----------------------------------------------------------
+  stale-contributor-issues:
+    name: "Issues – warn contributor"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v10
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Only process issues that have been explicitly flagged as
+          # awaiting the contributor's response by a reviewer.
+          only-issue-labels: "awaiting-contributor"
+
+          # 30 days with no activity → mark as stale
+          days-before-issue-stale: 30
+          # 7 more days → close
+          days-before-issue-close: 30
+
+          # Never touch PRs in this job
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+
+          stale-issue-label: "stale-contributor"
+          close-issue-label: "closed-for-inactivity"
+          close-issue-reason: "not_planned"
+
+          # Remove the awaiting label when unstaled (contributor replied)
+          labels-to-remove-when-unstale: "stale-contributor"
+
+          stale-issue-message: |
+            This issue has been waiting for the author's response to maintainer feedback for **30
+            days**. Please reply within the next **30 days** or this issue will be automatically
+            closed as inactive.
+
+            You can always re-open it or continue the conversation after it is closed. If you need
+            more time, just leave a quick comment and the timer resets!
+
+            > _Automated message from the stale-contributor workflow._
+
+          close-issue-message: |
+            This issue has been **automatically closed** due to 30+30 days of inactivity after
+            reviewer feedback was provided.
+
+            No worries — you're welcome to re-open it at any time if you would like to continue the
+            discussion. Please make sure to address the reviewer's comments when you do.
+
+            > _Automated message from the stale-contributor workflow._
+
+          # Global exemptions
+          exempt-issue-labels: "awaiting-reviewer"
+          exempt-all-issue-milestones: true  # milestone = planned work, never stale
+          exempt-draft-pr: true
+
+          # Performance / rate-limit safety
+          operations-per-run: 150
+          ascending: true   # process oldest first so long-forgotten items surface first
+
+  # ----------------------------------------------------------
+  # JOB 2 – PRs where the contributor hasn't replied
+  # ----------------------------------------------------------
+  stale-contributor-prs:
+    name: "PRs – warn contributor"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v10
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+          only-pr-labels: "awaiting-contributor"
+
+          days-before-pr-stale: 30
+          days-before-pr-close: 30
+
+          # Never touch issues in this job
+          days-before-issue-stale: -1
+          days-before-issue-close: -1
+
+          stale-pr-label: "stale-contributor"
+          close-pr-label: "closed-for-inactivity"
+
+          labels-to-remove-when-unstale: "stale-contributor"
+
+          stale-pr-message: |
+            This pull request has been awaiting for the author's response to reviewer feedback for
+            **30 days**. Please address the comments within **30 days** or this PR will be
+            automatically closed.
+
+            If you need more time, drop a comment and the clock resets. Closed PRs can always be
+            re-opened.
+
+            > _Automated message from the stale-contributor workflow._
+
+          close-pr-message: |
+            This pull request has been **automatically closed** after 30+30 days of inactivity
+            following reviewer feedback.
+
+            You are welcome to re-open it once the reviewer's comments have been addressed. Thank
+            you for your contribution!
+
+            > _Automated message from the stale-contributor workflow._
+
+          exempt-pr-labels: "awaiting-reviewer"
+          exempt-all-pr-milestones: true
+          exempt-draft-pr: true
+
+          operations-per-run: 150
+          ascending: true
