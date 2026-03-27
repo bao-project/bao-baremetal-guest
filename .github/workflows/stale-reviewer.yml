@@ -1,0 +1,282 @@
+# ============================================================
+# stale-reviewer.yml
+#
+# Tracks staleness from the REVIEWER side:
+#   - If a contributor updated an issue/PR and the reviewer
+#     hasn't replied within 15 days → nudge reviewer
+#   - Uses label-based routing so only the right items are touched
+#
+# This workflow runs on SCHEDULE (daily) AND on issue/PR events
+# so the "awaiting-reviewer" label is applied in near-real-time
+# when a contributor comments.
+#
+# Label contract (same as stale-contributor.yml):
+#   awaiting-contributor  – reviewer left feedback, waiting on contributor
+#   awaiting-reviewer     – contributor replied, waiting on reviewer
+#   stale-reviewer        – applied when reviewer is overdue
+# ============================================================
+
+name: "Stale PR & Issue Checker – Reviewer"
+
+on:
+  schedule:
+    - cron: "30 2 * * *"    # 30 min after stale-contributor, avoids race
+  workflow_dispatch:        # allow manual trigger for testing
+
+  # ── Real-time label routing ──────────────────────────────
+  # When a contributor comments, remove "awaiting-contributor"
+  # and add "awaiting-reviewer" immediately.
+  issue_comment:
+    types: [created]
+
+  pull_request_review:
+    types: [submitted]
+
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  pull-requests: write # to comment on stale pull requests
+  issues: write        # to comment on stale issues
+
+jobs:
+  # ----------------------------------------------------------
+  # JOB 1 – Real-time label routing on comment events
+  #
+  # When a non-bot contributor comments on an item that has
+  # "awaiting-contributor", flip the label to "awaiting-reviewer".
+  # When a reviewer submits a review/comment, flip back.
+  # ----------------------------------------------------------
+  route-labels:
+    name: "Route awaiting labels on activity"
+    runs-on: ubuntu-latest
+    # Only run on event-triggered runs, not schedule
+    if: github.event_name != 'schedule' && github.event_name != 'workflow_dispatch'
+    steps:
+      - name: "Flip label: contributor replied → awaiting-reviewer"
+        uses: actions/github-script@v8
+        if: |
+          github.event_name == 'issue_comment' &&
+          github.event.sender.type != 'Bot'
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const pr    = context.payload.pull_request;
+            const num   = issue ? issue.number : (pr ? pr.number : null);
+            if (!num) return;
+
+            // Determine if the commenter is a maintainer/reviewer or contributor
+            // We flip labels based on whether this is the issue author replying
+            // vs a reviewer replying.
+            const issueData = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: num,
+            });
+
+            const labels = issueData.data.labels.map(l => l.name);
+            const sender = context.payload.sender.login;
+            const author = issueData.data.user.login;
+
+            console.log(`#${num}: event=${context.payload.action || 'created'} sender=${sender} author=${author} labels=${labels.join(',')}`);
+
+            // If the commenter is the original author (contributor), flip to awaiting-reviewer
+            if (sender === author) {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                issue_number: num,
+                name: 'awaiting-contributor',
+              }).catch(() => {});  // label may already be gone
+
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                issue_number: num,
+                labels: ['awaiting-reviewer'],
+              });
+
+              console.log(`#${num}: contributor replied → set awaiting-reviewer`);
+            }
+
+            // If a reviewer/maintainer replies and label is awaiting-reviewer, flip back
+            if (sender !== author && labels.includes('awaiting-reviewer')) {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                issue_number: num,
+                name: 'awaiting-reviewer',
+              }).catch(() => {});
+
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                issue_number: num,
+                labels: ['awaiting-contributor'],
+              });
+
+              console.log(`#${num}: reviewer replied → set awaiting-contributor`);
+            }
+
+            // Also always clear stale-reviewer if anyone comments
+            if (labels.includes('stale-reviewer')) {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                issue_number: num,
+                name: 'stale-reviewer',
+              }).catch(() => {});
+            }
+
+      - name: "Flip label: reviewer submitted review → awaiting-contributor"
+        uses: actions/github-script@v8
+        if: |
+          (github.event_name == 'pull_request_review' ||
+           github.event_name == 'pull_request_review_comment') &&
+          github.event.sender.type != 'Bot'
+        with:
+          script: |
+            const num = context.payload.pull_request.number;
+
+            const prData = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              pull_number: num,
+            });
+
+            const labels = prData.data.labels.map(l => l.name);
+            const sender = context.payload.sender.login;
+            const author = prData.data.user.login;
+
+            console.log(`PR #${num}: event=${context.eventName} sender=${sender} author=${author} labels=${labels.join(',')}`);
+
+            if (sender !== author) {
+              // Reviewer commented/reviewed → awaiting-contributor
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                issue_number: num,
+                name: 'awaiting-reviewer',
+              }).catch(() => {});
+
+              if (!labels.includes('awaiting-contributor')) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo:  context.repo.repo,
+                  issue_number: num,
+                  labels: ['awaiting-contributor'],
+                });
+              }
+
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                issue_number: num,
+                name: 'stale-reviewer',
+              }).catch(() => {});
+
+              console.log(`PR #${num}: reviewer reviewed → set awaiting-contributor`);
+            }
+
+            if (sender === author) {
+              // Contributor updated via PR review/review-comment → awaiting-reviewer
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                issue_number: num,
+                name: 'awaiting-contributor',
+              }).catch(() => {});
+
+              if (!labels.includes('awaiting-reviewer')) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo:  context.repo.repo,
+                  issue_number: num,
+                  labels: ['awaiting-reviewer'],
+                });
+              }
+
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                issue_number: num,
+                name: 'stale-reviewer',
+              }).catch(() => {});
+
+              console.log(`PR #${num}: contributor updated review → set awaiting-reviewer`);
+            }
+
+  # ----------------------------------------------------------
+  # JOB 2 – Scheduled: nudge overdue reviewers on Issues
+  # ----------------------------------------------------------
+  stale-reviewer-issues:
+    name: "Issues – nudge reviewer"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/stale@v10
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Only process issues waiting on a reviewer
+          only-issue-labels: "awaiting-reviewer"
+
+          # 15 days with no reviewer activity → mark stale-reviewer
+          days-before-issue-stale: 15
+          # Never auto-close (reviewer staleness is a soft nudge, not a hard close)
+          days-before-issue-close: -1
+
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+
+          stale-issue-label: "stale-reviewer"
+          labels-to-remove-when-unstale: "stale-reviewer"
+
+          stale-issue-message: |
+            This issue has had recent activity from the contributor but no
+            reviewer response in **15 days**. A reviewer's attention is needed
+            to keep this moving forward @assignee.
+
+            > _Automated message from the stale-reviewer workflow._
+
+          exempt-issue-labels: "awaiting-contributor"
+          exempt-all-issue-milestones: true
+
+          operations-per-run: 150
+          ascending: true
+
+  # ----------------------------------------------------------
+  # JOB 3 – Scheduled: nudge overdue reviewers on PRs
+  # ----------------------------------------------------------
+  stale-reviewer-prs:
+    name: "PRs – nudge reviewer"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/stale@v10
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+          only-pr-labels: "awaiting-reviewer"
+
+          days-before-pr-stale: 15
+          days-before-pr-close: -1   # never auto-close on reviewer staleness
+
+          days-before-issue-stale: -1
+          days-before-issue-close: -1
+
+          stale-pr-label: "stale-reviewer"
+          labels-to-remove-when-unstale: "stale-reviewer"
+
+          stale-pr-message: |
+            This PR has had recent activity from the contributor but no reviewer
+            response in **15 days**. A review is needed to unblock progress @assignee.
+
+            > _Automated message from the stale-reviewer workflow._
+
+          exempt-pr-labels: "awaiting-contributor"
+          exempt-all-pr-milestones: true
+          exempt-draft-pr: true
+
+          operations-per-run: 150
+          ascending: true
