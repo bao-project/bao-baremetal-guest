@@ -41,7 +41,9 @@
 #define UART_RX_PIN    (LINFLEXD_9_RX_PIN)
 #endif
 
-#define UART_CLKFREQ (48000000UL)
+#define UART_CLKFREQ  (48000000UL)
+
+#define PLAT_CPU_FREQ (1000000000UL) // 1GHz
 
 #ifndef __ASSEMBLER__
 

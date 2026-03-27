@@ -12,4 +12,6 @@
 #define PLAT_UART_ADDR 0xFF000000
 #define UART_IRQ_ID    53
 
+#define PLAT_CPU_FREQ  (1200000000UL) // 1.2GHz
+
 #endif

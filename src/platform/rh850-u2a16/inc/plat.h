@@ -23,7 +23,6 @@
 #define UART_IRQ_ID         (438)          // RLIN35 Receive completion interrupt
 
 #define PLAT_OSTM0_BASE     (0xFFBF0000UL) // OSTM0
-#define PLAT_CLK_CPU        (400000000UL)  // 400 MHz. This value depends on CKDIVMD OPTION BYTE.
 // OSTM0 timer interrupt
 #define TIMER_IRQ_ID        (199UL)
 
@@ -41,5 +40,7 @@
 
 // OSTM use CLK_HSB
 #define TIMER_FREQ          PLAT_CLK_HSB
+
+#define PLAT_CPU_FREQ       (400000000UL) // 400 MHz. This value depends on CKDIVMD OPTION BYTE.
 
 #endif
