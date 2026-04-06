@@ -13,14 +13,14 @@
 
 #define TIMER_FREQ (PLAT_TIMER_FREQ)
 
-void timer_enable() { }
+static inline void timer_enable() { }
 
-uint64_t timer_get()
+static inline uint64_t timer_get()
 {
     return csrs_time_read();
 }
 
-uint64_t timer_set(uint64_t n)
+static inline uint64_t timer_set(uint64_t n)
 {
     uint64_t next_tick = timer_get() + n;
 
