@@ -102,6 +102,10 @@ void e3650_uart_enable_rxirq(volatile struct e3650_uart* uart)
 
 void e3650_uart_clear_rxirq(volatile struct e3650_uart* uart)
 {
+    while (!(uart->fsr1 & FSR1_EMPTY)) {
+        (void)uart->rxdr;
+    }
+
     /* Write 1 to clear Status */
     uart->intr0 = INTR0_RXFWF;
 }
