@@ -58,20 +58,6 @@ void e3650_uart_enable(volatile struct e3650_uart* uart)
 
 void e3650_uart_putc(volatile struct e3650_uart* uart, int8_t c)
 {
-    /* Startup Delay for VM1 (High Address) to avoid log interleaving */
-    static int started = 0;
-    if (!started) {
-        /* Check if we are running in the second VM (loaded > 0xB80000) */
-        /* We use the address of this function as a reference */
-        unsigned long my_addr = (unsigned long)e3650_uart_putc;
-        if (my_addr > (PLAT_MEM_BASE + (PLAT_MEM_SIZE / 2))) {
-            /* Spin for significant time to let VM0 finish banner */
-            for (volatile int i = 0; i < 40000000; i++)
-                ;
-        }
-        started = 1;
-    }
-
     /* Wait until TX FIFO is not full */
     while (uart->fsr0 & FSR0_TX_FULL) { }
 
