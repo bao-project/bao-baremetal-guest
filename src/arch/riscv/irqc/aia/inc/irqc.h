@@ -50,7 +50,9 @@
  * by the imsic. If there is a colision with another used interrupt, the platform
  * should define this macro.
  */
+#ifndef IPI_IRQ_ID
 #define IPI_IRQ_ID (255)
+#endif /* IPI_IRQ_ID */
 
 #endif /* IRQC == AIA */
 
