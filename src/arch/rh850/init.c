@@ -15,7 +15,7 @@ static inline void ei()
     asm volatile("ei\n\t");
 }
 
-void arch_init()
+__attribute__((weak)) void arch_init()
 {
 #ifndef SINGLE_CORE
     if (cpu_is_master()) {
