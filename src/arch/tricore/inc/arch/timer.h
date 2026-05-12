@@ -10,4 +10,8 @@
 
 #define TIMER_FREQ (PLAT_TIMER_FREQ)
 
+void timer_enable(void);
+
+void timer_disable(void);
+
 #endif /* ARCH_TIMER_H */
