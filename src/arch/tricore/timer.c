@@ -58,7 +58,6 @@ void timer_disable()
     *ICR = 0x0;
 }
 
-
 uint64_t timer_get()
 {
     volatile unsigned long long* ABS = STM_ABS_ADDR;

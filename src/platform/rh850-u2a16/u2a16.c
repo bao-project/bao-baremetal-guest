@@ -10,7 +10,7 @@
 
 static volatile struct renesas_rlin3* uart = (void*)PLAT_UART_ADDR;
 
-static volatile struct rh850_u2a16_OSTMn* timer = (void*)PLAT_OSTM0_BASE;
+static volatile struct rh850_u2a16_OSTMn* timer = (void*)PLAT_OSTM_BASE;
 
 void uart_init()
 {
