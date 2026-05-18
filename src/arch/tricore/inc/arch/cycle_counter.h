@@ -23,10 +23,7 @@ static inline void arch_cc_stop(void)
     csfr_cctrl_write(0);
 }
 
-static inline void arch_cc_enable(void)
-{
-    NOT_IMPLEMENTED();
-}
+static inline void arch_cc_enable(void) { }
 
 static inline void arch_cc_reset_count(void)
 {
