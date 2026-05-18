@@ -247,7 +247,9 @@ non_mskbl_interrupt:
 _irq_vector:
    .rept  254
         .balign 32
+            svlcx
             call ir_handle
+            rslcx
             rfe
         1:
             j 1b
