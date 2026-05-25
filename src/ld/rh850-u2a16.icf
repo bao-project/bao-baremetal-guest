@@ -1,0 +1,113 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) Bao Project and Contributors. All rights reserved.
+ *
+ * IAR ILINK linker configuration for the rh850-u2a16 platform.
+ * Corresponds to src/ld/linker_non_unified.ld (NON_UNIFIED memory model).
+ *
+ * Memory layout is sourced from src/platform/rh850-u2a16/inc/plat.h via
+ * the generated file others/link/linker_defs.icf (PLAT_RO_MEM_BASE, etc.).
+ * Run scripts/gen_plat_defs.py (or the IAR pre-build action) to regenerate.
+ */
+
+include "../../others/link/linker_defs.icf";
+
+define symbol RO_MEM_BASE    = PLAT_RO_MEM_BASE;
+define symbol RO_MEM_SIZE    = PLAT_RO_MEM_SIZE;
+define symbol RW_MEM_BASE    = PLAT_RW_MEM_BASE;
+define symbol RW_MEM_SIZE    = PLAT_RW_MEM_SIZE;
+define symbol STACKHEAP_SIZE = PLAT_STACKHEAP_SIZE;
+
+define memory mem with size = 4G;
+
+define region RO_region = mem:[from RO_MEM_BASE size RO_MEM_SIZE];
+define region RW_region = mem:[from RW_MEM_BASE size RW_MEM_SIZE];
+
+/*
+ * Initialization strategy (mirrors bao-hypervisor ICF pattern):
+ *   start_iar.S zeros all of RW_MEM, then only the master CPU calls
+ *   ___iar_data_init2 to copy ROM images for initialized sections.
+ *   BSS and small-BSS sections are already zero — exclude them so
+ *   ILINK does not generate zi vs. content placement conflicts.
+ */
+initialize by copy with packing = none { readwrite };
+
+do not initialize { section .bss };
+do not initialize { rw section .sbss* };
+do not initialize { section .stackheap };
+
+/* Prevent the linker stripping our startup section and vector table */
+keep { section .start };
+keep { section .vectors };
+
+/*---------------------------------------------------------------------------
+ * Small-data and small-const anchor blocks (matches bao-hypervisor pattern).
+ *
+ * static base TP: anchors the TP register (r5) for TP-relative addressing.
+ *   ILINK exports __iar_static_base$$TP at the midpoint of TP_BLOCK.
+ *   .sconst23 / .pcconst23 use 23-bit signed TP-relative offset (±4 MB).
+ *   .sconst   / .pcconst16 use 16-bit signed TP-relative offset (±32 KB).
+ *
+ * static base GP: anchors the GP register (r4) for GP-relative addressing.
+ *   ILINK exports __iar_static_base$$GP at the midpoint of GP_BLOCK.
+ *   .sdata* / .sbss* use GP-relative instructions.
+ *
+ * start_iar.S loads both __iar_static_base$$GP and __iar_static_base$$TP
+ * into the GP and TP registers before branching to C code.
+ *---------------------------------------------------------------------------*/
+define block TP_BLOCK with static base TP, alignment = 8, maximum size = 64K {
+    ro section .sconst,
+    ro section .pcconst16
+};
+define block TP23_BLOCK with alignment = 8, maximum size = 8M {
+    ro section .sconst23,
+    ro section .pcconst23,
+    midway block TP_BLOCK
+};
+define block GP_BLOCK with static base GP, alignment = 8, maximum size = 64K {
+    rw section .sbss*,
+    rw section .sdata*
+};
+
+/*---------------------------------------------------------------------------
+ * Section placement
+ *---------------------------------------------------------------------------*/
+
+/* .start must be the very first thing in ROM — _start is the reset vector */
+place at start of RO_region { section .start };
+
+place in RO_region {
+    section .vectors,   /* 512-byte aligned vector table (see exceptions_iar.S) */
+    section .text,
+    section .rodata,
+    section .const,
+    block TP23_BLOCK,   /* TP-relative const sections with TP anchor */
+    readonly            /* covers ROM images of initialized data + any remaining ro */
+};
+
+place in RW_region {
+    block GP_BLOCK,     /* GP-relative small data/bss with GP anchor */
+    readwrite,          /* remaining initialized data (.data etc.) */
+    section .bss
+};
+
+/*
+ * Place .stackheap at the top of RW_MEM so _stack_base is a fixed, known
+ * address.  ILINK does not allow "start of section" on the right-hand side
+ * of "define exported symbol", so we pin the section and derive the address
+ * arithmetically.
+ */
+define symbol STACK_BASE = RW_MEM_BASE + RW_MEM_SIZE - STACKHEAP_SIZE;
+
+place at address mem:STACK_BASE { section .stackheap };
+
+/*---------------------------------------------------------------------------
+ * Symbol exports consumed by start_iar.S
+ *
+ * _stack_base          : bottom of .stackheap; start_iar.S sets SP above it.
+ * __heap_base          : upper half of stackheap.
+ * __iar_static_base$$GP: auto-exported by ILINK from GP_BLOCK (no manual def).
+ * __iar_static_base$$TP: auto-exported by ILINK from TP_BLOCK (no manual def).
+ *---------------------------------------------------------------------------*/
+define exported symbol _stack_base = STACK_BASE;
+define exported symbol __heap_base = STACK_BASE + STACKHEAP_SIZE / 2;

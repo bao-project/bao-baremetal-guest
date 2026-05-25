@@ -18,20 +18,20 @@
 
 spinlock_t print_lock = SPINLOCK_INITVAL;
 
-void uart_rx_handler()
+void uart_rx_handler(unsigned id)
 {
     printf("cpu%d: %s\n", get_cpuid(), __func__);
     uart_clear_rxirq();
 }
 
-void ipi_handler()
+void ipi_handler(unsigned id)
 {
     irq_clear_ipi();
     printf("cpu%d: %s\n", get_cpuid(), __func__);
     irq_send_ipi(1ull << (get_cpuid() + 1));
 }
 
-void timer_handler()
+void timer_handler(unsigned id)
 {
     printf("cpu%d: %s\n", get_cpuid(), __func__);
     timer_set(TIMER_INTERVAL);

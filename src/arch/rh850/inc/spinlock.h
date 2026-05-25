@@ -19,18 +19,16 @@ static inline void spinlock_init(spinlock_t* lock)
 
 static inline void spin_lock(spinlock_t* lock)
 {
-    __asm__ volatile("1:\n\t"
-                     "    ldl.w  [%0], r19      \n\t"
-                     "    cmp    r0, r19        \n\t"
-                     "    bnz    2f             \n\t"
-                     "    mov    1, r19         \n\t"
-                     "    stc.w  r19, [%0]      \n\t"
-                     "    cmp    r0, r19        \n\t"
-                     "    bnz    3f             \n\t"
-                     "2:\n\t"
-                     "    snooze                \n\t"
-                     "    br     1b             \n\t"
-                     "3:\n\t" : : "r"(lock) : "r19", "memory");
+    uint32_t status;
+    while (1) {
+        __asm__ volatile("    LDL.W   [%1], %0    \n" : "=r"(status) : "r"(lock) : "memory");
+        if (status == 0) {
+            status = 1;
+            __asm__ volatile("    STC.W   %0, [%1]    \n" : "+r"(status) : "r"(lock) : "memory");
+            if (status != 0) break;
+        }
+        __asm__ volatile("    SNOOZE    \n");
+    }
 }
 
 static inline void spin_unlock(spinlock_t* lock)
