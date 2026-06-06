@@ -47,10 +47,12 @@
 #if (IRQC == AIA)
 /**
  * For AIA systems, by default, the IPI_IRQ_ID is largest interrupt id supported
- * by the imsic. If there is a colision with another used interrupt, the platform
- * should define this macro.
+ * by the imsic. If there is a colision with another used interrupt, or the imsic
+ * file supports fewer ids than this, the platform should define this macro.
  */
+#ifndef IPI_IRQ_ID
 #define IPI_IRQ_ID (255)
+#endif
 
 #endif /* IRQC == AIA */
 
@@ -93,7 +95,10 @@ static inline void irqc_enable_irq(unsigned long target, unsigned long int_id)
 #endif
 
     if (irqc_requires_aplic_setup(int_id)) {
-        aplic_set_sourcecfg(int_id, APLIC_SOURCECFG_SM_EDGE_RISE);
+        /* Wired peripheral interrupts on the K3 (e.g. the UART, <42 LEVEL_HIGH>)
+         * are active-high level, not edge. An edge-rise config can miss the
+         * assertion entirely (and never re-pends while the line stays high). */
+        aplic_set_sourcecfg(int_id, APLIC_SOURCECFG_SM_LEVEL_HIGH);
         aplic_set_enbl(int_id);
         aplic_set_target_hart(int_id, get_cpuid());
 #if (IRQC == AIA)

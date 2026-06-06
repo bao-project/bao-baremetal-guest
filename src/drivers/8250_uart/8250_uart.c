@@ -11,8 +11,8 @@
 #define writeb(val, addr) (*(volatile uint8_t*)(addr) = val)
 #define readw(addr)       (*((volatile uint16_t*)addr))
 #define writew(val, addr) (*(volatile uint16_t*)(addr) = val)
-#define readl(addr)       (*((volatile uint32_t*)addr))
-#define writel(val, addr) (*((volatile uint32_t*)addr) = val)
+#define readl(addr)       (*((volatile uint32_t*)(addr)))
+#define writel(val, addr) (*((volatile uint32_t*)(addr)) = val)
 
 /* clang-format off */
 
@@ -97,7 +97,7 @@ void uart8250_interrupt_handler()
 
 void uart8250_enable_rx_int()
 {
-    set_reg(UART_IER_OFFSET, 1);
+    set_reg(UART_IER_OFFSET, 0x50 | 1);
 }
 
 int uart8250_init(unsigned long base, u32 in_freq, u32 baudrate, u32 reg_shift, u32 reg_width)
@@ -113,9 +113,9 @@ int uart8250_init(unsigned long base, u32 in_freq, u32 baudrate, u32 reg_shift, 
     bdiv = uart8250_in_freq / (16 * uart8250_baudrate);
 
     /* Disable all interrupts */
-    set_reg(UART_IER_OFFSET, 0x00);
+    set_reg(UART_IER_OFFSET, 0x50);
     /* Enable DLAB */
-    set_reg(UART_LCR_OFFSET, 0x80);
+    set_reg(UART_LCR_OFFSET, 0x0);
     // /* Set divisor low byte */
     // set_reg(UART_DLL_OFFSET, bdiv & 0xff);
     // /* Set divisor high byte */
@@ -123,9 +123,13 @@ int uart8250_init(unsigned long base, u32 in_freq, u32 baudrate, u32 reg_shift, 
     /* 8 bits, no parity, one stop bit */
     set_reg(UART_LCR_OFFSET, 0x03);
     /* Enable FIFO */
-    set_reg(UART_FCR_OFFSET, 0x01);
-    /* No modem control DTR RTS */
-    set_reg(UART_MCR_OFFSET, 0x00);
+    set_reg(UART_FCR_OFFSET, 0x01 | 0x6);
+    /* MCR: raise OUT2 (bit 3). On a 16550 OUT2 gates the tri-state INTR output
+     * buffer - with OUT2=0 the RX interrupt is raised INTERNALLY (IIR pending,
+     * LSR.DR=1) but never reaches the external INTR pin, so the APLIC source-42
+     * input line never asserts. Linux does this in serial8250_init_mctrl ("Most
+     * PC uarts need OUT2 raised to enable interrupts"). DTR/RTS left low. */
+    set_reg(UART_MCR_OFFSET, 0x08);
     /* Clear line status */
     get_reg(UART_LSR_OFFSET);
     /* Read receive buffer */
