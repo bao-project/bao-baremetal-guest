@@ -52,6 +52,14 @@ void aplic_set_sourcecfg(unsigned long intp_id, uint32_t val)
     aplic_control->sourcecfg[intp_id - 1] = val & APLIC_SOURCECFG_SM_MASK;
 }
 
+/* Default interrupt sense: edge-rising. Weak so a platform with level-sensitive
+ * wired lines (e.g. a UART) can override it per interrupt id. */
+__attribute__((weak)) uint32_t irqc_get_irq_sense(unsigned long int_id)
+{
+    (void)int_id;
+    return APLIC_SOURCECFG_SM_EDGE_RISE;
+}
+
 void aplic_set_enbl(unsigned long intp_id)
 {
     aplic_control->setienum = intp_id;
