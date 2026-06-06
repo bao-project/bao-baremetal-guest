@@ -86,6 +86,13 @@ static inline bool irqc_requires_aplic_setup(unsigned long int_id)
 #endif
 }
 
+/**
+ * Returns the APLIC source mode (sense) to program for a wired interrupt.
+ * Defaults (weak) to edge-rising; a platform with level-sensitive lines (e.g. a
+ * UART wired active-high) overrides this to return the right sense per id.
+ */
+uint32_t irqc_get_irq_sense(unsigned long int_id);
+
 static inline void irqc_enable_irq(unsigned long target, unsigned long int_id)
 {
 #if (IRQC == AIA)
@@ -93,7 +100,7 @@ static inline void irqc_enable_irq(unsigned long target, unsigned long int_id)
 #endif
 
     if (irqc_requires_aplic_setup(int_id)) {
-        aplic_set_sourcecfg(int_id, APLIC_SOURCECFG_SM_EDGE_RISE);
+        aplic_set_sourcecfg(int_id, irqc_get_irq_sense(int_id));
         aplic_set_enbl(int_id);
         aplic_set_target_hart(int_id, get_cpuid());
 #if (IRQC == AIA)
