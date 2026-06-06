@@ -46,11 +46,15 @@
 
 #if (IRQC == AIA)
 /**
- * For AIA systems, by default, the IPI_IRQ_ID is largest interrupt id supported
- * by the imsic. If there is a colision with another used interrupt, the platform
- * should define this macro.
+ * For AIA systems the IPI defaults to the largest interrupt id the IMSIC
+ * supports (derived from PLAT_IMSIC_MAX_INTERRUPTS) rather than a fixed magic
+ * value. A platform whose IMSIC file exposes fewer ids than that (e.g. a Bao
+ * VS-file), or where this id collides with a wired interrupt, must override
+ * IPI_IRQ_ID in its plat.h.
  */
-#define IPI_IRQ_ID (255)
+#ifndef IPI_IRQ_ID
+#define IPI_IRQ_ID (PLAT_IMSIC_MAX_INTERRUPTS - 1)
+#endif
 
 #endif /* IRQC == AIA */
 
