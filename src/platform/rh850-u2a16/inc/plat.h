@@ -8,10 +8,10 @@
 
 #include <core.h>
 
-#define PLAT_RO_MEM_BASE    0x7F0000
+#define PLAT_RO_MEM_BASE    0x00000
 #define PLAT_RO_MEM_SIZE    0x10000
 
-#define PLAT_RW_MEM_BASE    0xFE100000
+#define PLAT_RW_MEM_BASE    0xfe400000
 #define PLAT_RW_MEM_SIZE    0x80000
 
 #define PLAT_STACKHEAP_SIZE 0x2000

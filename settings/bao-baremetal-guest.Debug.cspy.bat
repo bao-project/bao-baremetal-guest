@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\iar\ewrh850c-3.20.1\common\bin\cspybat" -f "C:\Users\David\Desktop\IAR\bao-hypervisor-osyx_baremetal-guest\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.general.xcl" --backend -f "C:\Users\David\Desktop\IAR\bao-hypervisor-osyx_baremetal-guest\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.driver.xcl" 
+"C:\iar\ewrh850c-3.20.1\common\bin\cspybat" -f "C:\Users\David\Desktop\IAR\baremetal-app\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.general.xcl" --backend -f "C:\Users\David\Desktop\IAR\baremetal-app\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\iar\ewrh850c-3.20.1\common\bin\cspybat" -f "C:\Users\David\Desktop\IAR\bao-hypervisor-osyx_baremetal-guest\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\David\Desktop\IAR\bao-hypervisor-osyx_baremetal-guest\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.driver.xcl" 
+"C:\iar\ewrh850c-3.20.1\common\bin\cspybat" -f "C:\Users\David\Desktop\IAR\baremetal-app\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\David\Desktop\IAR\baremetal-app\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.driver.xcl" 
 
 @echo off 
 :end

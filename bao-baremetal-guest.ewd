@@ -24,11 +24,11 @@
                 </option>
                 <option>
                     <name>CSPYDynDriver</name>
-                    <state>SIMRH850</state>
+                    <state>E2RH850</state>
                 </option>
                 <option>
                     <name>CSPYRunToEnable</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CSPYRunoToName</name>
@@ -48,7 +48,7 @@
                 </option>
                 <option>
                     <name>CSPYMemFile</name>
-                    <state></state>
+                    <state>$TOOLKIT_DIR$/config/debugger/ior7f702300b.ddf</state>
                 </option>
                 <option>
                     <name>CSPYMandatory</name>

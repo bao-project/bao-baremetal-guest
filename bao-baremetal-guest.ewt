@@ -3401,6 +3401,24 @@
         </file>
     </group>
     <group>
+        <name>bsp</name>
+        <file>
+            <name>$PROJ_DIR$\src\bsp\clock.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\bsp\pbg.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\bsp\plat.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\bsp\port.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\bsp\stbc.c</name>
+        </file>
+    </group>
+    <group>
         <name>core</name>
         <file>
             <name>$PROJ_DIR$\src\core\irq.c</name>

@@ -12,7 +12,7 @@
  */
 
 #include <core.h>
-#include <spinlock.h>
+#include <cpu.h>
 #include <uart.h>
 #include <wfi.h>
 #include <fences.h>
@@ -74,23 +74,43 @@ void __exit(int return_value)
  * "EXTERN _init / jr _init" resolves to this C function named "init".
  *
  * Marked weak so a platform or application can override it entirely.
- * The multi-core spinlock ensures uart_init() runs exactly once across CPUs.
+ *
+ * Two-layer boot synchronization (mirrors bao-hypervisor boot.S pattern):
+ *
+ * Layer 1 — assembly (start_iar.S):
+ *   Non-master PEs spin on _boot_sync_flag until master has finished
+ *   boot_clear + ___iar_data_init2 and written BOOT_SYNC_MAGIC.  This
+ *   guarantees that all PEs enter C code only after RAM is fully initialised
+ *   (BSS zeroed, .data copied).
+ *
+ * Layer 2 — this function:
+ *   uart_init() must run exactly once.  The original LDL.W/STC.W spinlock
+ *   is unreliable: the IAR hardware debugger invalidates the link reservation
+ *   on every debug halt, so STC.W always fails when single-stepping.
+ *   Replaced with a cpu_is_master() split: master calls uart_init() and
+ *   publishes init_done; non-master CPUs poll with wfi() (SNOOZE) until set.
+ *   No atomic RMW instructions required.
  * --------------------------------------------------------------------------- */
 extern void arch_init(void);
 extern int main(void);
 extern void uart_init(void);
+extern void platform_custom_init(void);
 
-static bool init_done = false;
-static spinlock_t init_lock = SPINLOCK_INITVAL;
+static volatile bool init_done = false;
 
 __attribute__((weak)) void init(void)
 {
-    spin_lock(&init_lock);
-    if (!init_done) {
-        init_done = true;
+    if (cpu_is_master()) {
+        platform_custom_init();
         uart_init();
+        fence_ord();      /* ensure uart_init stores are visible before flag */
+        init_done = true;
+    } else {
+        while (!init_done) {
+            wfi();        /* SNOOZE while waiting for master to finish */
+        }
+        fence_ord();      /* acquire barrier before using UART */
     }
-    spin_unlock(&init_lock);
 
     arch_init();
 

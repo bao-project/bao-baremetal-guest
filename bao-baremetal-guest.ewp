@@ -16,7 +16,7 @@
                 <debug>1</debug>
                 <option>
                     <name>GDeviceSelect</name>
-                    <state>UnspecifiedG3M	RH850 G3M - Unspecified</state>
+                    <state>R7F702300B	RH850 - R7F702300B</state>
                 </option>
                 <option>
                     <name>GDataModel</name>
@@ -88,7 +88,7 @@
                 </option>
                 <option>
                     <name>GNumCores</name>
-                    <state>1</state>
+                    <state>4</state>
                 </option>
                 <option>
                     <name>GenDoubleSize</name>
@@ -135,15 +135,15 @@
                 </option>
                 <option>
                     <name>GRAMTuning</name>
-                    <state>0x40000</state>
+                    <state>0x8000</state>
                 </option>
                 <option>
                     <name>GRAMTuningText</name>
-                    <state>0x80000 bytes</state>
+                    <state>0x10000 bytes</state>
                 </option>
                 <option>
                     <name>GDeviceSelectSlave</name>
-                    <state>UnspecifiedG3M	RH850 G3M - Unspecified</state>
+                    <state>R7F702300B	RH850 - R7F702300B</state>
                 </option>
                 <option>
                     <name>GenRopi</name>
@@ -352,6 +352,7 @@
                     <state>$PROJ_DIR$/src/platform/rh850-u2a16/inc</state>
                     <state>$PROJ_DIR$/src/drivers/renesas_rlin3/inc</state>
                     <state>$PROJ_DIR$/src/drivers/rh850-u2a16_ostm/inc</state>
+                    <state>$PROJ_DIR$\src\bsp\inc\</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2028,6 +2029,24 @@
         </file>
         <file>
             <name>$PROJ_DIR$\src\arch\rh850\start_iar.S</name>
+        </file>
+    </group>
+    <group>
+        <name>bsp</name>
+        <file>
+            <name>$PROJ_DIR$\src\bsp\clock.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\bsp\pbg.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\bsp\plat.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\bsp\port.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\src\bsp\stbc.c</name>
         </file>
     </group>
     <group>

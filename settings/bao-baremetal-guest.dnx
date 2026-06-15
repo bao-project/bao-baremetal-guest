@@ -13,9 +13,9 @@
         <FillEnabled>0</FillEnabled>
         <OverflowWarningsEnabled>1</OverflowWarningsEnabled>
         <WarningThreshold>90</WarningThreshold>
-        <SpWarningsEnabled>1</SpWarningsEnabled>
+        <SpWarningsEnabled>0</SpWarningsEnabled>
         <WarnLogOnly>1</WarnLogOnly>
-        <UseTrigger>1</UseTrigger>
+        <UseTrigger>0</UseTrigger>
         <TriggerName>main</TriggerName>
         <LimitSize>0</LimitSize>
         <ByteLimit>50</ByteLimit>
@@ -24,6 +24,26 @@
         <Enabled>0</Enabled>
         <ShowSource>1</ShowSource>
     </Trace1>
+    <DebugChecksum>
+        <Checksum>1859039633</Checksum>
+    </DebugChecksum>
+    <Disassembly>
+        <InstrCount>0</InstrCount>
+        <MixedMode>1</MixedMode>
+    </Disassembly>
+    <CallStack>
+        <ShowArgs>0</ShowArgs>
+    </CallStack>
+    <SfrWindow>
+        <Show>1 1</Show>
+        <Sort>4 0</Sort>
+    </SfrWindow>
+    <DriverProfiling>
+        <Enabled>0</Enabled>
+        <Mode>1</Mode>
+        <Graph>0</Graph>
+        <Symbiont>0</Symbiont>
+    </DriverProfiling>
     <InterruptLog>
         <GraphEnabled>0</GraphEnabled>
         <LogEnabled>0</LogEnabled>
@@ -31,6 +51,24 @@
         <SumEnabled>0</SumEnabled>
         <ShowTimeSum>1</ShowTimeSum>
         <SumSortOrder>0</SumSortOrder>
+        <GraphEnabledCore1>0</GraphEnabledCore1>
+        <LogEnabledCore1>0</LogEnabledCore1>
+        <ShowTimeLogCore1>1</ShowTimeLogCore1>
+        <SumEnabledCore1>0</SumEnabledCore1>
+        <ShowTimeSumCore1>1</ShowTimeSumCore1>
+        <SumSortOrderCore1>0</SumSortOrderCore1>
+        <GraphEnabledCore2>0</GraphEnabledCore2>
+        <LogEnabledCore2>0</LogEnabledCore2>
+        <ShowTimeLogCore2>1</ShowTimeLogCore2>
+        <SumEnabledCore2>0</SumEnabledCore2>
+        <ShowTimeSumCore2>1</ShowTimeSumCore2>
+        <SumSortOrderCore2>0</SumSortOrderCore2>
+        <GraphEnabledCore3>0</GraphEnabledCore3>
+        <LogEnabledCore3>0</LogEnabledCore3>
+        <ShowTimeLogCore3>1</ShowTimeLogCore3>
+        <SumEnabledCore3>0</SumEnabledCore3>
+        <ShowTimeSumCore3>1</ShowTimeSumCore3>
+        <SumSortOrderCore3>0</SumSortOrderCore3>
     </InterruptLog>
     <DataLog>
         <GraphEnabled>0</GraphEnabled>
@@ -38,14 +76,22 @@
         <ShowTimeLog>1</ShowTimeLog>
         <SumEnabled>0</SumEnabled>
         <ShowTimeSum>1</ShowTimeSum>
+        <GraphEnabledCore1>0</GraphEnabledCore1>
+        <LogEnabledCore1>0</LogEnabledCore1>
+        <ShowTimeLogCore1>1</ShowTimeLogCore1>
+        <SumEnabledCore1>0</SumEnabledCore1>
+        <ShowTimeSumCore1>1</ShowTimeSumCore1>
+        <GraphEnabledCore2>0</GraphEnabledCore2>
+        <LogEnabledCore2>0</LogEnabledCore2>
+        <ShowTimeLogCore2>1</ShowTimeLogCore2>
+        <SumEnabledCore2>0</SumEnabledCore2>
+        <ShowTimeSumCore2>1</ShowTimeSumCore2>
+        <GraphEnabledCore3>0</GraphEnabledCore3>
+        <LogEnabledCore3>0</LogEnabledCore3>
+        <ShowTimeLogCore3>1</ShowTimeLogCore3>
+        <SumEnabledCore3>0</SumEnabledCore3>
+        <ShowTimeSumCore3>1</ShowTimeSumCore3>
     </DataLog>
-    <TermIOLog>
-        <LoggingEnabled>_ 0</LoggingEnabled>
-        <LogFile>_ ""</LogFile>
-    </TermIOLog>
-    <Breakpoints2>
-        <Count>0</Count>
-    </Breakpoints2>
     <Interrupts>
         <Enabled>1</Enabled>
     </Interrupts>
@@ -65,4 +111,42 @@
         <FreqHi>0</FreqHi>
         <MultiCoreRunAll>1</MultiCoreRunAll>
     </Simulator>
+    <PlDriver>
+        <MemConfigValue>C:\iar\ewrh850c-3.20.1\rh850/config/debugger/ior7f702300b.ddf</MemConfigValue>
+        <FirstRun>0</FirstRun>
+    </PlDriver>
+    <watch_formats>
+        <Fmt0>{W}42:_boot_sync_flag	4	0</Fmt0>
+    </watch_formats>
+    <DataSample>
+        <GraphEnabled>0</GraphEnabled>
+        <LogEnabled>0</LogEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+    </DataSample>
+    <TermIOLog>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+    </TermIOLog>
+    <Breakpoints2>
+        <Bp0>_ 0 "EMUL_CODE" "0xAFA" 0 0 1 "" 0 "" 0</Bp0>
+        <Bp1>_ 0 "EMUL_CODE" "{$PROJ_DIR$\src\core\retarget.c}.116.1" 0 0 1 "" 0 "" 0</Bp1>
+        <Bp2>_ 1 "EMUL_CODE" "{$PROJ_DIR$\src\arch\rh850\init.c}.27.5" 0 0 1 "" 0 "" 0</Bp2>
+        <Bp3>_ 0 "EMUL_CODE" "{$PROJ_DIR$\src\arch\rh850\start_iar.S}.69.1" 0 0 1 "" 0 "" 0</Bp3>
+        <Bp4>_ 0 "EMUL_CODE" "0xB4" 0 0 1 "" 0 "" 0</Bp4>
+        <Bp5>_ 1 "EMUL_CODE" "0x4" 0 0 1 "" 0 "" 0</Bp5>
+        <Count>6</Count>
+    </Breakpoints2>
+    <OCD>
+        <HardwareSettings>6,16411,0,1,FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF,FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF,FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF,0</HardwareSettings>
+        <ClockSettings>1,16000,0,0</ClockSettings>
+        <TraceSettings>0,1,256,0,2151685632</TraceSettings>
+        <Leave_target_running>0</Leave_target_running>
+        <Operating_Frequency>16000000</Operating_Frequency>
+        <EnableCache>1</EnableCache>
+    </OCD>
+    <Aliases>
+        <Count>0</Count>
+        <SuppressDialog>0</SuppressDialog>
+        <SuppressResolveSourcesForDebugTarget>1</SuppressResolveSourcesForDebugTarget>
+    </Aliases>
 </settings>

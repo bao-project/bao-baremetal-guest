@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\iar\ewrh850c-3.20.1\common\bin\cspybat" -f "C:\Users\David\Desktop\IAR\bao-hypervisor-osyx_baremetal-guest\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.general.xcl" --backend -f "C:\Users\David\Desktop\IAR\bao-hypervisor-osyx_baremetal-guest\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.driver.xcl" 
+& "C:\iar\ewrh850c-3.20.1\common\bin\cspybat" -f "C:\Users\David\Desktop\IAR\baremetal-app\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.general.xcl" --backend -f "C:\Users\David\Desktop\IAR\baremetal-app\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.driver.xcl" 
 }
 else
 {
-& "C:\iar\ewrh850c-3.20.1\common\bin\cspybat" -f "C:\Users\David\Desktop\IAR\bao-hypervisor-osyx_baremetal-guest\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\David\Desktop\IAR\bao-hypervisor-osyx_baremetal-guest\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.driver.xcl" 
+& "C:\iar\ewrh850c-3.20.1\common\bin\cspybat" -f "C:\Users\David\Desktop\IAR\baremetal-app\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\David\Desktop\IAR\baremetal-app\bao-baremetal-guest\settings\bao-baremetal-guest.Debug.driver.xcl" 
 }

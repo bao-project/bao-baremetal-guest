@@ -1,6 +1,6 @@
 --core
 
-g3m
+g4mh
 
 --fpu
 
@@ -8,15 +8,19 @@ double
 
 -p
 
-C:\iar\ewrh850c-3.20.1\rh850/config/debugger/iorh850_g3m.ddf
+C:\iar\ewrh850c-3.20.1\rh850/config/debugger/ior7f702300b.ddf
 
 --double=64
 
 -d
 
-sim
+e2
 
---multicore_nr_of_cores=1
+--multicore_nr_of_cores=4
+
+--LPD4_freq
+
+0
 
 
 

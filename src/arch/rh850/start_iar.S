@@ -13,22 +13,35 @@
  * IAR naming convention: IAR prepends '_' to C symbol names in object files.
  *   C "init"             -> assembly "_init"
  *   C "__iar_data_init2" -> assembly "___iar_data_init2"
+ *
+ * Multi-core boot synchronization
+ * --------------------------------
+ * All PEs start from reset simultaneously.  Non-master PEs must not enter C
+ * code until master has finished zeroing RW_MEM and running ___iar_data_init2,
+ * otherwise they will read uninitialised BSS or stale .data values.
+ *
+ * Pattern (mirrors bao-hypervisor boot.S / iar.S):
+ *   1. Master zeros RW_MEM, runs ___iar_data_init2, then writes BOOT_SYNC_MAGIC
+ *      to _boot_sync_flag.
+ *   2. Non-master PEs spin-read _boot_sync_flag; they enter C only after seeing
+ *      BOOT_SYNC_MAGIC, guaranteeing RAM is fully initialised.
+ *   3. C-level init() then uses a cpu_is_master() guard so uart_init() runs
+ *      exactly once before any PE calls main().
  */
 
 #include <plat.h>
 #include <core.h>
 
-#define CPU_MASTER  0x0
-#define STACK_SIZE  0x200
+#define CPU_MASTER      0x0
+#define STACK_SIZE      0x1000
+#define BOOT_SYNC_MAGIC 0xBA0B007
 
-/* LOAD_ADDR: load a 32-bit symbol address into reg. IAR generates a full-word relocation for mov with a symbol. */
+/* LOAD_ADDR: load a 32-bit symbol address into reg. */
 LOAD_ADDR MACRO sym, reg
     mov sym, reg
     ENDM
 
     ; Declare Region$$Table so SFB/SFE operators can reference it.
-    ; ILINK populates this section with data-init records when
-    ; "initialize by copy with packing = none" is used in the ICF.
     SECTION `Region$$Table`:DATA:REORDER:NOROOT(0)
 
     EXTERN _vector_table
@@ -37,6 +50,16 @@ LOAD_ADDR MACRO sym, reg
     EXTERN __iar_static_base$$GP
     EXTERN __iar_static_base$$TP
     EXTERN _init
+
+; ---------------------------------------------------------------------------
+; Boot synchronization flag (in .bss, zeroed by master's boot_clear).
+; Master writes BOOT_SYNC_MAGIC here after RAM init; non-master PEs spin on
+; this address before entering C code.
+; ---------------------------------------------------------------------------
+    SECTION .bss:DATA:NOROOT(2)
+    PUBLIC _boot_sync_flag
+_boot_sync_flag:
+    DS8 4                   ; uint32_t, zero-initialised by boot_clear
 
     SECTION .start:CODE:ROOT(2)     ; 2-byte aligned, kept by linker (ROOT)
     PUBLIC _start
@@ -81,47 +104,52 @@ _start:
     add r21, r20        ; r20 = _stack_base + STACK_SIZE * (PEID + 1)
     mov r20, sp
 
-    ; Only the master CPU initialises memory and .data
+    ; Branch: non-master PEs go directly to the boot-sync spin loop.
     mov CPU_MASTER, r10
     cmp r5, r10
-    bne skip
+    bne _wait_boot_sync
 
-    ; Zero the entire RW_MEM region (covers .data, .bss, .stackheap)
+    ; ===========================================================
+    ; MASTER CPU ONLY
+    ; ===========================================================
+
+    ; Zero the entire RW_MEM region (covers .data, .bss, .stackheap,
+    ; and _boot_sync_flag itself — slaves see 0 until we set the magic).
     mov RW_MEM_BASE, r20
     mov RW_MEM_BASE + RW_MEM_SIZE, r21
     jarl boot_clear, lp
 
-    ; Set the GP register (r4) to the midpoint of GP_BLOCK for GP-relative
-    ; small-data access (.sdata23, .sbss23).  ILINK auto-exports this symbol
-    ; from the "static base GP" block in the ICF.
+    ; Set GP (r4) and TP (r5) for GP/TP-relative addressing.
     LOAD_ADDR __iar_static_base$$GP, gp
-
-    ; Set the TP register (r5) to the midpoint of TP_BLOCK for TP-relative
-    ; small-const access (.sconst23, .sconst).  ILINK auto-exports this symbol
-    ; from the "static base TP" block in the ICF.
     LOAD_ADDR __iar_static_base$$TP, r5
 
-    ; Copy .data ROM image to RAM via IAR's initialisation runtime.
-    ; ILINK generates Region$$Table when "initialize by copy with packing = none"
-    ; is used in the ICF. r6 = table start, r7 = table end (RH850 ABI).
+    ; Copy .data ROM images to RAM and zero BSS via IAR runtime.
     mov SFB(`Region$$Table`), r6
     mov SFE(`Region$$Table`), r7
     jarl ___iar_data_init2, lp
-    jr _end_of_start
 
-skip:
-    ; Set the GP register (r4) to the midpoint of GP_BLOCK for GP-relative
-    ; small-data access (.sdata23, .sbss23).  ILINK auto-exports this symbol
-    ; from the "static base GP" block in the ICF.
+    ; Signal non-master PEs: RAM is fully initialised.
+    LOAD_ADDR _boot_sync_flag, r20
+    mov BOOT_SYNC_MAGIC, r21
+    st.w r21, 0[r20]
+
+    jr _init
+
+    ; ===========================================================
+    ; NON-MASTER CPUs: spin until master signals RAM is ready
+    ; ===========================================================
+_wait_boot_sync:
+    ; GP and TP are absolute linker symbols — safe to load before sync.
     LOAD_ADDR __iar_static_base$$GP, gp
-
-    ; Set the TP register (r5) to the midpoint of TP_BLOCK for TP-relative
-    ; small-const access (.sconst23, .sconst).  ILINK auto-exports this symbol
-    ; from the "static base TP" block in the ICF.
     LOAD_ADDR __iar_static_base$$TP, r5
 
-_end_of_start:
-    ; Jump to C-level entry: init() calls uart_init(), arch_init(), main().
+_boot_sync_spin:
+    LOAD_ADDR _boot_sync_flag, r20
+    ld.w 0[r20], r21
+    mov BOOT_SYNC_MAGIC, r22
+    cmp r21, r22
+    bne _boot_sync_spin
+
     jr _init
 
 
