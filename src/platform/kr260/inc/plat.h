@@ -1,0 +1,17 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (c) Bao Project and Contributors. All rights reserved.
+ */
+
+#ifndef PLAT_H
+#define PLAT_H
+
+#define PLAT_MEM_BASE  0x20000000
+#define PLAT_MEM_SIZE  0x8000000
+
+#define PLAT_UART_ADDR 0xFF000000
+#define UART_IRQ_ID    53
+
+#define PLAT_CPU_FREQ  (1200000000UL) // 1.2GHz
+
+#endif
