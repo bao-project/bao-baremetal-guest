@@ -4,7 +4,14 @@
  */
 
 #include <plat.h>
+#include <mem.h>
 #include <cmsdk_uart.h>
+
+const struct mpu_region plat_mpu_regs[] = {
+    MPU_REGION_DESC(PLAT_MEM_BASE, PLAT_MEM_BASE + PLAT_MEM_SIZE, PRBAR_SH_IS, PRBAR_AP_RW_ALL, PRBAR_ATTR_NORMAL),
+    MPU_REGION_DESC(0xe0000000, 0xe7c00000, PRBAR_SH_IS, PRBAR_AP_RW_ALL, PRBAR_ATTR_DEVICE),
+};
+DEFINE_PLAT_MPU_NUM_REGS();
 
 struct cmsdk_uart_hw* uart = (void*)PLAT_UART_ADDR;
 
