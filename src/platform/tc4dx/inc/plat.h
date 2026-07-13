@@ -20,6 +20,8 @@
 
 #define IRQ_SRC_NODE(id) (*((unsigned long*)(0xF4432000 + ((id) * 4))))
 
+#define PLAT_UART_ADDR   (0xF46C0000UL)
+
 #define UART_IRQ_ID      (173)
 #define UART_IRQ_PRIO    (100)
 
