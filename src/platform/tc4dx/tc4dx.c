@@ -15,7 +15,6 @@
 #define PORT_DRVCFG_DIR_IN       0x1UL
 #define PORT_DRVCFG_DIR_OUT      0UL
 
-#define UART_ADDR                0xF46C0000UL
 struct asclin_hw* uart = (void*)UART_ADDR;
 
 void uart_init()
