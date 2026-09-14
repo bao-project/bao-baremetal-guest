@@ -83,7 +83,13 @@ bool tricore_uart_set_baud_rate(volatile struct asclin_hw* uart, uint32_t baud_r
 
 uint32_t tricore_uart_getc(volatile struct asclin_hw* uart)
 {
-    return 0;
+    while (!(uart->FLAGS & RFLE))
+        ;
+
+    uint32_t data = uart->RXDATA[0];
+    uart->FLAGSCLEAR = RFLE;
+
+    return data;
 }
 
 void tricore_uart_putc(volatile struct asclin_hw* uart, int8_t c)
@@ -92,4 +98,14 @@ void tricore_uart_putc(volatile struct asclin_hw* uart, int8_t c)
     while (!(uart->FLAGS & TFL))
         ;
     uart->FLAGSCLEAR = ASCLIN_ALLFLAGS_MASK;
+}
+
+void tricore_uart_enable_rxirq(volatile struct asclin_hw* uart)
+{
+    uart->FLAGSENABLE |= RFLE;
+}
+
+void tricore_uart_clear_rxirq(volatile struct asclin_hw* uart)
+{
+    uart->FLAGSCLEAR = RFLE;
 }

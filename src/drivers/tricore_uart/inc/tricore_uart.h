@@ -91,5 +91,7 @@ void tricore_uart_disable(volatile struct asclin_hw* uart);
 bool tricore_uart_set_baud_rate(volatile struct asclin_hw* uart, uint32_t baud_rate);
 uint32_t tricore_uart_getc(volatile struct asclin_hw* uart);
 void tricore_uart_putc(volatile struct asclin_hw* uart, int8_t c);
+void tricore_uart_enable_rxirq(volatile struct asclin_hw* uart);
+void tricore_uart_clear_rxirq(volatile struct asclin_hw* uart);
 
 #endif /* __UART_TRICORE_H */
