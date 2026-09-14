@@ -30,6 +30,8 @@ typedef struct {
     volatile uint64_t RELTIM;    /* 0x138 - 0x13F */
 } tc_stm_t;
 
+#define STM_ISCR_CMP0IRR         (1UL << 0)
+
 #define STM_CMCON_Mx_MASK        (0x1F)
 #define STM_CMCON_MSIZE0_OFFSET  (0)
 #define STM_CMCON_MSTART0_OFFSET (8)
@@ -70,6 +72,8 @@ uint64_t timer_set(uint64_t period_us)
         uint32_t next = current + (uint32_t)period_us;
 
         STM->CMP0 = next;
+
+        STM->ISCR = STM_ISCR_CMP0IRR;
 
         return next;
     }
