@@ -21,7 +21,7 @@
 #define INT_OFFSET       0xF4430000
 #define SRB_OFFSET       0xB00
 #define SRB(x)           (INT_OFFSET + SRB_OFFSET + ((x) * 4))
-unsigned long irq_ids[IRQ_MAX_PRIO] = { 0 };
+unsigned long irq_ids[IRQ_MAX_PRIO + 1] = { 0 };
 
 static inline uint8_t read_ccpn(void)
 {
@@ -42,7 +42,7 @@ bool ir_irq_enabled(int int_id)
 {
     bool ret = false;
 
-    for (int i = 0; i < IRQ_MAX_PRIO; i++) {
+    for (int i = 0; i <= IRQ_MAX_PRIO; i++) {
         if (int_id == irq_ids[i]) {
             ret = true;
         }
