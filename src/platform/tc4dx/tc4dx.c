@@ -36,9 +36,15 @@ void uart_putc(char c)
 
 char uart_getchar(void)
 {
-    return -1;
+    return (char)tricore_uart_getc(uart);
 }
 
-void uart_enable_rxirq() { }
+void uart_enable_rxirq()
+{
+    tricore_uart_enable_rxirq(uart);
+}
 
-void uart_clear_rxirq() { }
+void uart_clear_rxirq()
+{
+    tricore_uart_clear_rxirq(uart);
+}
