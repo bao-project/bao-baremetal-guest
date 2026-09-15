@@ -46,6 +46,9 @@ endif
 ifneq ($(SHMEM_SIZE),)
 CPPFLAGS+=-DSHMEM_SIZE=$(SHMEM_SIZE)
 endif
+ifneq ($(SHMEM_IRQ_ID),)
+CPPFLAGS+=-DSHMEM_IRQ_ID=$(SHMEM_IRQ_ID)
+endif
 ifneq ($(SINGLE_CORE),)
 CPPFLAGS+=-DSINGLE_CORE=y
 endif
