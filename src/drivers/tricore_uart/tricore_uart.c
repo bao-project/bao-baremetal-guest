@@ -9,6 +9,14 @@
 #define BRG_NUMERATOR   8
 #define BRG_DENOMINATOR 0xD9
 
+#if TC4DX_ASCLIN == 0
+#define UART_RX_ALTI 0
+#elif TC4DX_ASCLIN == 1
+#define UART_RX_ALTI 5
+#else
+#error Unsupported ASCLIN instance TC4DX_ASCLIN
+#endif
+
 static inline void tricore_uart_enable_clock(volatile struct asclin_hw* uart, uint32_t clk_mode)
 {
     uart->CSR = clk_mode;
@@ -29,6 +37,8 @@ bool tricore_uart_init(volatile struct asclin_hw* uart)
     uart->CLC = 0x0;
 
     tricore_uart_disable_clock(uart);
+
+    uart->IOCR = UART_RX_ALTI & ASCLIN_IOCR_ALTI_MASK;
 
     // set module to initilise mode
     uart->FRAMECON = 0;
@@ -97,7 +107,7 @@ void tricore_uart_putc(volatile struct asclin_hw* uart, int8_t c)
     uart->TXDATA[0] = (uint32_t)c;
     while (!(uart->FLAGS & TFL))
         ;
-    uart->FLAGSCLEAR = ASCLIN_ALLFLAGS_MASK;
+    uart->FLAGSCLEAR = TFL | TFOE;
 }
 
 void tricore_uart_enable_rxirq(volatile struct asclin_hw* uart)

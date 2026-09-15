@@ -39,6 +39,7 @@
 #define ASCLIN_FRAMECON_STOP_OFFSET       9UL
 #define ASCLIN_FRAMECON_STOP_001B         1UL
 #define ASCLIN_ALLFLAGS_MASK              0xFFFFFFFFUL
+#define ASCLIN_IOCR_ALTI_MASK             0x7UL
 
 struct asclin0_hw {
     volatile uint8_t RESERVED[0x200];
