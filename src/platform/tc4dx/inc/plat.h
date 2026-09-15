@@ -20,15 +20,22 @@
 
 #define IRQ_SRC_NODE(id) (*((unsigned long*)(0xF4432000 + ((id) * 4))))
 
-#define PLAT_UART_ADDR   (0xF46C0000UL)
+#if TC4DX_ASCLIN == 0
+#define PLAT_UART_ADDR (0xF46C0000UL)
+#define UART_IRQ_ID    (173)
+#elif TC4DX_ASCLIN == 1
+#define PLAT_UART_ADDR (0xF46C0200UL)
+#define UART_IRQ_ID    (176)
+#else
+#error Unsupported ASCLIN instance TC4DX_ASCLIN
+#endif
 
-#define UART_IRQ_ID      (173)
-#define UART_IRQ_PRIO    (100)
+#define UART_IRQ_PRIO  (100)
 
-#define TIMER_IRQ_ID     (10)
-#define TIMER_IRQ_PRIO   (75)
+#define TIMER_IRQ_ID   (10)
+#define TIMER_IRQ_PRIO (75)
 
-#define IPI_IRQ_ID       (1312 + get_cpuid())
-#define IPI_IRQ_PRIO     (52 + get_cpuid())
+#define IPI_IRQ_ID     (1312 + get_cpuid())
+#define IPI_IRQ_PRIO   (52 + get_cpuid())
 
 #endif
