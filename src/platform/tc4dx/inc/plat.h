@@ -25,9 +25,15 @@
 #error Unsupported ASCLIN instance TC4DX_ASCLIN
 #endif
 
-#define UART_IRQ_PRIO  (100)
+#define UART_IRQ_PRIO (100)
 
-#define TIMER_IRQ_ID   (10)
+#if MASTER_CPU < 0 || MASTER_CPU >= PLAT_CPU_NUM
+#error Unsupported MASTER_CPU value
+#endif
+#if VM_ID < 1 || VM_ID > 7
+#error Unsupported VM_ID value
+#endif
+#define TIMER_IRQ_ID   (8 + (16 * MASTER_CPU) + (2 * VM_ID))
 #define TIMER_IRQ_PRIO (75)
 
 #define IPI_IRQ_ID     (1312 + get_cpuid())
