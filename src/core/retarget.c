@@ -105,17 +105,18 @@ int _kill(int pid, int sig)
 extern void arch_init();
 extern int main();
 
-static bool init_done = false;
+static bool volatile init_done = false;
 static spinlock_t init_lock = SPINLOCK_INITVAL;
 
 __attribute__((weak)) void _init()
 {
     spin_lock(&init_lock);
-    if (!init_done) {
-        init_done = true;
+    if (!init_done && cpu_is_master()) {
         uart_init();
+        init_done = true;
     }
     spin_unlock(&init_lock);
+    while (!init_done) { }
 
     arch_init();
 
