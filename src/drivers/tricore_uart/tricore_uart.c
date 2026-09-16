@@ -33,6 +33,11 @@ static inline void tricore_uart_disable_clock(volatile struct asclin_hw* uart)
 
 bool tricore_uart_init(volatile struct asclin_hw* uart)
 {
+    bool prot_run = prot_get_state(&uart->PROTE) == PROT_STATE_RUN;
+    if (prot_run) {
+        prot_set_state(&uart->PROTE, PROT_STATE_CONFIG);
+    }
+
     // Enable module
     uart->CLC = 0x0;
 
@@ -76,6 +81,11 @@ bool tricore_uart_init(volatile struct asclin_hw* uart)
     // Flush FIFOs
     uart->TXFIFOCON |= ASCLIN_TXFIFOCON_FLUSH_MASK;
     uart->RXFIFOCON |= ASCLIN_RXFIFOCON_FLUSH_MASK;
+
+    if (prot_run) {
+        prot_set_state(&uart->PROTE, PROT_STATE_RUN);
+    }
+
     return true;
 }
 
