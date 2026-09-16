@@ -52,6 +52,7 @@ struct PROT_ACCESSEN {
 #define GET_PROT_TAGID(reg)     (((reg) & PROT_TAGID_MASK) >> PROT_TAGID_POS)
 #define GET_PROT_PRSEN(reg)     (((reg) & PROT_PRSEN_MASK) >> PROT_PRSEN_POS)
 #define GET_PROT_PRS(reg)       (((reg) & PROT_PRS_MASK) >> PROT_PRS_POS)
+#define GET_PROT_STATE(reg)     (((reg) & PROT_STATE_MASK) >> PROT_STATE_POS)
 
 #define PROT_STATE_INIT         0UL
 #define PROT_STATE_CONFIG       1UL
@@ -89,6 +90,11 @@ static inline void apu_clear_access_cpu(struct PROT_ACCESSEN* accessen, unsigned
 static inline void prot_set_state(volatile prottos_t* prottos, unsigned long state)
 {
     SET_PROT_STATE(*prottos, state);
+}
+
+static inline unsigned long prot_get_state(volatile prottos_t* prottos)
+{
+    return GET_PROT_STATE(*prottos);
 }
 
 static inline void prot_enable(volatile prottos_t* prottos)
