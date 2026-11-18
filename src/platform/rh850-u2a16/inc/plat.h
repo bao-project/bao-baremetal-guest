@@ -14,7 +14,7 @@
 #define PLAT_RW_MEM_BASE    0xFE100000
 #define PLAT_RW_MEM_SIZE    0x80000
 
-#define PLAT_STACKHEAP_SIZE 0x2000
+#define PLAT_STACKHEAP_SIZE 0x4000
 
 /* --------------------------------------- */
 
