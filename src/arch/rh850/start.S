@@ -8,7 +8,7 @@
 #include <core.h>
 
 #define CPU_MASTER  0x0
-#define STACK_SIZE  0x200
+#define STACK_SIZE  0x800
 
 .macro LOAD_ADDR    sym, reg
     movhi hi(\sym), r0, \reg
