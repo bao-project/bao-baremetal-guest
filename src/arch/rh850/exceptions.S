@@ -140,8 +140,7 @@ ei_ret:
 	eiret
 
 .macro SAVE_REGS
-    addi 124, r0, r20
-    sub r20, sp
+    addi -128, sp, sp
 
     st.dw r0,    0[sp]
     st.dw r2,    8[sp]
@@ -179,8 +178,7 @@ ei_ret:
     ld.dw 112[sp], r28
     ld.dw 120[sp], r30
 
-    addi 124, r0, r20
-    add r20, sp
+    addi 128, sp, sp
 .endm
 
 .extern _irq_handle
