@@ -27,14 +27,13 @@
 #define PLAT_GICD_BASE_ADDR (0x47800000)
 #define PLAT_GICR_BASE_ADDR (0x47900000)
 
-#define UART0               // FTDI UART (USB IS UART9)
-
+/* The board's USB serial port is LINFLEXD_9; define UART0 for LINFLEXD_0, on the J37 header. */
 #ifdef UART0
 #define PLAT_UART_ADDR LINFLEXD_0_BASE
 #define UART_IRQ_ID    244 // LINFLEXD_0
 #define UART_TX_PIN    (LINFLEXD_0_TX_PIN)
 #define UART_RX_PIN    (LINFLEXD_0_RX_PIN)
-#else                      // UART9
+#else
 #define PLAT_UART_ADDR LINFLEXD_9_BASE
 #define UART_IRQ_ID    253 // LINFLEXD_9
 #define UART_TX_PIN    (LINFLEXD_9_TX_PIN)
